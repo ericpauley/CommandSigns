@@ -1,4 +1,4 @@
-package com.hans.CommandSigns;
+package org.zonedabone.commandsigns;
 
 public class CommandSignsLocation {
 	private int x;

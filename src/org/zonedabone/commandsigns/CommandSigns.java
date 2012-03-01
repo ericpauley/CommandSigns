@@ -1,4 +1,4 @@
-package com.hans.CommandSigns;
+package org.zonedabone.commandsigns;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,7 +10,6 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,9 +24,8 @@ public class CommandSigns extends JavaPlugin
 	public final HashMap<String, CommandSignsText> playerText = new HashMap<String, CommandSignsText>();
 	
 	//listeners
-	private final CommandSignsPlayerListener playerListener = new CommandSignsPlayerListener(this);
+	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
 	private CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
-	private final CommandSignsBlockListener blockListener = new CommandSignsBlockListener(this);
 	
 	@Override
 	public void onDisable() 
@@ -47,8 +45,7 @@ public class CommandSigns extends JavaPlugin
 		
 		getCommand("commandsigns").setExecutor(commandExecutor);
 
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener,Event.Priority.Monitor, this);
-		pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Event.Priority.Normal, this);
+		pm.registerEvents(listener, this);
 	}
 	
 	public boolean hasPermission(Player player, String string) {

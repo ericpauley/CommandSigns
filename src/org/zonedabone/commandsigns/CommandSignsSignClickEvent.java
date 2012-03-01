@@ -1,4 +1,4 @@
-package com.hans.CommandSigns;
+package org.zonedabone.commandsigns;
 
 import java.util.ArrayList;
 import java.util.List;

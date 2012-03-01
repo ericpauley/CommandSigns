@@ -1,6 +1,6 @@
 name: CommandSigns
-main: com.hans.CommandSigns.CommandSigns
-author: HansAnderson
+main: org.zonedabone.commandsigns.CommandSigns
+authors: [HansAnderson, zonedabone]
 version: 1.2.0
 description: >
              Add commands to signs.

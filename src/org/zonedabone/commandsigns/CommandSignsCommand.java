@@ -1,4 +1,4 @@
-package com.hans.CommandSigns;
+package org.zonedabone.commandsigns;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
