@@ -7,10 +7,8 @@ import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,7 +27,6 @@ public class CommandSigns extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		saveFile();
-		PluginDescriptionFile pdfFile = this.getDescription();
 	}
 
 	@Override
