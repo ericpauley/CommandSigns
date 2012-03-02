@@ -38,7 +38,7 @@ public class CommandSignsSignClickEvent {
 			return;
 		}
 		List<String> commandList = parseCommandSign(player, plugin.activeSigns.get(location));
-		if(plugin.hasPermission(player,"CommandSigns.use.regular")) {				
+		if(plugin.hasPermission(player,"commandsigns.use.regular")) {				
 			String groupFilter = null;
 			
 			for(String command : commandList)
@@ -64,9 +64,9 @@ public class CommandSignsSignClickEvent {
 					}
 					if(command.indexOf("*") == 1) {
 						command = command.substring(1);
-						if(player.hasPermission("CommandSigns.use.super")) {
-							if(!player.hasPermission("CommandSigns.permissions")) {
-								newPermission = player.addAttachment(plugin, "CommandSigns.permissions", true);
+						if(plugin.hasPermission(player,"commandsigns.use.super")) {
+							if(!plugin.hasPermission(player, "commandsigns.permissions")) {
+								newPermission = player.addAttachment(plugin, "commandsigns.permissions", true);
 							}
 						} else {
 							player.sendMessage("You may not use this type of sign.");
@@ -90,9 +90,11 @@ public class CommandSignsSignClickEvent {
 	}
 	
 	private boolean inGroup(Player player, String group) {
-		String permissionsNode = ("CommandSigns.group." + group);
-		if(player.hasPermission(permissionsNode)) {
+		String permissionsNode = ("commandsigns.group." + group);
+		if(plugin.hasPermission(player, permissionsNode)) {
 			return true;
+		}else if(plugin.hasPermission(player, "commandsigns.group.*")){
+			
 		}
 		player.sendMessage("You do not have that group permission");
 		return false;

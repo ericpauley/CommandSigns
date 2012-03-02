@@ -48,12 +48,16 @@ public class CommandSigns extends JavaPlugin
 		pm.registerEvents(listener, this);
 	}
 	
-	public boolean hasPermission(Player player, String string) {
+	public boolean hasPermission(Player player, String string, boolean notify) {
 		boolean permission = player.hasPermission(string);
-		if(permission == false) {
+		if(permission == false && notify) {
 			player.sendMessage("§cYou do not have permission.");
 		}
 		return permission;
+	}
+	
+	public boolean hasPermission(Player player, String string) {
+		return hasPermission(player,string,true);
 	}
 	
 	public void loadFile() {

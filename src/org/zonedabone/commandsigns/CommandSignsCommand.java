@@ -22,7 +22,7 @@ class CommandSignsCommand implements CommandExecutor {
 			Player player = (Player)sender;
 			String playerName = player.getName();
 			if(args[0].indexOf("line") == 0) {
-				if(plugin.hasPermission(player, "CommandSigns.create.regular") || plugin.hasPermission(player, "CommandSigns.create.super")) {
+				if(plugin.hasPermission(player, "commandsigns.create.regular") || plugin.hasPermission(player, "commandsigns.create.super")) {
 					int lineNumber;
 					try {
 						lineNumber = Integer.parseInt(args[0].substring(4));
@@ -38,7 +38,7 @@ class CommandSignsCommand implements CommandExecutor {
 					for(int i = 1; i < args.length; i++) {
 						line = line.concat(args[i] + ((i != (args.length - 1))?" ":""));
 					}
-					if(line.contains("/*") && !plugin.hasPermission(player, "CommandSigns.create.super")) {
+					if(line.contains("/*") && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
 						while(line.contains("/*")) {
 							line = line.replace("/*", "/");
 						}
@@ -51,23 +51,23 @@ class CommandSignsCommand implements CommandExecutor {
 					player.sendMessage("Ready to add.");
 				}
 			} else if(args[0].equalsIgnoreCase("read")) {
-				if(plugin.hasPermission(player, "CommandSigns.create.regular") || plugin.hasPermission(player, "CommandSigns.create.super")) {
+				if(plugin.hasPermission(player, "commandsigns.create.regular") || plugin.hasPermission(player, "commandsigns.create.super")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.READ);
 					player.sendMessage("Click a sign to read CommandSign text.");
 				}
 			} else if(args[0].equalsIgnoreCase("copy")) {
-				if(plugin.hasPermission(player, "CommandSigns.create.regular") || plugin.hasPermission(player, "CommandSigns.create.super")) {
+				if(plugin.hasPermission(player, "commandsigns.create.regular") || plugin.hasPermission(player, "commandsigns.create.super")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.COPY);
 					player.sendMessage("Click a sign to copy CommandSign text.");
 				}
 			} else if(args[0].equalsIgnoreCase("remove")) {
-				if(plugin.hasPermission(player, "CommandSigns.remove")) {
+				if(plugin.hasPermission(player, "commandsigns.remove")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.DISABLE);
 					player.sendMessage("Click a sign to remove CommandSign.");
 				}
 			} else if(args[0].equalsIgnoreCase("clear")) {
-				if(plugin.hasPermission(player, "CommandSigns.remove") || 
-						plugin.hasPermission(player, "CommandSigns.create.regular") || plugin.hasPermission(player, "CommandSigns.create.super")) {
+				if(plugin.hasPermission(player, "commandsigns.remove") || 
+						plugin.hasPermission(player, "commandsigns.create.regular") || plugin.hasPermission(player, "commandsigns.create.super")) {
 					plugin.playerStates.remove(playerName);
 					plugin.playerText.remove(playerName);
 					player.sendMessage("CommandSign text and status cleared.");

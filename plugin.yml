@@ -1,7 +1,7 @@
 name: CommandSigns
 main: org.zonedabone.commandsigns.CommandSigns
 authors: [HansAnderson, zonedabone]
-version: 1.2.0
+version: 1.2.1
 description: >
              Add commands to signs.
 commands:
@@ -15,41 +15,39 @@ commands:
         /commandsigns remove - Right click a sign to remove a CommandSign.
         /commandsigns clear - Clear your CommandSign clipboard.
 permissions:
-    CommandSigns.*:
+    commandsigns.*:
         description: Gives access to all CommandSigns commands
         children:
-            CommandSigns.create.regular: true
-            CommandSigns.create.super: true
-            CommandSigns.remove: true
-            CommandSigns.use.regular: true
-            CommandSigns.use.super: true
-            CommandSigns.remove: true
-            CommandSigns.group.*: true
-    CommandSigns.create.*:
+            commandsigns.create.*: true
+            commandsigns.remove: true
+            commandsigns.use.*: true
+            commandsigns.group.*: true
+    commandsigns.create.*:
         description: Gives access CommandSigns sign creation commands
         children:
-            CommandSigns.create.regular: true
-            CommandSigns.create.super: true
-    CommandSigns.use.*:
+            commandsigns.create.regular: true
+            commandsigns.create.super: true
+    commandsigns.use.*:
         description: Gives access to CommandSigns sign use
+        default: true
         children:
-            CommandSigns.use.regular: true
-            CommandSigns.use.super: true
-    CommandSigns.create.regular:
+            commandsigns.use.regular: true
+            commandsigns.use.super: true
+    commandsigns.create.regular:
         description: Allows you to create a regular CommandSign
         default: false
-    CommandSigns.create.super:
+    commandsigns.create.super:
         description: Allows you to create a super CommandSign
         default: false
-    CommandSigns.remove:
+    commandsigns.remove:
         description: Allows you to remove a CommandSign
         default: false
-    CommandSigns.use.regular:
+    commandsigns.use.regular:
         description: Allows you to use a regular CommandSign
         default: false
-    CommandSigns.use.super:
+    commandsigns.use.super:
         description: Allows you to use a super CommandSign
         default: false
-    CommandSigns.group.*:
+    commandsigns.group.*:
         description: Allows you to use all group commands
         default: false
