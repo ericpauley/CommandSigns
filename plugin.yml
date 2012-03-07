@@ -1,7 +1,7 @@
 name: CommandSigns
 main: org.zonedabone.commandsigns.CommandSigns
 authors: [HansAnderson, zonedabone]
-version: 1.3.0
+version: 1.3.1
 description: >
              Add commands to signs.
 commands:
@@ -27,6 +27,9 @@ permissions:
         children:
             commandsigns.create.regular: true
             commandsigns.create.super: true
+    commandsigns.import:
+        description: Allows automated importing of [command] or [scs] signs
+        default: true;
     commandsigns.use.*:
         description: Gives access to CommandSigns sign use
         default: true

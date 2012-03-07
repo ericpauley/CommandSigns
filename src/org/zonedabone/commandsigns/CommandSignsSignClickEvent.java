@@ -37,7 +37,10 @@ public class CommandSignsSignClickEvent {
 			return;
 		}
 		if (!plugin.activeSigns.containsKey(location)) {
-			return;
+			if(!importSign(player,location)){
+				return;
+			}
+			
 		}
 		List<String> commandList = parseCommandSign(player,
 				plugin.activeSigns.get(location));
@@ -151,6 +154,21 @@ public class CommandSignsSignClickEvent {
 		plugin.playerStates.remove(player.getName());
 		plugin.playerText.remove(player.getName());
 		player.sendMessage("CommandSign enabled");
+	}
+	
+	public boolean importSign(Player player, CommandSignsLocation l){
+		if(!plugin.hasPermission(player,"commandsigns.import"))return false;
+		Sign s = (Sign) player.getWorld().getBlockAt(l.getX(),l.getY(), l.getZ()).getState();
+		String[] lines = s.getLines();
+		if(lines[0].equalsIgnoreCase("[command]")||lines[0].equalsIgnoreCase("[scs]")){
+			CommandSignsText cst = new CommandSignsText();
+			cst.setLine(1, lines[1]+" "+lines[2]+" "+lines[3]);
+			plugin.activeSigns.put(l,cst);
+			player.sendMessage("Just importing that sign now...");
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public void readSign(Player player, CommandSignsLocation location) {
