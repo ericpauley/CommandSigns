@@ -3,6 +3,7 @@ package org.zonedabone.commandsigns;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -160,9 +161,9 @@ public class CommandSignsSignClickEvent {
 		if(!plugin.hasPermission(player,"commandsigns.import"))return false;
 		Sign s = (Sign) player.getWorld().getBlockAt(l.getX(),l.getY(), l.getZ()).getState();
 		String[] lines = s.getLines();
-		if(lines[0].equalsIgnoreCase("[command]")||lines[0].equalsIgnoreCase("[scs]")){
+		if(ChatColor.stripColor(lines[0]).equalsIgnoreCase("[command]")||ChatColor.stripColor(lines[0]).equalsIgnoreCase("[scs]")){
 			CommandSignsText cst = new CommandSignsText();
-			cst.setLine(1, lines[1]+" "+lines[2]+" "+lines[3]);
+			cst.setLine(1, ChatColor.stripColor(lines[1])+" "+ChatColor.stripColor(lines[2])+" "+ChatColor.stripColor(lines[3]));
 			plugin.activeSigns.put(l,cst);
 			player.sendMessage("Just importing that sign now...");
 			return true;
