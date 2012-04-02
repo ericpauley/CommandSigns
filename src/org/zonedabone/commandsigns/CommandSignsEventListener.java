@@ -11,35 +11,31 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class CommandSignsEventListener implements Listener {
-
+	
 	private CommandSigns plugin;
-
+	
 	public CommandSignsEventListener(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
-
+	
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (event.isCancelled()) {
 			return;
 		}
 		Block block = event.getBlock();
-		if (block.getType() == Material.SIGN_POST
-				|| block.getType() == Material.WALL_SIGN) {
-			CommandSignsLocation location = new CommandSignsLocation(
-					block.getX(), block.getY(), block.getZ());
+		if (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN) {
+			CommandSignsLocation location = new CommandSignsLocation(block.getX(), block.getY(), block.getZ(), block.getWorld());
 			if (plugin.activeSigns.containsKey(location)) {
-				event.getPlayer().sendMessage(
-						"§cCommandSign text must be removed first.");
+				event.getPlayer().sendMessage("§cCommandSign text must be removed first.");
 				event.setCancelled(true);
 			}
 		}
 	}
-
+	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		CommandSignsSignClickEvent signClickEvent = new CommandSignsSignClickEvent(
-				plugin);
+		CommandSignsSignClickEvent signClickEvent = new CommandSignsSignClickEvent(plugin);
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			BlockState state = event.getClickedBlock().getState();
 			if (state instanceof Sign) {

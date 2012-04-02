@@ -1,12 +1,13 @@
 name: CommandSigns
 main: org.zonedabone.commandsigns.CommandSigns
 authors: [HansAnderson, zonedabone]
-version: 1.3.2
+version: 1.4.0
 description: >
              Add commands to signs.
+depend: [Vault]
 commands:
   commandsigns:
-    aliases:
+    aliases: [cs]
     description: CommandSigns commands.
     usage: |
         /commandsigns line<number> - Add a line to your CommandSign clipboard. Right click a sign to activate.
@@ -22,6 +23,7 @@ permissions:
             commandsigns.remove: true
             commandsigns.use.*: true
             commandsigns.group.*: true
+        default: op
     commandsigns.create.*:
         description: Gives access CommandSigns sign creation commands
         children:

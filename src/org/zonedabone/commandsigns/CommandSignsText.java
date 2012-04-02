@@ -1,17 +1,62 @@
 package org.zonedabone.commandsigns;
 
+
 public class CommandSignsText {
-
+	
 	private String[] text = new String[10];
-
-	CommandSignsText() {
+	private String owner;
+	
+	CommandSignsText(String owner) {
+		this.owner = owner;
 		for (int i = 0; i < 10; i++) {
-			this.text[i] = null;
+			text[i] = null;
 		}
 	}
-
+	
+	public CommandSignsText clone(String owner){
+		CommandSignsText cst = new CommandSignsText(owner);
+		cst.setText(text.clone());
+		return cst;
+	}
+	
+	public String getLine(int index) {
+		if (index < 0 || index >= 10) {
+			return null;
+		}
+		return text[index];
+	}
+	
 	public String[] getText() {
-		return this.text;
+		return text;
+	}
+	
+	public void setText(String[] text){
+		this.text = text;
+	}
+	
+	public boolean setLine(int index, String line) {
+		if (index < 0 || index >= 10) {
+			return false;
+		}
+		text[index] = line;
+		return true;
+	}
+	
+	public String toFileString() {
+		String string = "";
+		String line;
+		for (int i = 0; i < 10; i++) {
+			line = getLine(i);
+			if (line != null && !line.equals("")) {
+				string = string.concat(getLine(i) + "[LINEBREAK]");
+			}
+		}
+		return string;
+	}
+	
+	
+	public String getOwner() {
+		return owner;
 	}
 
 	@Override
@@ -19,36 +64,9 @@ public class CommandSignsText {
 		String string = "";
 		String line;
 		for (int i = 0; i < 10; i++) {
-			line = this.getLine(i);
+			line = getLine(i);
 			if (line != null) {
-				string = string.concat(this.getLine(i) + ((i != 9) ? " " : ""));
-			}
-		}
-		return string;
-	}
-
-	public String getLine(int index) {
-		if (index < 0 || index >= 10) {
-			return null;
-		}
-		return this.text[index];
-	}
-
-	public boolean setLine(int index, String line) {
-		if (index < 0 || index >= 10) {
-			return false;
-		}
-		this.text[index] = line;
-		return true;
-	}
-
-	public String toFileString() {
-		String string = "";
-		String line;
-		for (int i = 0; i < 10; i++) {
-			line = this.getLine(i);
-			if (line != null && !line.equals("")) {
-				string = string.concat(this.getLine(i) + "[LINEBREAK]");
+				string = string.concat(getLine(i) + (i != 9 ? " " : ""));
 			}
 		}
 		return string;
