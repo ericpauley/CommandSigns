@@ -237,7 +237,7 @@ public class CommandSignsSignClickEvent {
 				}
 				if (command.startsWith("\\")) {
 					String msg = command.substring(1);
-					player.sendMessage(msg);
+					player.sendMessage(msg.replaceAll("&([0-9A-FK-OR])", "\u00A7$1"));
 					continue;
 				}
 			}
