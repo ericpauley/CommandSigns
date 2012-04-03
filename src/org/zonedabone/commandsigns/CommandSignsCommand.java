@@ -56,22 +56,22 @@ class CommandSignsCommand implements CommandExecutor {
 					player.sendMessage("Line " + lineNumber + ": " + line);
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
 					player.sendMessage("Ready to add.");
-				}else{
-					player.sendMessage(ChatColor.RED+"You do not have perisssion.");
+				} else {
+					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
 				}
 			} else if (args[0].equalsIgnoreCase("read")) {
 				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super", false)) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.READ);
 					player.sendMessage("Click a sign to read CommandSign text.");
-				}else{
-					player.sendMessage(ChatColor.RED+"You do not have perisssion.");
+				} else {
+					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
 				}
 			} else if (args[0].equalsIgnoreCase("copy")) {
 				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super", false)) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.COPY);
 					player.sendMessage("Click a sign to copy CommandSign text.");
-				}else{
-					player.sendMessage(ChatColor.RED+"You do not have perisssion.");
+				} else {
+					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
 				}
 			} else if (args[0].equalsIgnoreCase("remove")) {
 				if (plugin.hasPermission(player, "commandsigns.remove")) {
@@ -83,8 +83,8 @@ class CommandSignsCommand implements CommandExecutor {
 					plugin.playerStates.remove(playerName);
 					plugin.playerText.remove(playerName);
 					player.sendMessage("CommandSign text and status cleared.");
-				}else{
-					player.sendMessage(ChatColor.RED+"You do not have perisssion.");
+				} else {
+					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
 				}
 			} else {
 				player.sendMessage("Wrong CommandSigns command syntax.");

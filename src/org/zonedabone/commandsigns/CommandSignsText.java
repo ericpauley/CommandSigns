@@ -1,10 +1,9 @@
 package org.zonedabone.commandsigns;
 
-
 public class CommandSignsText {
 	
-	private String[] text = new String[10];
 	private String owner;
+	private String[] text = new String[10];
 	
 	CommandSignsText(String owner) {
 		this.owner = owner;
@@ -13,7 +12,7 @@ public class CommandSignsText {
 		}
 	}
 	
-	public CommandSignsText clone(String owner){
+	public CommandSignsText clone(String owner) {
 		CommandSignsText cst = new CommandSignsText(owner);
 		cst.setText(text.clone());
 		return cst;
@@ -26,12 +25,12 @@ public class CommandSignsText {
 		return text[index];
 	}
 	
-	public String[] getText() {
-		return text;
+	public String getOwner() {
+		return owner;
 	}
 	
-	public void setText(String[] text){
-		this.text = text;
+	public String[] getText() {
+		return text;
 	}
 	
 	public boolean setLine(int index, String line) {
@@ -40,6 +39,10 @@ public class CommandSignsText {
 		}
 		text[index] = line;
 		return true;
+	}
+	
+	public void setText(String[] text) {
+		this.text = text;
 	}
 	
 	public String toFileString() {
@@ -54,11 +57,6 @@ public class CommandSignsText {
 		return string;
 	}
 	
-	
-	public String getOwner() {
-		return owner;
-	}
-
 	@Override
 	public String toString() {
 		String string = "";

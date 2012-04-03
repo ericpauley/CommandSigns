@@ -49,7 +49,7 @@ public class CommandSigns extends JavaPlugin {
 	
 	public void loadFile() {
 		try {
-			File file = new File(this.getDataFolder(), "signs.dat");
+			File file = new File(getDataFolder(), "signs.dat");
 			if (file.exists()) {
 				FileInputStream inStream = new FileInputStream(file);
 				Scanner scanner = new Scanner(inStream);
@@ -63,8 +63,9 @@ public class CommandSigns extends JavaPlugin {
 							data = line.split(":", 2);
 							String[] extra = data[0].split("\\|");
 							CommandSignsLocation location = CommandSignsLocation.fromFileString(extra[0]);
-							if (location == null)
+							if (location == null) {
 								continue;
+							}
 							textData = data[1].split("\\[LINEBREAK]");
 							CommandSignsText text;
 							if (extra.length >= 2) {
@@ -106,9 +107,9 @@ public class CommandSigns extends JavaPlugin {
 	
 	public void saveFile() {
 		try {
-			File file = new File(this.getDataFolder(), "signs.dat");
+			File file = new File(getDataFolder(), "signs.dat");
 			if (!file.exists()) {
-				this.getDataFolder().mkdir();
+				getDataFolder().mkdir();
 				file.createNewFile();
 			}
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -121,7 +122,7 @@ public class CommandSigns extends JavaPlugin {
 			}
 			writer.close();
 		} catch (IOException ex) {
-			this.getLogger().severe("Failed to save signs!");
+			getLogger().severe("Failed to save signs!");
 			ex.printStackTrace();
 		}
 	}

@@ -126,7 +126,7 @@ public class CommandSignsSignClickEvent {
 		if (in) {
 			return true;
 		} else {
-			player.sendMessage(ChatColor.RED+"You are not in the rquired group to run this command.");
+			player.sendMessage(ChatColor.RED + "You are not in the rquired group to run this command.");
 			return false;
 		}
 	}
@@ -157,6 +157,17 @@ public class CommandSignsSignClickEvent {
 			boolean groupFiltered = false;
 			boolean moneyFiltered = false;
 			for (String command : commandList) {
+				if (command.startsWith("%")) {
+					double amount = 0;
+					try {
+						amount = Double.parseDouble(command.substring(1));
+					} catch (NumberFormatException e) {
+					}
+					try {
+						Thread.sleep((long) (amount * 1000));
+					} catch (InterruptedException e) {
+					}
+				}
 				if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
 					if (command.equals("@")) {
 						groupFiltered = false;
@@ -175,8 +186,8 @@ public class CommandSignsSignClickEvent {
 						} catch (NumberFormatException e) {
 						}
 						moneyFiltered = !CommandSigns.economy.withdrawPlayer(player.getName(), amount).transactionSuccess();
-						if(moneyFiltered){
-							player.sendMessage(ChatColor.RED+"You cannot afford to use this CommandSign. ("+CommandSigns.economy.format(amount)+")");
+						if (moneyFiltered) {
+							player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
 						}
 					}
 				}
@@ -194,8 +205,13 @@ public class CommandSignsSignClickEvent {
 						if (command.startsWith("/*")) {
 							command = command.substring(1);
 							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-								/*for (Map.Entry<String, Boolean> s : Bukkit.getPluginManager().getPermission("commandsigns.permissions").getChildren().entrySet()) {
-								}*/
+								/*
+								 * for (Map.Entry<String, Boolean> s :
+								 * Bukkit.getPluginManager
+								 * ().getPermission("commandsigns.permissions"
+								 * ).getChildren().entrySet()) {
+								 * }
+								 */
 								perm = player.addAttachment(plugin, "commandsigns.permissions", true);
 								player.performCommand(command.substring(1));
 							} else {

@@ -34,13 +34,19 @@ public class CommandSignsEventListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		CommandSignsSignClickEvent signClickEvent = new CommandSignsSignClickEvent(plugin);
+	public void onPlayerInteract(final PlayerInteractEvent event) {
+		final CommandSignsSignClickEvent signClickEvent = new CommandSignsSignClickEvent(plugin);
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			BlockState state = event.getClickedBlock().getState();
 			if (state instanceof Sign) {
-				Sign sign = (Sign) state;
-				signClickEvent.onRightClick(event, sign);
+				final Sign sign = (Sign) state;
+				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+					
+					@Override
+					public void run() {
+						signClickEvent.onRightClick(event, sign);
+					}
+				});
 			}
 		}
 	}
