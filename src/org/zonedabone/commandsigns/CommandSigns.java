@@ -22,6 +22,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.zonedabone.commandsigns.Metrics.Graph;
+import org.zonedabone.commandsigns.Metrics.Plotter;
 
 public class CommandSigns extends JavaPlugin {
 	
@@ -36,6 +38,7 @@ public class CommandSigns extends JavaPlugin {
 	public final Map<String, CommandSignsText> playerText = new HashMap<String, CommandSignsText>();
 	public final Map<CommandSignsLocation, Map<String, Long>> timeouts = new ConcurrentHashMap<CommandSignsLocation, Map<String, Long>>();
 	public final Set<String> running = Collections.synchronizedSet(new HashSet<String>());
+	private Metrics metrics;
 	
 	public synchronized Map<String, Long> getSignTimeouts(CommandSignsLocation csl) {
 		Map<String, Long> toReturn = timeouts.get(csl);
@@ -63,6 +66,30 @@ public class CommandSigns extends JavaPlugin {
 		return perm;
 	}
 	
+	public void startMetrics() {
+		try {
+			metrics = new Metrics(this);
+		} catch (IOException e) {
+			this.getLogger().warning("Could not initialize metrics.");
+			e.printStackTrace();
+			return;
+		}
+		Graph g = metrics.createGraph("Number of CommandSigns");
+		g.addPlotter(new Plotter() {
+			
+			@Override
+			public int getValue() {
+				return activeSigns.size();
+			}
+		});
+		if(metrics.start()){
+			this.getLogger().info("Plugin metrics enabled! Thank you!");
+		}else{
+			this.getLogger().info("You opted out of CommandSigns metrics. =(");
+		}
+		
+	}
+	
 	public void loadFile() {
 		try {
 			File file = new File(getDataFolder(), "signs.dat");
@@ -79,10 +106,10 @@ public class CommandSigns extends JavaPlugin {
 								int x = Integer.parseInt(raw[1]);
 								int y = Integer.parseInt(raw[2]);
 								int z = Integer.parseInt(raw[3]);
-								CommandSignsLocation csl = new CommandSignsLocation(Bukkit.getWorld(world),x,y,z);
+								CommandSignsLocation csl = new CommandSignsLocation(Bukkit.getWorld(world), x, y, z);
 								String owner = raw[4];
 								CommandSignsText cst = new CommandSignsText(owner);
-								for(String command:raw[5].split("\u00B6")){
+								for (String command : raw[5].split("\u00B6")) {
 									cst.getText().add(command);
 								}
 								activeSigns.put(csl, cst);
@@ -129,6 +156,7 @@ public class CommandSigns extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		getCommand("commandsigns").setExecutor(commandExecutor);
 		pm.registerEvents(listener, this);
+		startMetrics();
 		setupPermissions();
 		setupEconomy();
 	}
@@ -145,8 +173,8 @@ public class CommandSigns extends JavaPlugin {
 			for (Map.Entry<CommandSignsLocation, CommandSignsText> entry : activeSigns.entrySet()) {
 				String commands = "";
 				entry.getValue().trim();
-				for(String command:entry.getValue().getText()){
-					if(!commands.equals(""))
+				for (String command : entry.getValue().getText()) {
+					if (!commands.equals(""))
 						commands += "\u00B6";
 					commands += command;
 				}
@@ -163,7 +191,7 @@ public class CommandSigns extends JavaPlugin {
 				line += entry.getValue().getOwner();
 				line += sep;
 				line += commands;
-				writer.write(line+"\n");
+				writer.write(line + "\n");
 			}
 			writer.close();
 		} catch (IOException ex) {
