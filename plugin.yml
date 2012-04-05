@@ -7,7 +7,7 @@ description: >
 depend: [Vault]
 commands:
   commandsigns:
-    aliases: [cs]
+    aliases: [cs, cmds, cmdsigns]
     description: CommandSigns commands.
     usage: |
         /commandsigns line<number> - Add a line to your CommandSign clipboard. Right click a sign to activate.
