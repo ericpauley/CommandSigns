@@ -31,29 +31,22 @@ class CommandSignsCommand implements CommandExecutor {
 						player.sendMessage("Line number invalid!");
 						return true;
 					}
-					CommandSignsText text;
-					if ((text = plugin.playerText.get(playerName)) == null) {
+					CommandSignsText text = plugin.playerText.get(playerName);
+					if (text == null) {
 						text = new CommandSignsText(player.getName());
+						plugin.playerText.put(playerName, text);
 					}
 					String line = "";
 					for (int i = 1; i < args.length; i++) {
-						line = line.concat(args[i] + (i != args.length - 1 ? " " : ""));
+						line = line.concat((i == 0 ? "" : " ") + args[i]);
 					}
-					if ((line.contains("/*") || line.contains("/^") || line.contains("/#")) && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
-						while (line.contains("/*")) {
-							line = line.replace("/*", "/");
-						}
-						while (line.contains("/^")) {
-							line = line.replace("/^", "/");
-						}
-						while (line.contains("/#")) {
-							line = line.replace("#", "/");
-						}
+					if ((line.startsWith("/*") || line.startsWith("/^") || line.startsWith("/#")) && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
+						line = "/" + line.substring(2);
 						player.sendMessage("You may not make signs with '/*', '/^', or '/#'");
 					}
 					text.setLine(lineNumber, line);
-					plugin.playerText.put(playerName, text);
-					player.sendMessage("Line " + lineNumber + ": " + line);
+					text.trim();
+					player.sendMessage(lineNumber + ": " + line);
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
 					player.sendMessage("Ready to add.");
 				} else {

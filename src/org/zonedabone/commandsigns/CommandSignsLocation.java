@@ -14,7 +14,7 @@ public class CommandSignsLocation {
 			int y = Integer.parseInt(data[1]);
 			int z = Integer.parseInt(data[2]);
 			if (data.length == 4) {
-				CommandSignsLocation csl = new CommandSignsLocation(x, y, z, Bukkit.getWorld(data[3]));
+				CommandSignsLocation csl = new CommandSignsLocation(Bukkit.getWorld(data[3]), x, y, z);
 				if (csl.check()) {
 					return csl;
 				} else {
@@ -24,7 +24,7 @@ public class CommandSignsLocation {
 				for (World w : Bukkit.getWorlds()) {
 					Block b = w.getBlockAt(x, y, z);
 					if (b.getType() == Material.SIGN_POST || b.getType() == Material.WALL_SIGN) {
-						return new CommandSignsLocation(x, y, z, w);
+						return new CommandSignsLocation(w, x, y, z);
 					}
 				}
 				return null;
@@ -38,7 +38,7 @@ public class CommandSignsLocation {
 	private int y;
 	private int z;
 	
-	CommandSignsLocation(int x, int y, int z, World world) {
+	CommandSignsLocation(World world, int x, int y, int z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;

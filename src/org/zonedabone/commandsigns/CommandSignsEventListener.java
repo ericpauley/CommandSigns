@@ -25,7 +25,7 @@ public class CommandSignsEventListener implements Listener {
 		}
 		Block block = event.getBlock();
 		if (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN) {
-			CommandSignsLocation location = new CommandSignsLocation(block.getX(), block.getY(), block.getZ(), block.getWorld());
+			CommandSignsLocation location = new CommandSignsLocation(block.getWorld(), block.getX(), block.getY(), block.getZ());
 			if (plugin.activeSigns.containsKey(location)) {
 				event.getPlayer().sendMessage("§cCommandSign text must be removed first.");
 				event.setCancelled(true);
@@ -40,13 +40,12 @@ public class CommandSignsEventListener implements Listener {
 			BlockState state = event.getClickedBlock().getState();
 			if (state instanceof Sign) {
 				final Sign sign = (Sign) state;
-				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
-					
+				new Thread(){
 					@Override
 					public void run() {
 						signClickEvent.onRightClick(event, sign);
 					}
-				});
+				}.start();
 			}
 		}
 	}

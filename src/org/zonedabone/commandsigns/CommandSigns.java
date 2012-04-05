@@ -5,13 +5,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -22,13 +27,24 @@ public class CommandSigns extends JavaPlugin {
 	
 	public static Economy economy = null;
 	public static Permission permission = null;
-	public final HashMap<CommandSignsLocation, CommandSignsText> activeSigns = new HashMap<CommandSignsLocation, CommandSignsText>();
+	public final Map<CommandSignsLocation, CommandSignsText> activeSigns = new HashMap<CommandSignsLocation, CommandSignsText>();
 	private CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
 	// listeners
 	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
 	// plugin variables
-	public final HashMap<String, CommandSignsPlayerState> playerStates = new HashMap<String, CommandSignsPlayerState>();
-	public final HashMap<String, CommandSignsText> playerText = new HashMap<String, CommandSignsText>();
+	public final Map<String, CommandSignsPlayerState> playerStates = new HashMap<String, CommandSignsPlayerState>();
+	public final Map<String, CommandSignsText> playerText = new HashMap<String, CommandSignsText>();
+	public final Map<CommandSignsLocation, Map<String, Long>> timeouts = new ConcurrentHashMap<CommandSignsLocation, Map<String, Long>>();
+	public final Set<String> running = Collections.synchronizedSet(new HashSet<String>());
+	
+	public synchronized Map<String, Long> getSignTimeouts(CommandSignsLocation csl) {
+		Map<String, Long> toReturn = timeouts.get(csl);
+		if (toReturn == null) {
+			toReturn = new ConcurrentHashMap<String, Long>();
+			timeouts.put(csl, toReturn);
+		}
+		return toReturn;
+	}
 	
 	public boolean hasPermission(Player player, String string) {
 		return hasPermission(player, string, true);
@@ -53,30 +69,42 @@ public class CommandSigns extends JavaPlugin {
 			if (file.exists()) {
 				FileInputStream inStream = new FileInputStream(file);
 				Scanner scanner = new Scanner(inStream);
-				String line;
-				String[] data;
-				String[] textData;
 				while (scanner.hasNextLine()) {
 					try {
-						line = scanner.nextLine();
+						String line = scanner.nextLine();
 						if (!line.equals("")) {
-							data = line.split(":", 2);
-							String[] extra = data[0].split("\\|");
-							CommandSignsLocation location = CommandSignsLocation.fromFileString(extra[0]);
-							if (location == null) {
-								continue;
-							}
-							textData = data[1].split("\\[LINEBREAK]");
-							CommandSignsText text;
-							if (extra.length >= 2) {
-								text = new CommandSignsText(extra[1]);
+							if (line.contains("\u00A7")) {
+								String[] raw = line.split("\u00A7");
+								String world = raw[0];
+								int x = Integer.parseInt(raw[1]);
+								int y = Integer.parseInt(raw[2]);
+								int z = Integer.parseInt(raw[3]);
+								CommandSignsLocation csl = new CommandSignsLocation(Bukkit.getWorld(world),x,y,z);
+								String owner = raw[4];
+								CommandSignsText cst = new CommandSignsText(owner);
+								for(String command:raw[5].split("\u00B6")){
+									cst.getText().add(command);
+								}
+								activeSigns.put(csl, cst);
 							} else {
-								text = new CommandSignsText(null);
+								String[] data = line.split(":", 2);
+								String[] extra = data[0].split("\\|");
+								CommandSignsLocation location = CommandSignsLocation.fromFileString(extra[0]);
+								if (location == null) {
+									continue;
+								}
+								String[] textData = data[1].split("\\[LINEBREAK]");
+								CommandSignsText text;
+								if (extra.length >= 2) {
+									text = new CommandSignsText(extra[1]);
+								} else {
+									text = new CommandSignsText(null);
+								}
+								for (int i = 0; i < textData.length; i++) {
+									text.setLine(i, textData[i]);
+								}
+								activeSigns.put(location, text);
 							}
-							for (int i = 0; i < textData.length; i++) {
-								text.setLine(i, textData[i]);
-							}
-							activeSigns.put(location, text);
 						}
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -115,10 +143,27 @@ public class CommandSigns extends JavaPlugin {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			writer.write("");
 			for (Map.Entry<CommandSignsLocation, CommandSignsText> entry : activeSigns.entrySet()) {
-				String keyString = entry.getKey().toFileString();
-				CommandSignsText value = entry.getValue();
-				String line = keyString + "|" + value.getOwner() + ":" + value.toFileString() + "\n";
-				writer.write(line);
+				String commands = "";
+				entry.getValue().trim();
+				for(String command:entry.getValue().getText()){
+					if(!commands.equals(""))
+						commands += "\u00B6";
+					commands += command;
+				}
+				CommandSignsLocation csl = entry.getKey();
+				String sep = "\u00A7";
+				String line = csl.getWorld().getName();
+				line += sep;
+				line += csl.getX();
+				line += sep;
+				line += csl.getY();
+				line += sep;
+				line += csl.getZ();
+				line += sep;
+				line += entry.getValue().getOwner();
+				line += sep;
+				line += commands;
+				writer.write(line+"\n");
 			}
 			writer.close();
 		} catch (IOException ex) {
