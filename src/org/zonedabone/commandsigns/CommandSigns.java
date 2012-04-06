@@ -82,12 +82,57 @@ public class CommandSigns extends JavaPlugin {
 				return activeSigns.size();
 			}
 		});
-		if(metrics.start()){
+		Graph g2 = metrics.createGraph("Super Signs Used");
+		g2.addPlotter(new Plotter("Permission") {
+			
+			@Override
+			public int getValue() {
+				int number = 0;
+				for (CommandSignsText cst : activeSigns.values()) {
+					for (String s : cst.getText()) {
+						if (s.startsWith("/*") || s.startsWith("!/*")) {
+							number++;
+						}
+					}
+				}
+				return number;
+			}
+		});
+		g2.addPlotter(new Plotter("Op") {
+			
+			@Override
+			public int getValue() {
+				int number = 0;
+				for (CommandSignsText cst : activeSigns.values()) {
+					for (String s : cst.getText()) {
+						if (s.startsWith("/^") || s.startsWith("!/^")) {
+							number++;
+						}
+					}
+				}
+				return number;
+			}
+		});
+		g2.addPlotter(new Plotter("Console") {
+			
+			@Override
+			public int getValue() {
+				int number = 0;
+				for (CommandSignsText cst : activeSigns.values()) {
+					for (String s : cst.getText()) {
+						if (s.startsWith("/#") || s.startsWith("!/#")) {
+							number++;
+						}
+					}
+				}
+				return number;
+			}
+		});
+		if (metrics.start()) {
 			this.getLogger().info("Plugin metrics enabled! Thank you!");
-		}else{
+		} else {
 			this.getLogger().info("You opted out of CommandSigns metrics. =(");
 		}
-		
 	}
 	
 	public void loadFile() {
