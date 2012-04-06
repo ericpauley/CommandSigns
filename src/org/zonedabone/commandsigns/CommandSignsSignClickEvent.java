@@ -114,7 +114,7 @@ public class CommandSignsSignClickEvent {
 	}
 	
 	public void onRightClick(PlayerInteractEvent event, Sign sign) {
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		CommandSignsLocation location = new CommandSignsLocation(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
 		CommandSignsPlayerState state = plugin.playerStates.get(player.getName());
 		if (state != null) {
@@ -187,9 +187,7 @@ public class CommandSignsSignClickEvent {
 						if (show)
 							player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
 					}
-					continue;
-				}
-				if (command.startsWith("%")) {
+				}else if (command.startsWith("%")) {
 					double amount = 0;
 					try {
 						amount = Double.parseDouble(command.substring(1));
@@ -199,21 +197,16 @@ public class CommandSignsSignClickEvent {
 						Thread.sleep((long) (amount * 1000));
 					} catch (InterruptedException e) {
 					}
-				}
-				if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
+				}else if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
 					permFiltered = !plugin.hasPermission(player, command.substring(1));
 					if (permFiltered && show) {
 						player.sendMessage(ChatColor.RED + "You don't have permission to use this CommandSign.");
 					}
-					continue;
-				}
-				if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
+				}else if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
 					groupFiltered = !inGroup(player, command.substring(1));
 					if (groupFiltered && show)
 						player.sendMessage(ChatColor.RED + "You are not in the rquired group to run this command.");
-					continue;
-				}
-				if (CommandSigns.economy != null && CommandSigns.economy.isEnabled() && command.startsWith("$")) {
+				}else if (CommandSigns.economy != null && CommandSigns.economy.isEnabled() && command.startsWith("$")) {
 					double amount = 0;
 					try {
 						amount = Double.parseDouble(command.substring(1));
@@ -223,75 +216,84 @@ public class CommandSignsSignClickEvent {
 					if (moneyFiltered && show) {
 						player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
 					}
-					continue;
-				}
-				if (command.startsWith("/")) {
-					boolean op = false;
-					List<PermissionAttachment> given = new ArrayList<PermissionAttachment>();
-					List<String> vGiven = new ArrayList<String>();
-					if (command.length() <= 1) {
-						if (show)
-							player.sendMessage("Error, SignCommand /command is of length 0.");
-						continue;
-					}
-					try {
-						if (command.startsWith("/*")) {
-							command = command.substring(1);
-							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-								for (Map.Entry<String, Boolean> s : Bukkit.getPluginManager().getPermission("commandsigns.permissions").getChildren().entrySet()) {
-									given.add(player.addAttachment(plugin, s.getKey(), s.getValue()));
-									if (CommandSigns.permission.playerHas(player, s.getKey()) != s.getValue()) {
-										String node = (s.getValue() ? "" : "-") + s.getKey();
-										CommandSigns.permission.playerAdd(player, node);
-										vGiven.add(node);
+				}else if (command.startsWith("/")) {
+					final boolean fShow = show;
+					final String fCommand = command;
+					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+						
+						private boolean show = fShow;
+						private String command = fCommand;
+						
+						@Override
+						public void run() {
+							boolean op = false;
+							List<PermissionAttachment> given = new ArrayList<PermissionAttachment>();
+							List<String> vGiven = new ArrayList<String>();
+							if (command.length() <= 1) {
+								if (show)
+									player.sendMessage("Error, SignCommand /command is of length 0.");
+								return;
+							}
+							try {
+								if (command.startsWith("/*")) {
+									command = command.substring(1);
+									if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
+										for (Map.Entry<String, Boolean> s : Bukkit.getPluginManager().getPermission("commandsigns.permissions").getChildren().entrySet()) {
+											given.add(player.addAttachment(plugin, s.getKey(), s.getValue()));
+											if (CommandSigns.permission.playerHas(player, s.getKey()) != s.getValue()) {
+												String node = (s.getValue() ? "" : "-") + s.getKey();
+												CommandSigns.permission.playerAdd(player, node);
+												vGiven.add(node);
+											}
+										}
+										given.add(player.addAttachment(plugin, "commandsigns.permissions", true));
+										player.performCommand(command.substring(1));
+									} else {
+										if (show)
+											player.sendMessage("You may not use this type of sign.");
+										return;
 									}
+								} else if (command.startsWith("/^")) {
+									command = command.substring(1);
+									if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
+										if (!player.isOp()) {
+											op = true;
+											player.setOp(true);
+										}
+										player.performCommand(command.substring(1));
+									} else {
+										if (show)
+											player.sendMessage("You may not use this type of sign.");
+										return;
+									}
+								} else if (command.startsWith("/#")) {
+									command = command.substring(1);
+									if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
+										plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.substring(1));
+									} else {
+										if (show)
+											player.sendMessage("You may not use this type of sign.");
+										return;
+									}
+								} else {
+									player.performCommand(command.substring(1));
 								}
-								given.add(player.addAttachment(plugin, "commandsigns.permissions", true));
-								player.performCommand(command.substring(1));
-							} else {
-								if (show)
-									player.sendMessage("You may not use this type of sign.");
-								continue;
-							}
-						} else if (command.startsWith("/^")) {
-							command = command.substring(1);
-							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-								if (!player.isOp()) {
-									op = true;
-									player.setOp(true);
+							} finally {
+								for (PermissionAttachment pa : given) {
+									pa.remove();
 								}
-								player.performCommand(command.substring(1));
-							} else {
-								if (show)
-									player.sendMessage("You may not use this type of sign.");
-								continue;
+								for (String s : vGiven) {
+									CommandSigns.permission.playerRemove(player, s);
+								}
+								if (op) {
+									player.setOp(false);
+								}
 							}
-						} else if (command.startsWith("/#")) {
-							command = command.substring(1);
-							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-								plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.substring(1));
-							} else {
-								if (show)
-									player.sendMessage("You may not use this type of sign.");
-								continue;
-							}
-						} else {
-							player.performCommand(command.substring(1));
 						}
-					} finally {
-						for (PermissionAttachment pa : given) {
-							pa.remove();
-						}
-						for (String s : vGiven) {
-							CommandSigns.permission.playerRemove(player, s);
-						}
-						if (op) {
-							player.setOp(false);
-						}
-					}
-					continue;
-				}
-				if (command.startsWith("\\")) {
+						
+					});
+					
+				}else if (command.startsWith("\\")) {
 					String msg = command.substring(1);
 					if (show)
 						player.sendMessage(msg.replaceAll("&([0-9A-FK-OR])", "\u00A7$1"));
