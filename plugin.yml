@@ -1,7 +1,7 @@
 name: CommandSigns
 main: org.zonedabone.commandsigns.CommandSigns
 authors: [HansAnderson, zonedabone]
-version: 1.5.1
+version: 1.5.2
 description: >
              Add commands to signs.
 depend: [Vault]
@@ -23,6 +23,7 @@ permissions:
             commandsigns.remove: true
             commandsigns.use.*: true
             commandsigns.group.*: true
+            commandsigns.update: true
         default: op
     commandsigns.create.*:
         description: Gives access CommandSigns sign creation commands
@@ -55,4 +56,7 @@ permissions:
         default: false
     commandsigns.group.*:
         description: Allows you to use all group commands
+        default: false
+    commandsigns.updates:
+        description: Shows this player CommandSigns updates and allows them to update
         default: false

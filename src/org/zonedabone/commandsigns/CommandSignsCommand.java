@@ -1,5 +1,12 @@
 package org.zonedabone.commandsigns;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,7 +27,7 @@ class CommandSignsCommand implements CommandExecutor {
 			if (args.length < 1) {
 				return false;
 			}
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 			String playerName = player.getName();
 			if (args[0].indexOf("line") == 0) {
 				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super", false)) {
@@ -78,6 +85,49 @@ class CommandSignsCommand implements CommandExecutor {
 					player.sendMessage("CommandSign text and status cleared.");
 				} else {
 					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
+				}
+			} else if (args[0].equalsIgnoreCase("update")) {
+				if (player.hasPermission("commandsigns.update")) {
+					if (plugin.version<plugin.newestVersion) {
+						if (!plugin.getUpdateFile().exists()) {
+							player.sendMessage(ChatColor.YELLOW + "Updating CommandSigns to version " + ChatColor.DARK_PURPLE + plugin.stringNew + ChatColor.YELLOW + "...");
+							new Thread() {
+								
+								@Override
+								public void run() {
+									try {
+										long startTime = System.currentTimeMillis();
+										URL url = new URL(plugin.downloadLocation);
+										url.openConnection();
+										InputStream reader = url.openStream();
+										File f = plugin.getUpdateFile();
+										f.getParentFile().mkdirs();
+										FileOutputStream writer = new FileOutputStream(f);
+										byte[] buffer = new byte[153600];
+										int totalBytesRead = 0;
+										int bytesRead = 0;
+										while ((bytesRead = reader.read(buffer)) > 0) {
+											writer.write(buffer, 0, bytesRead);
+											buffer = new byte[153600];
+											totalBytesRead += bytesRead;
+										}
+										long endTime = System.currentTimeMillis();
+										player.sendMessage(ChatColor.YELLOW + "Downloaded " + ChatColor.DARK_PURPLE + (((totalBytesRead)) / 1000) + ChatColor.YELLOW + " KB in " + ChatColor.DARK_PURPLE + (((double) (endTime - startTime)) / 1000) + ChatColor.YELLOW + " seconds. To complete the update, restart/reload your server.");
+										writer.close();
+										reader.close();
+									} catch (MalformedURLException e) {
+										e.printStackTrace();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
+							}.start();
+						} else {
+							player.sendMessage(ChatColor.YELLOW + "An update to CommandSigns is already waiting to be installed on reload/restart.");
+						}
+					} else {
+						player.sendMessage(ChatColor.YELLOW + "CommandSigns is already up to date. (" + ChatColor.DARK_PURPLE + plugin.getDescription().getVersion() + ChatColor.YELLOW + ")");
+					}
 				}
 			} else {
 				player.sendMessage("Wrong CommandSigns command syntax.");

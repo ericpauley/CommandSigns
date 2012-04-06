@@ -1,10 +1,15 @@
 package org.zonedabone.commandsigns;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +44,9 @@ public class CommandSigns extends JavaPlugin {
 	public final Map<CommandSignsLocation, Map<String, Long>> timeouts = new ConcurrentHashMap<CommandSignsLocation, Map<String, Long>>();
 	public final Set<String> running = Collections.synchronizedSet(new HashSet<String>());
 	private Metrics metrics;
+	public int version, newestVersion;
+	public String downloadLocation, stringNew;
+	private int updateTask;
 	
 	public synchronized Map<String, Long> getSignTimeouts(CommandSignsLocation csl) {
 		Map<String, Long> toReturn = timeouts.get(csl);
@@ -192,6 +200,7 @@ public class CommandSigns extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
+		this.getServer().getScheduler().cancelTask(updateTask);
 		saveFile();
 	}
 	
@@ -201,9 +210,37 @@ public class CommandSigns extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		getCommand("commandsigns").setExecutor(commandExecutor);
 		pm.registerEvents(listener, this);
+		this.startUpdateCheck();
 		startMetrics();
 		setupPermissions();
 		setupEconomy();
+	}
+	
+	public void startUpdateCheck(){
+		this.version = Integer.parseInt(this.getDescription().getVersion().replaceAll("\\.", ""));
+		this.newestVersion = this.version;
+		updateTask = this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable(){
+
+			@Override
+			public void run() {
+				try{
+					// open HTTP connection
+					URL url = new URL("http://cloud.github.com/downloads/zonedabone/CommandSigns/version.txt");
+					URLConnection connection = url.openConnection();
+					BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+					// just read first line
+					stringNew = in.readLine();
+					newestVersion = Integer.parseInt(stringNew.replaceAll("\\.", ""));
+					downloadLocation = in.readLine();
+					in.close();
+				} catch (MalformedURLException e) {
+				} catch (IOException e) {
+				}finally{
+					
+				}
+			}
+			
+		}, 0, 24000);
 	}
 	
 	public void saveFile() {
@@ -259,5 +296,9 @@ public class CommandSigns extends JavaPlugin {
 			permission = permissionProvider.getProvider();
 		}
 		return permission != null;
+	}
+
+	public File getUpdateFile() {
+		return new File(this.getServer().getUpdateFolderFile().getAbsoluteFile(), super.getFile().getName());
 	}
 }
