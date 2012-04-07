@@ -78,7 +78,7 @@ public class CommandSigns extends JavaPlugin {
 		try {
 			metrics = new Metrics(this);
 		} catch (IOException e) {
-			this.getLogger().warning("Could not initialize metrics.");
+			getLogger().warning("Could not initialize metrics.");
 			e.printStackTrace();
 			return;
 		}
@@ -91,11 +91,11 @@ public class CommandSigns extends JavaPlugin {
 			}
 		});
 		Graph g3 = metrics.createGraph("CommandSigns Version");
-		g3.addPlotter(new Plotter(this.getDescription().getVersion()) {
+		g3.addPlotter(new Plotter(getDescription().getVersion()) {
 			
 			@Override
 			public int getValue() {
-				return activeSigns.size();
+				return 1;
 			}
 		});
 		Graph g2 = metrics.createGraph("Super Signs Used");
@@ -145,9 +145,9 @@ public class CommandSigns extends JavaPlugin {
 			}
 		});
 		if (metrics.start()) {
-			this.getLogger().info("Plugin metrics enabled! Thank you!");
+			getLogger().info("Plugin metrics enabled! Thank you!");
 		} else {
-			this.getLogger().info("You opted out of CommandSigns metrics. =(");
+			getLogger().info("You opted out of CommandSigns metrics. =(");
 		}
 	}
 	
@@ -208,7 +208,7 @@ public class CommandSigns extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		this.getServer().getScheduler().cancelTask(updateTask);
+		getServer().getScheduler().cancelTask(updateTask);
 		saveFile();
 	}
 	
@@ -218,20 +218,20 @@ public class CommandSigns extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		getCommand("commandsigns").setExecutor(commandExecutor);
 		pm.registerEvents(listener, this);
-		this.startUpdateCheck();
+		startUpdateCheck();
 		startMetrics();
 		setupPermissions();
 		setupEconomy();
 	}
 	
-	public void startUpdateCheck(){
-		this.version = Integer.parseInt(this.getDescription().getVersion().replaceAll("\\.", ""));
-		this.newestVersion = this.version;
-		updateTask = this.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable(){
-
+	public void startUpdateCheck() {
+		version = Integer.parseInt(getDescription().getVersion().replaceAll("\\.", ""));
+		newestVersion = version;
+		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+			
 			@Override
 			public void run() {
-				try{
+				try {
 					// open HTTP connection
 					URL url = new URL("http://cloud.github.com/downloads/zonedabone/CommandSigns/version.txt");
 					URLConnection connection = url.openConnection();
@@ -240,14 +240,17 @@ public class CommandSigns extends JavaPlugin {
 					stringNew = in.readLine();
 					newestVersion = Integer.parseInt(stringNew.replaceAll("\\.", ""));
 					downloadLocation = in.readLine();
+					System.out.println(stringNew);
+					System.out.println(newestVersion);
+					System.out.println(downloadLocation);
 					in.close();
 				} catch (MalformedURLException e) {
+					e.printStackTrace();
 				} catch (IOException e) {
-				}finally{
-					
+					e.printStackTrace();
+				} finally {
 				}
 			}
-			
 		}, 0, 24000);
 	}
 	
@@ -305,8 +308,8 @@ public class CommandSigns extends JavaPlugin {
 		}
 		return permission != null;
 	}
-
+	
 	public File getUpdateFile() {
-		return new File(this.getServer().getUpdateFolderFile().getAbsoluteFile(), super.getFile().getName());
+		return new File(getServer().getUpdateFolderFile().getAbsoluteFile(), super.getFile().getName());
 	}
 }
