@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,12 +29,12 @@ class CommandSignsCommand implements CommandExecutor {
 			final Player player = (Player) sender;
 			String playerName = player.getName();
 			if (args[0].indexOf("line") == 0) {
-				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super", false)) {
+				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
 					int lineNumber;
 					try {
 						lineNumber = Integer.parseInt(args[0].substring(4));
 					} catch (NumberFormatException ex) {
-						player.sendMessage("Line number invalid!");
+						MessageManager.sendMessage(player, "failure.invalid_line");
 						return true;
 					}
 					CommandSignsText text = plugin.playerText.get(playerName);
@@ -48,49 +47,42 @@ class CommandSignsCommand implements CommandExecutor {
 						line = line.concat((i == 0 ? "" : " ") + args[i]);
 					}
 					if ((line.startsWith("/*") || line.startsWith("/^") || line.startsWith("/#")) && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
-						line = "/" + line.substring(2);
-						player.sendMessage("You may not make signs with '/*', '/^', or '/#'");
+						MessageManager.sendMessage(player, "failure.no_super");
+						return true;
 					}
 					text.setLine(lineNumber, line);
 					text.trim();
+					MessageManager.sendMessage(player, "success.line_print", "n", "" + lineNumber, "l", line);
 					player.sendMessage(lineNumber + ": " + line);
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
-					player.sendMessage("Ready to add.");
-				} else {
-					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
+					MessageManager.sendMessage(player, "progress.add");
 				}
 			} else if (args[0].equalsIgnoreCase("read")) {
-				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super", false)) {
+				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.READ);
-					player.sendMessage("Click a sign to read CommandSign text.");
-				} else {
-					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
+					MessageManager.sendMessage(player, "progress.read");
 				}
 			} else if (args[0].equalsIgnoreCase("copy")) {
-				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super", false)) {
+				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.COPY);
-					player.sendMessage("Click a sign to copy CommandSign text.");
-				} else {
-					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
+					MessageManager.sendMessage(player, "progress.copy");
 				}
 			} else if (args[0].equalsIgnoreCase("remove")) {
 				if (plugin.hasPermission(player, "commandsigns.remove")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.DISABLE);
-					player.sendMessage("Click a sign to remove CommandSign.");
+					MessageManager.sendMessage(player, "progress.remove");
 				}
 			} else if (args[0].equalsIgnoreCase("clear")) {
-				if (plugin.hasPermission(player, "commandsigns.remove", false) || plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super", false)) {
+				if (plugin.hasPermission(player, "commandsigns.remove", false) || plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
 					plugin.playerStates.remove(playerName);
 					plugin.playerText.remove(playerName);
-					player.sendMessage("CommandSign text and status cleared.");
-				} else {
-					player.sendMessage(ChatColor.RED + "You do not have perisssion.");
+					MessageManager.sendMessage(player, "success.cleared");
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
 				if (player.hasPermission("commandsigns.update")) {
-					if (plugin.version<plugin.newestVersion) {
+					if (plugin.version < plugin.newestVersion) {
 						if (!plugin.getUpdateFile().exists()) {
-							player.sendMessage(ChatColor.YELLOW + "Updating CommandSigns to version " + ChatColor.DARK_PURPLE + plugin.stringNew + ChatColor.YELLOW + "...");
+							MessageManager.sendMessage(player, "update.start", "v", plugin.stringNew);
 							new Thread() {
 								
 								@Override
@@ -112,25 +104,25 @@ class CommandSignsCommand implements CommandExecutor {
 											totalBytesRead += bytesRead;
 										}
 										long endTime = System.currentTimeMillis();
-										player.sendMessage(ChatColor.YELLOW + "Downloaded " + ChatColor.DARK_PURPLE + (((totalBytesRead)) / 1000) + ChatColor.YELLOW + " KB in " + ChatColor.DARK_PURPLE + (((double) (endTime - startTime)) / 1000) + ChatColor.YELLOW + " seconds. To complete the update, restart/reload your server.");
+										MessageManager.sendMessage(player, "update.finish", "s", "" + (((totalBytesRead)) / 1000), "t", "" + (((double) (endTime - startTime)) / 1000));
 										writer.close();
 										reader.close();
 									} catch (MalformedURLException e) {
-										e.printStackTrace();
+										MessageManager.sendMessage(player, "update.fetch_error", "e", e.getMessage());
 									} catch (IOException e) {
-										e.printStackTrace();
+										MessageManager.sendMessage(player, "update.fetch_error", "e", e.getMessage());
 									}
 								}
 							}.start();
 						} else {
-							player.sendMessage(ChatColor.YELLOW + "An update to CommandSigns is already waiting to be installed on reload/restart.");
+							MessageManager.sendMessage(player, "update.already_downloaded");
 						}
 					} else {
-						player.sendMessage(ChatColor.YELLOW + "CommandSigns is already up to date. (" + ChatColor.DARK_PURPLE + plugin.getDescription().getVersion() + ChatColor.YELLOW + ")");
+						MessageManager.sendMessage(player, "update.up_to_date", "v", plugin.getDescription().getVersion());
 					}
 				}
 			} else {
-				player.sendMessage("Wrong CommandSigns command syntax.");
+				MessageManager.sendMessage(player, "failure.wrong_syntax");
 			}
 			return true;
 		}

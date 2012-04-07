@@ -1,0 +1,34 @@
+prefix: "&4[CommandSigns]&f"
+success:
+    cleared: "CommandSign text and status cleared."
+    copied: "Added to CommandSigns clipboard. Click a sign to enable."
+    line_print: "{NUMBER} &4: &f {LINE}"
+    
+progress:
+    remove: "Click a sign to remove CommandSign."
+    copy: "Click a sign to copy CommandSign text."
+    read: "Click a sign to read CommandSign text."
+    add: "Ready to add."
+    
+failure:
+    prefix: "&c"
+    no_perms: "You do not have permission."
+    wrong_syntax: "Wrong CommandSigns command syntax."
+    no_super: "You may not make signs with '/*', '/^', or '/#'"
+    invalid_line: "Line number invalid!"
+    remove_first: "CommandSign text must be removed first."
+    not_a_sign: "Sign is not a CommandSign."
+    
+update:
+    prefix: "&e"
+    start: "Updating CommandSigns to version &5{VERSION}{PREFIX}..."
+    finish: "Downloaded &5{SIZE}{PREFIX} KB in &5{TIME}{PREFIX} seconds. To complete the update, restart/reload your server."
+    already_downloaded: "An update to CommandSigns is already waiting to be installed on reload/restart."
+    up_to_date: "CommandSigns is already up to date. (&5{VERSION}{PREFIX})"
+    notify: "CommandSigns is updated to &5{VERSION}{PREFIX}. You can update your install with &5/cs update{PREFIX}."
+    fetch_error: "Error fetching update - {ERROR}"
+    
+metrics:
+    success: "Plugin metrics enabled! Thank you!"
+    opt_out: "You opted out of CommandSigns metrics. =("
+    failure: "Could not initialize metrics."

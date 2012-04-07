@@ -1,6 +1,5 @@
 package org.zonedabone.commandsigns;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -29,7 +28,7 @@ public class CommandSignsEventListener implements Listener {
 		if (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN) {
 			CommandSignsLocation location = new CommandSignsLocation(block.getWorld(), block.getX(), block.getY(), block.getZ());
 			if (plugin.activeSigns.containsKey(location)) {
-				event.getPlayer().sendMessage("§cCommandSign text must be removed first.");
+				MessageManager.sendMessage(event.getPlayer(), "failure.remove_first");
 				event.setCancelled(true);
 			}
 		}
@@ -42,7 +41,8 @@ public class CommandSignsEventListener implements Listener {
 			BlockState state = event.getClickedBlock().getState();
 			if (state instanceof Sign) {
 				final Sign sign = (Sign) state;
-				new Thread(){
+				new Thread() {
+					
 					@Override
 					public void run() {
 						signClickEvent.onRightClick(event, sign);
@@ -53,11 +53,11 @@ public class CommandSignsEventListener implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e){
-		if(e.getPlayer().hasPermission("commandsigns.update")){
-			if(plugin.version < plugin.newestVersion){
-				if(!plugin.getUpdateFile().exists()){
-					e.getPlayer().sendMessage(ChatColor.YELLOW+"CommandSigns is updated to "+ChatColor.DARK_PURPLE+plugin.stringNew+ChatColor.YELLOW+". You can update your install with "+ChatColor.DARK_PURPLE+"/cs update"+ChatColor.YELLOW+".");
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		if (e.getPlayer().hasPermission("commandsigns.update")) {
+			if (plugin.version < plugin.newestVersion) {
+				if (!plugin.getUpdateFile().exists()) {
+					MessageManager.sendMessage(e.getPlayer(), "update.notify", "v", plugin.stringNew);
 				}
 			}
 		}

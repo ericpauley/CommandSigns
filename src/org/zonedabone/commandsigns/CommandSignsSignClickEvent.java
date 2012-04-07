@@ -24,11 +24,11 @@ public class CommandSignsSignClickEvent {
 			line = line.replaceAll("(?iu)<y>", "" + player.getLocation().getBlockY());
 			line = line.replaceAll("(?iu)<z>", "" + player.getLocation().getBlockZ());
 			line = line.replaceAll("(?iu)<world>", player.getWorld().getName());
-			line = line.replace("(?iu)<name>", "" + player.getName());
-			line = line.replace("(?iu)<display>", player.getDisplayName());
+			line = line.replaceAll("(?iu)<name>", "" + player.getName());
+			line = line.replaceAll("(?iu)<display>", player.getDisplayName());
 			if (CommandSigns.economy != null && CommandSigns.economy.isEnabled()) {
-				line = line.replace("(?iu)<money>", "" + CommandSigns.economy.getBalance(player.getName()));
-				line = line.replace("(?iu)<formatted>", CommandSigns.economy.format(CommandSigns.economy.getBalance(player.getName())));
+				line = line.replaceAll("(?iu)<money>", "" + CommandSigns.economy.getBalance(player.getName()));
+				line = line.replaceAll("(?iu)<formatted>", CommandSigns.economy.format(CommandSigns.economy.getBalance(player.getName())));
 			}
 			commandList.add(line);
 		}
@@ -43,18 +43,18 @@ public class CommandSignsSignClickEvent {
 		String playerName = player.getName();
 		CommandSignsText text = plugin.activeSigns.get(location).clone(player.getName());
 		if (text == null) {
-			player.sendMessage("Sign is not a CommandSign.");
+			MessageManager.sendMessage(player, "failure.not_a_sign");
 		}
 		plugin.playerText.put(playerName, text);
-		this.readSign(player, location);
-		player.sendMessage("Added to CommandSigns clipboard. Click a sign to enable.");
+		readSign(player, location);
+		MessageManager.sendMessage(player, "success.copied");
 		plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
 	}
 	
 	public void disableSign(Player player, CommandSignsLocation location) {
 		String playerName = player.getName();
 		if (!plugin.activeSigns.containsKey(location)) {
-			player.sendMessage("Sign is not enabled!");
+			MessageManager.sendMessage(player, "failure.not_a_sign");
 			plugin.playerStates.remove(playerName);
 			return;
 		}
@@ -165,16 +165,15 @@ public class CommandSignsSignClickEvent {
 				} else if (command.equals("-")) {
 					elsed = !elsed;
 				}
-				if(!elsed){
+				if (!elsed) {
 					if (groupFiltered || moneyFiltered || permFiltered || timeFiltered) {
 						continue;
 					}
-				}else{
+				} else {
 					if (!(groupFiltered || moneyFiltered || permFiltered || timeFiltered)) {
 						continue;
 					}
 				}
-				
 				if (command.startsWith("~")) {
 					int amount = 0;
 					try {
@@ -188,7 +187,7 @@ public class CommandSignsSignClickEvent {
 						if (show)
 							player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
 					}
-				}else if (command.startsWith("%")) {
+				} else if (command.startsWith("%")) {
 					double amount = 0;
 					try {
 						amount = Double.parseDouble(command.substring(1));
@@ -198,16 +197,16 @@ public class CommandSignsSignClickEvent {
 						Thread.sleep((long) (amount * 1000));
 					} catch (InterruptedException e) {
 					}
-				}else if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
+				} else if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
 					permFiltered = !plugin.hasPermission(player, command.substring(1));
 					if (permFiltered && show) {
 						player.sendMessage(ChatColor.RED + "You don't have permission to use this CommandSign.");
 					}
-				}else if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
+				} else if (CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
 					groupFiltered = !inGroup(player, command.substring(1));
 					if (groupFiltered && show)
 						player.sendMessage(ChatColor.RED + "You are not in the rquired group to run this command.");
-				}else if (CommandSigns.economy != null && CommandSigns.economy.isEnabled() && command.startsWith("$")) {
+				} else if (CommandSigns.economy != null && CommandSigns.economy.isEnabled() && command.startsWith("$")) {
 					double amount = 0;
 					try {
 						amount = Double.parseDouble(command.substring(1));
@@ -217,10 +216,10 @@ public class CommandSignsSignClickEvent {
 					if (moneyFiltered && show) {
 						player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
 					}
-				}else if (command.startsWith("/")) {
+				} else if (command.startsWith("/")) {
 					final boolean fShow = show;
 					final String fCommand = command;
-					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 						
 						private boolean show = fShow;
 						private String command = fCommand;
@@ -292,10 +291,8 @@ public class CommandSignsSignClickEvent {
 								}
 							}
 						}
-						
 					});
-					
-				}else if (command.startsWith("\\")) {
+				} else if (command.startsWith("\\")) {
 					String msg = command.substring(1);
 					if (show)
 						player.sendMessage(msg.replaceAll("&([0-9A-FK-OR])", "\u00A7$1"));

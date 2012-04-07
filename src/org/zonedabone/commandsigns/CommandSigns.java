@@ -22,7 +22,6 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -69,7 +68,7 @@ public class CommandSigns extends JavaPlugin {
 			perm = permission.has(player, string);
 		}
 		if (perm == false && notify) {
-			player.sendMessage(ChatColor.RED + "You do not have permission.");
+			MessageManager.sendMessage(player, "failure.no_perms");
 		}
 		return perm;
 	}
@@ -78,9 +77,7 @@ public class CommandSigns extends JavaPlugin {
 		try {
 			metrics = new Metrics(this);
 		} catch (IOException e) {
-			getLogger().warning("Could not initialize metrics.");
-			e.printStackTrace();
-			return;
+			getLogger().warning(MessageManager.parseRaw("metrics.failure"));
 		}
 		Graph g = metrics.createGraph("Number of CommandSigns");
 		g.addPlotter(new Plotter() {
@@ -145,9 +142,9 @@ public class CommandSigns extends JavaPlugin {
 			}
 		});
 		if (metrics.start()) {
-			getLogger().info("Plugin metrics enabled! Thank you!");
+			getLogger().info(MessageManager.parseRaw("metrics.success"));
 		} else {
-			getLogger().info("You opted out of CommandSigns metrics. =(");
+			getLogger().info(MessageManager.parseRaw("metrics.optout"));
 		}
 	}
 	
@@ -214,6 +211,7 @@ public class CommandSigns extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		MessageManager.loadMessages(this);
 		loadFile();
 		PluginManager pm = getServer().getPluginManager();
 		getCommand("commandsigns").setExecutor(commandExecutor);
@@ -240,9 +238,6 @@ public class CommandSigns extends JavaPlugin {
 					stringNew = in.readLine();
 					newestVersion = Integer.parseInt(stringNew.replaceAll("\\.", ""));
 					downloadLocation = in.readLine();
-					System.out.println(stringNew);
-					System.out.println(newestVersion);
-					System.out.println(downloadLocation);
 					in.close();
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
