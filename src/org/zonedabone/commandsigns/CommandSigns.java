@@ -90,6 +90,14 @@ public class CommandSigns extends JavaPlugin {
 				return activeSigns.size();
 			}
 		});
+		Graph g3 = metrics.createGraph("CommandSigns Version");
+		g3.addPlotter(new Plotter(this.getDescription().getVersion()) {
+			
+			@Override
+			public int getValue() {
+				return activeSigns.size();
+			}
+		});
 		Graph g2 = metrics.createGraph("Super Signs Used");
 		g2.addPlotter(new Plotter("Permission") {
 			
