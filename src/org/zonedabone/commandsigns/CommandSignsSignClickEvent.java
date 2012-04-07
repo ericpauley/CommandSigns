@@ -7,6 +7,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Sign;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.permissions.PermissionAttachment;
@@ -269,7 +270,8 @@ public class CommandSignsSignClickEvent {
 								} else if (command.startsWith("/#")) {
 									command = command.substring(1);
 									if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-										plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.substring(1));
+										ConsoleCommandSender ccs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), player);
+										plugin.getServer().dispatchCommand(ccs, command.substring(1));
 									} else {
 										if (show)
 											player.sendMessage("You may not use this type of sign.");
