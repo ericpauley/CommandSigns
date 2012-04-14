@@ -1,9 +1,6 @@
 package org.zonedabone.commandsigns;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -25,30 +22,24 @@ public class CommandSignsEventListener implements Listener {
 			return;
 		}
 		Block block = event.getBlock();
-		if (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN) {
-			CommandSignsLocation location = new CommandSignsLocation(block.getWorld(), block.getX(), block.getY(), block.getZ());
-			if (plugin.activeSigns.containsKey(location)) {
-				MessageManager.sendMessage(event.getPlayer(), "failure.remove_first");
-				event.setCancelled(true);
-			}
+		CommandSignsLocation location = new CommandSignsLocation(block.getWorld(), block.getX(), block.getY(), block.getZ());
+		if (plugin.activeSigns.containsKey(location)) {
+			MessageManager.sendMessage(event.getPlayer(), "failure.remove_first");
+			event.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
 	public void onPlayerInteract(final PlayerInteractEvent event) {
 		final CommandSignsSignClickEvent signClickEvent = new CommandSignsSignClickEvent(plugin);
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			BlockState state = event.getClickedBlock().getState();
-			if (state instanceof Sign) {
-				final Sign sign = (Sign) state;
-				new Thread() {
-					
-					@Override
-					public void run() {
-						signClickEvent.onRightClick(event, sign);
-					}
-				}.start();
-			}
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
+			new Thread() {
+				
+				@Override
+				public void run() {
+					signClickEvent.onRightClick(event.getPlayer(), event.getClickedBlock());
+				}
+			}.start();
 		}
 	}
 	

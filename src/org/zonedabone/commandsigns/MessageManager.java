@@ -57,4 +57,8 @@ public class MessageManager {
 	public static void sendMessage(CommandSender cs, String message, String... replacements) {
 		cs.sendMessage(parseMessage(message, replacements));
 	}
+	
+	public static void sendRaw(CommandSender cs, String message, String... replacements) {
+		cs.sendMessage(parseRaw(message, replacements));
+	}
 }

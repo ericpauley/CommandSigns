@@ -6,10 +6,9 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Sign;
+import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.permissions.PermissionAttachment;
 
 public class CommandSignsSignClickEvent {
@@ -80,28 +79,6 @@ public class CommandSignsSignClickEvent {
 		player.sendMessage("CommandSign enabled");
 	}
 	
-	public boolean importSign(Player player, CommandSignsLocation l, Sign s) {
-		if (!plugin.hasPermission(player, "commandsigns.import")) {
-			return false;
-		}
-		String[] lines = s.getLines();
-		if (ChatColor.stripColor(lines[0]).equalsIgnoreCase("[command]") || ChatColor.stripColor(lines[0]).equalsIgnoreCase("[scs]")) {
-			CommandSignsText cst = new CommandSignsText(null);
-			cst.setLine(1, ChatColor.stripColor(lines[1]) + " " + ChatColor.stripColor(lines[2]) + " " + ChatColor.stripColor(lines[3]).trim());
-			if (cst.getLine(1).startsWith("/*") || cst.getLine(1).startsWith("/^") || cst.getLine(1).startsWith("/#")) {
-				if (!plugin.hasPermission(player, "commandsigns.create.super", false)) {
-					player.sendMessage("You cannot import super signs.");
-					return false;
-				}
-			}
-			plugin.activeSigns.put(l, cst);
-			player.sendMessage("Just importing that sign now...");
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
 	private boolean inGroup(Player player, String group) {
 		boolean in = false;
 		for (String s : CommandSigns.permission.getPlayerGroups(player)) {
@@ -114,28 +91,11 @@ public class CommandSignsSignClickEvent {
 		return in;
 	}
 	
-	public void onRightClick(PlayerInteractEvent event, Sign sign) {
-		final Player player = event.getPlayer();
-		CommandSignsLocation location = new CommandSignsLocation(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
-		CommandSignsPlayerState state = plugin.playerStates.get(player.getName());
-		if (state != null) {
-			if (state.equals(CommandSignsPlayerState.ENABLE)) {
-				enableSign(player, location);
-			} else if (state.equals(CommandSignsPlayerState.DISABLE)) {
-				disableSign(player, location);
-			} else if (state.equals(CommandSignsPlayerState.READ)) {
-				readSign(player, location);
-			} else if (state.equals(CommandSignsPlayerState.COPY)) {
-				copySign(player, location);
-			}
+	public void runSign(final Player player, CommandSignsLocation location) {
+		CommandSignsText cst = plugin.activeSigns.get(location);
+		if (cst == null)
 			return;
-		}
-		if (!plugin.activeSigns.containsKey(location)) {
-			if (!importSign(player, location, sign)) {
-				return;
-			}
-		}
-		List<String> commandList = parseCommandSign(player, plugin.activeSigns.get(location));
+		List<String> commandList = parseCommandSign(player, cst);
 		if (plugin.hasPermission(player, "commandsigns.use.regular")) {
 			if (plugin.running.contains(player.getName()))
 				return;
@@ -303,6 +263,24 @@ public class CommandSignsSignClickEvent {
 				lastUse.put(player.getName(), System.currentTimeMillis());
 			plugin.running.remove(player.getName());
 		}
+	}
+	
+	public void onRightClick(final Player player, Block sign) {
+		CommandSignsLocation location = new CommandSignsLocation(sign.getWorld(), sign.getX(), sign.getY(), sign.getZ());
+		CommandSignsPlayerState state = plugin.playerStates.get(player.getName());
+		if (state != null) {
+			if (state.equals(CommandSignsPlayerState.ENABLE)) {
+				enableSign(player, location);
+			} else if (state.equals(CommandSignsPlayerState.DISABLE)) {
+				disableSign(player, location);
+			} else if (state.equals(CommandSignsPlayerState.READ)) {
+				readSign(player, location);
+			} else if (state.equals(CommandSignsPlayerState.COPY)) {
+				copySign(player, location);
+			}
+			return;
+		}
+		runSign(player, location);
 	}
 	
 	public void readSign(Player player, CommandSignsLocation location) {

@@ -1,13 +1,13 @@
 prefix: "&4[CommandSigns]&f"
 success:
     cleared: "CommandSign text and status cleared."
-    copied: "Added to CommandSigns clipboard. Click a sign to enable."
-    line_print: "{NUMBER} &4: &f {LINE}"
+    copied: "Added to CommandSigns clipboard. Click a block to enable."
+    line_print: "{NUMBER} &4: &f{LINE}"
     
 progress:
-    remove: "Click a sign to remove CommandSign."
-    copy: "Click a sign to copy CommandSign text."
-    read: "Click a sign to read CommandSign text."
+    remove: "Click a sign to remove CommandBlock."
+    copy: "Click a sign to copy CommandBlock text."
+    read: "Click a sign to read CommandBlock text."
     add: "Ready to add."
     
 failure:
@@ -17,7 +17,7 @@ failure:
     no_super: "You may not make signs with '/*', '/^', or '/#'"
     invalid_line: "Line number invalid!"
     remove_first: "CommandSign text must be removed first."
-    not_a_sign: "Sign is not a CommandSign."
+    not_a_sign: "Block is not a CommandBlock."
     
 update:
     prefix: "&e"

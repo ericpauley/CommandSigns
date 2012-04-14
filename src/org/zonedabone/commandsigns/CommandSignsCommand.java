@@ -52,8 +52,8 @@ class CommandSignsCommand implements CommandExecutor {
 					}
 					text.setLine(lineNumber, line);
 					text.trim();
-					MessageManager.sendMessage(player, "success.line_print", "n", "" + lineNumber, "l", line);
-					player.sendMessage(lineNumber + ": " + line);
+					String display = line.replace("$", "\\$");
+					MessageManager.sendRaw(player, "success.line_print", "n", "" + lineNumber, "l", display);
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
 					MessageManager.sendMessage(player, "progress.add");
 				}
