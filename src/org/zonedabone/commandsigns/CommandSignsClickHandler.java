@@ -6,18 +6,19 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
-public class CommandSignsSignClickEvent {
+public class CommandSignsClickHandler {
 	
 	private CommandSigns plugin;
 	private Player player;
-	private CommandSignsLocation location;
+	private Location location;
 	
-	public List<String> parseCommandSign(Player player, CommandSignsLocation loc, CommandSignsText commandSign) {
+	public List<String> parseCommandSign(Player player, Location loc, CommandSignsText commandSign) {
 		List<String> commandList = new ArrayList<String>();
 		for (String line : commandSign.getText()) {
 			if (player == null) {
@@ -42,10 +43,10 @@ public class CommandSignsSignClickEvent {
 		return commandList;
 	}
 	
-	public CommandSignsSignClickEvent(CommandSigns plugin, Player player, Block block) {
+	public CommandSignsClickHandler(CommandSigns plugin, Player player, Block block) {
 		this.plugin = plugin;
 		this.player = player;
-		location = new CommandSignsLocation(block.getWorld(), block.getX(), block.getY(), block.getZ());
+		location = block.getLocation();
 	}
 	
 	public void copySign() {
@@ -208,14 +209,19 @@ public class CommandSignsSignClickEvent {
 	public void onRightClick() {
 		CommandSignsPlayerState state = plugin.playerStates.get(player.getName());
 		if (state != null) {
-			if (state.equals(CommandSignsPlayerState.ENABLE)) {
-				enableSign();
-			} else if (state.equals(CommandSignsPlayerState.DISABLE)) {
-				disableSign();
-			} else if (state.equals(CommandSignsPlayerState.READ)) {
-				readSign();
-			} else if (state.equals(CommandSignsPlayerState.COPY)) {
-				copySign();
+			switch (state) {
+				case ENABLE :
+					enableSign();
+					break;
+				case DISABLE :
+					disableSign();
+					break;
+				case READ :
+					readSign();
+					break;
+				case COPY :
+					copySign();
+					break;
 			}
 		} else {
 			runSign();

@@ -1,6 +1,6 @@
 package org.zonedabone.commandsigns;
 
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -22,8 +22,7 @@ public class CommandSignsEventListener implements Listener {
 		if (event.isCancelled()) {
 			return;
 		}
-		Block block = event.getBlock();
-		CommandSignsLocation location = new CommandSignsLocation(block.getWorld(), block.getX(), block.getY(), block.getZ());
+		Location location = event.getBlock().getLocation();
 		if (plugin.activeSigns.containsKey(location)) {
 			Messaging.sendMessage(event.getPlayer(), "failure.remove_first");
 			event.setCancelled(true);
@@ -32,7 +31,7 @@ public class CommandSignsEventListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerInteract(final PlayerInteractEvent event) {
-		final CommandSignsSignClickEvent signClickEvent = new CommandSignsSignClickEvent(plugin, event.getPlayer(), event.getClickedBlock());
+		final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, event.getPlayer(), event.getClickedBlock());
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
 			new Thread() {
 				
@@ -58,12 +57,17 @@ public class CommandSignsEventListener implements Listener {
 	@EventHandler
 	public void onRedstoneChange(BlockRedstoneEvent event) {
 		if (event.getNewCurrent() != 0 && event.getOldCurrent() == 0) {
-			Block b = event.getBlock();
-			CommandSignsLocation csl = new CommandSignsLocation(b.getWorld(), b.getX(), b.getY(), b.getZ());
+			Location csl = event.getBlock().getLocation();
 			CommandSignsText cst = plugin.activeSigns.get(csl);
 			if (cst != null && cst.isRedstone()) {
-				final CommandSignsSignClickEvent signClickEvent = new CommandSignsSignClickEvent(plugin, null, event.getBlock());
-				signClickEvent.runSign();
+				final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, null, event.getBlock());
+				new Thread() {
+					
+					@Override
+					public void run() {
+						signClickEvent.runSign();
+					}
+				}.start();
 			}
 		}
 	}

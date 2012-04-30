@@ -22,6 +22,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -33,21 +34,21 @@ public class CommandSigns extends JavaPlugin {
 	
 	public static Economy economy = null;
 	public static Permission permission = null;
-	public final Map<CommandSignsLocation, CommandSignsText> activeSigns = new HashMap<CommandSignsLocation, CommandSignsText>();
+	public final Map<Location, CommandSignsText> activeSigns = new HashMap<Location, CommandSignsText>();
 	private CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
 	// listeners
 	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
 	// plugin variables
 	public final Map<String, CommandSignsPlayerState> playerStates = new HashMap<String, CommandSignsPlayerState>();
 	public final Map<String, CommandSignsText> playerText = new HashMap<String, CommandSignsText>();
-	public final Map<CommandSignsLocation, Map<String, Long>> timeouts = new ConcurrentHashMap<CommandSignsLocation, Map<String, Long>>();
+	public final Map<Location, Map<String, Long>> timeouts = new ConcurrentHashMap<Location, Map<String, Long>>();
 	public final Set<String> running = Collections.synchronizedSet(new HashSet<String>());
 	private Metrics metrics;
 	public int version, newestVersion;
 	public String downloadLocation, stringNew;
 	private int updateTask;
 	
-	public synchronized Map<String, Long> getSignTimeouts(CommandSignsLocation csl) {
+	public synchronized Map<String, Long> getSignTimeouts(Location csl) {
 		Map<String, Long> toReturn = timeouts.get(csl);
 		if (toReturn == null) {
 			toReturn = new ConcurrentHashMap<String, Long>();
@@ -165,7 +166,7 @@ public class CommandSigns extends JavaPlugin {
 							int x = Integer.parseInt(raw[1]);
 							int y = Integer.parseInt(raw[2]);
 							int z = Integer.parseInt(raw[3]);
-							CommandSignsLocation csl = new CommandSignsLocation(Bukkit.getWorld(world), x, y, z);
+							Location csl = new Location(Bukkit.getWorld(world), x, y, z);
 							String owner = raw[4];
 							boolean redstone = false;
 							if (raw.length >= 7)
@@ -266,7 +267,7 @@ public class CommandSigns extends JavaPlugin {
 			}
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			writer.write("");
-			for (Map.Entry<CommandSignsLocation, CommandSignsText> entry : activeSigns.entrySet()) {
+			for (Map.Entry<Location, CommandSignsText> entry : activeSigns.entrySet()) {
 				String commands = "";
 				entry.getValue().trim();
 				for (String command : entry.getValue().getText()) {
@@ -274,15 +275,15 @@ public class CommandSigns extends JavaPlugin {
 						commands += "\u00B6";
 					commands += command;
 				}
-				CommandSignsLocation csl = entry.getKey();
+				Location csl = entry.getKey();
 				String sep = "\u00A7";
 				String line = csl.getWorld().getName();
 				line += sep;
-				line += csl.getX();
+				line += csl.getBlockX();
 				line += sep;
-				line += csl.getY();
+				line += csl.getBlockY();
 				line += sep;
-				line += csl.getZ();
+				line += csl.getBlockZ();
 				line += sep;
 				line += entry.getValue().getOwner();
 				line += sep;

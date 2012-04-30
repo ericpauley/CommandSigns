@@ -30,7 +30,7 @@ class CommandSignsCommand implements CommandExecutor {
 			String playerName = null;
 			if (sender instanceof Player) {
 				player = (Player) sender;
-				player.getName();
+				playerName = player.getName();
 			}
 			if (args[0].indexOf("line") == 0) {
 				if (player == null) {
