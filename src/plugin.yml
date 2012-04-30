@@ -1,10 +1,11 @@
 name: CommandSigns
 main: org.zonedabone.commandsigns.CommandSigns
-authors: [HansAnderson, zonedabone]
-version: 1.6.0
+authors: [zonedabone, HansAnderson]
+version: 1.7.0
 description: >
              Add commands to signs.
 depend: [Vault]
+dev-url: http://dev.bukkit.org/server-mods/command-signs/
 commands:
   commandsigns:
     aliases: [cs, cmds, cmdsigns]
@@ -24,15 +25,17 @@ permissions:
             commandsigns.use.*: true
             commandsigns.group.*: true
             commandsigns.update: true
+            commandsigns.save: true
         default: op
     commandsigns.create.*:
         description: Gives access CommandSigns sign creation commands
         children:
             commandsigns.create.regular: true
             commandsigns.create.super: true
-    commandsigns.import:
-        description: Allows automated importing of [command] or [scs] signs
-        default: true;
+            commandsigns.create.redstone: true
+    commandsigns.save:
+        description: Allows saving CommandSigns without reloading
+        default: false;
     commandsigns.use.*:
         description: Gives access to CommandSigns sign use
         default: true
@@ -44,6 +47,9 @@ permissions:
         default: false
     commandsigns.create.super:
         description: Allows you to create a super CommandSign
+        default: false
+    commandsigns.create.redstone:
+        description: Allows you to create redstone-activated signs
         default: false
     commandsigns.remove:
         description: Allows you to remove a CommandSign

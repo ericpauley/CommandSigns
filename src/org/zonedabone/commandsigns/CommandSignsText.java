@@ -7,14 +7,24 @@ public class CommandSignsText {
 	
 	private String owner;
 	private List<String> text;
+	private boolean redstone = false;
 	
-	public CommandSignsText(String owner) {
+	public boolean isRedstone() {
+		return redstone;
+	}
+	
+	public void setRedstone(boolean redstone) {
+		this.redstone = redstone;
+	}
+	
+	public CommandSignsText(String owner, boolean redstone) {
 		this.owner = owner;
-		this.text = new ArrayList<String>();
+		text = new ArrayList<String>();
+		this.redstone = redstone;
 	}
 	
 	public CommandSignsText clone(String owner) {
-		CommandSignsText cst = new CommandSignsText(owner);
+		CommandSignsText cst = new CommandSignsText(owner, redstone);
 		for (String s : text) {
 			cst.getText().add(s);
 		}
@@ -56,10 +66,10 @@ public class CommandSignsText {
 	}
 	
 	public void trim() {
-		while (text.get(text.size() - 1).equals("")) {
+		while (text.size() > 0 && text.get(text.size() - 1).equals("")) {
 			text.remove(text.size() - 1);
 		}
-		for(int i = 0;i<text.size();i++){
+		for (int i = 0; i < text.size(); i++) {
 			text.set(i, text.get(i).trim());
 		}
 	}

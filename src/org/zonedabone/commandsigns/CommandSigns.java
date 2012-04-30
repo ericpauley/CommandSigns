@@ -22,7 +22,7 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -56,11 +56,11 @@ public class CommandSigns extends JavaPlugin {
 		return toReturn;
 	}
 	
-	public boolean hasPermission(Player player, String string) {
+	public boolean hasPermission(CommandSender player, String string) {
 		return hasPermission(player, string, true);
 	}
 	
-	public boolean hasPermission(Player player, String string, boolean notify) {
+	public boolean hasPermission(CommandSender player, String string, boolean notify) {
 		boolean perm;
 		if (permission == null) {
 			perm = player.hasPermission(string);
@@ -68,7 +68,7 @@ public class CommandSigns extends JavaPlugin {
 			perm = permission.has(player, string);
 		}
 		if (perm == false && notify) {
-			MessageManager.sendMessage(player, "failure.no_perms");
+			Messaging.sendMessage(player, "failure.no_perms");
 		}
 		return perm;
 	}
@@ -77,7 +77,7 @@ public class CommandSigns extends JavaPlugin {
 		try {
 			metrics = new Metrics(this);
 		} catch (IOException e) {
-			getLogger().warning(MessageManager.parseRaw("metrics.failure"));
+			getLogger().warning(Messaging.parseRaw("metrics.failure"));
 		}
 		Graph g = metrics.createGraph("Number of CommandSigns");
 		g.addPlotter(new Plotter() {
@@ -142,9 +142,9 @@ public class CommandSigns extends JavaPlugin {
 			}
 		});
 		if (metrics.start()) {
-			getLogger().info(MessageManager.parseRaw("metrics.success"));
+			getLogger().info(Messaging.parseRaw("metrics.success"));
 		} else {
-			getLogger().info(MessageManager.parseRaw("metrics.optout"));
+			getLogger().info(Messaging.parseRaw("metrics.optout"));
 		}
 	}
 	
@@ -154,42 +154,49 @@ public class CommandSigns extends JavaPlugin {
 			if (file.exists()) {
 				FileInputStream inStream = new FileInputStream(file);
 				Scanner scanner = new Scanner(inStream);
+				int loaded = 0;
 				while (scanner.hasNextLine()) {
 					try {
 						String line = scanner.nextLine();
 						if (!line.equals("")) {
-							if (line.contains("\u00A7")) {
-								String[] raw = line.split("\u00A7");
-								String world = raw[0];
-								int x = Integer.parseInt(raw[1]);
-								int y = Integer.parseInt(raw[2]);
-								int z = Integer.parseInt(raw[3]);
-								CommandSignsLocation csl = new CommandSignsLocation(Bukkit.getWorld(world), x, y, z);
-								String owner = raw[4];
-								CommandSignsText cst = new CommandSignsText(owner);
-								for (String command : raw[5].split("\u00B6")) {
-									cst.getText().add(command);
-								}
-								activeSigns.put(csl, cst);
-							} else {
-								String[] data = line.split(":", 2);
-								String[] extra = data[0].split("\\|");
-								CommandSignsLocation location = CommandSignsLocation.fromFileString(extra[0]);
-								if (location == null) {
-									continue;
-								}
-								String[] textData = data[1].split("\\[LINEBREAK]");
-								CommandSignsText text;
-								if (extra.length >= 2) {
-									text = new CommandSignsText(extra[1]);
-								} else {
-									text = new CommandSignsText(null);
-								}
-								for (int i = 0; i < textData.length; i++) {
-									text.setLine(i, textData[i]);
-								}
-								activeSigns.put(location, text);
+							// if (line.contains("\u00A7")) {
+							String[] raw = line.split("\u00A7");
+							String world = raw[0];
+							int x = Integer.parseInt(raw[1]);
+							int y = Integer.parseInt(raw[2]);
+							int z = Integer.parseInt(raw[3]);
+							CommandSignsLocation csl = new CommandSignsLocation(Bukkit.getWorld(world), x, y, z);
+							String owner = raw[4];
+							boolean redstone = false;
+							if (raw.length >= 7)
+								redstone = Boolean.parseBoolean(raw[6]);
+							CommandSignsText cst = new CommandSignsText(owner, redstone);
+							for (String command : raw[5].split("\u00B6")) {
+								cst.getText().add(command);
 							}
+							activeSigns.put(csl, cst);
+							loaded++;
+							/*
+							 * } else {
+							 * String[] data = line.split(":", 2);
+							 * String[] extra = data[0].split("\\|");
+							 * CommandSignsLocation location = CommandSignsLocation.fromFileString(extra[0]);
+							 * if (location == null) {
+							 * continue;
+							 * }
+							 * String[] textData = data[1].split("\\[LINEBREAK]");
+							 * CommandSignsText text;
+							 * if (extra.length >= 2) {
+							 * text = new CommandSignsText(extra[1], false);
+							 * } else {
+							 * text = new CommandSignsText(null, false);
+							 * }
+							 * for (int i = 0; i < textData.length; i++) {
+							 * text.setLine(i, textData[i]);
+							 * }
+							 * activeSigns.put(location, text);
+							 * }
+							 */
 						}
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -197,6 +204,7 @@ public class CommandSigns extends JavaPlugin {
 				}
 				scanner.close();
 				inStream.close();
+				getLogger().info("Loaded " + loaded + " signs");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -211,7 +219,7 @@ public class CommandSigns extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		MessageManager.loadMessages(this);
+		Messaging.loadMessages(this);
 		loadFile();
 		PluginManager pm = getServer().getPluginManager();
 		getCommand("commandsigns").setExecutor(commandExecutor);
@@ -279,6 +287,8 @@ public class CommandSigns extends JavaPlugin {
 				line += entry.getValue().getOwner();
 				line += sep;
 				line += commands;
+				line += sep;
+				line += entry.getValue().isRedstone();
 				writer.write(line + "\n");
 			}
 			writer.close();

@@ -1,13 +1,16 @@
+version: 1
 prefix: "&4[CommandSigns]&f"
 success:
     cleared: "CommandSign text and status cleared."
     copied: "Added to CommandSigns clipboard. Click a block to enable."
     line_print: "{NUMBER} &4: &f{LINE}"
+    saved: "Saved CommandSigns to file"
     
 progress:
     remove: "Click a sign to remove CommandBlock."
     copy: "Click a sign to copy CommandBlock text."
     read: "Click a sign to read CommandBlock text."
+    redstone: "CommandBlock now has redstone {STATE}."
     add: "Ready to add."
     
 failure:
@@ -18,6 +21,8 @@ failure:
     invalid_line: "Line number invalid!"
     remove_first: "CommandSign text must be removed first."
     not_a_sign: "Block is not a CommandBlock."
+    cannot_use: "You may not use this type of sign."
+    player_only: "This command can only be run as a player."
     
 update:
     prefix: "&e"

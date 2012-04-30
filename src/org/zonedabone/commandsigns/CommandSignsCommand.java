@@ -21,25 +21,33 @@ class CommandSignsCommand implements CommandExecutor {
 	}
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+	public boolean onCommand(final CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("commandsigns")) {
 			if (args.length < 1) {
 				return false;
 			}
-			final Player player = (Player) sender;
-			String playerName = player.getName();
+			Player player = null;
+			String playerName = null;
+			if (sender instanceof Player) {
+				player = (Player) sender;
+				player.getName();
+			}
 			if (args[0].indexOf("line") == 0) {
-				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
+				if (player == null) {
+					Messaging.sendMessage(sender, "failure.player_only");
+					return true;
+				}
+				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 					int lineNumber;
 					try {
 						lineNumber = Integer.parseInt(args[0].substring(4));
 					} catch (NumberFormatException ex) {
-						MessageManager.sendMessage(player, "failure.invalid_line");
+						Messaging.sendMessage(player, "failure.invalid_line");
 						return true;
 					}
 					CommandSignsText text = plugin.playerText.get(playerName);
 					if (text == null) {
-						text = new CommandSignsText(player.getName());
+						text = new CommandSignsText(player.getName(), false);
 						plugin.playerText.put(playerName, text);
 					}
 					String line = "";
@@ -47,42 +55,79 @@ class CommandSignsCommand implements CommandExecutor {
 						line = line.concat((i == 0 ? "" : " ") + args[i]);
 					}
 					if ((line.startsWith("/*") || line.startsWith("/^") || line.startsWith("/#")) && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
-						MessageManager.sendMessage(player, "failure.no_super");
+						Messaging.sendMessage(player, "failure.no_super");
 						return true;
 					}
 					text.setLine(lineNumber, line);
 					text.trim();
 					String display = line.replace("$", "\\$");
-					MessageManager.sendRaw(player, "success.line_print", "n", "" + lineNumber, "l", display);
+					Messaging.sendRaw(player, "success.line_print", "n", "" + lineNumber, "l", display);
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
-					MessageManager.sendMessage(player, "progress.add");
+					Messaging.sendMessage(player, "progress.add");
+				}
+			} else if (args[0].equalsIgnoreCase("redstone")) {
+				if (player == null) {
+					Messaging.sendMessage(sender, "failure.player_only");
+					return true;
+				}
+				if (plugin.hasPermission(player, "commandsigns.create.redstone")) {
+					CommandSignsText text = plugin.playerText.get(playerName);
+					if (text == null) {
+						text = new CommandSignsText(player.getName(), false);
+						plugin.playerText.put(playerName, text);
+					}
+					text.setRedstone(!text.isRedstone());
+					plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
+					Messaging.sendMessage(player, "progress.redstone", "s", ((text.isRedstone()) ? "enabled" : "disabled"));
+					Messaging.sendMessage(player, "progress.add");
 				}
 			} else if (args[0].equalsIgnoreCase("read")) {
-				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
+				if (player == null) {
+					Messaging.sendMessage(sender, "failure.player_only");
+					return true;
+				}
+				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.READ);
-					MessageManager.sendMessage(player, "progress.read");
+					Messaging.sendMessage(player, "progress.read");
 				}
 			} else if (args[0].equalsIgnoreCase("copy")) {
-				if (plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
+				if (player == null) {
+					Messaging.sendMessage(sender, "failure.player_only");
+					return true;
+				}
+				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.COPY);
-					MessageManager.sendMessage(player, "progress.copy");
+					Messaging.sendMessage(player, "progress.copy");
 				}
 			} else if (args[0].equalsIgnoreCase("remove")) {
+				if (player == null) {
+					Messaging.sendMessage(sender, "failure.player_only");
+					return true;
+				}
 				if (plugin.hasPermission(player, "commandsigns.remove")) {
 					plugin.playerStates.put(playerName, CommandSignsPlayerState.DISABLE);
-					MessageManager.sendMessage(player, "progress.remove");
+					Messaging.sendMessage(player, "progress.remove");
 				}
 			} else if (args[0].equalsIgnoreCase("clear")) {
-				if (plugin.hasPermission(player, "commandsigns.remove", false) || plugin.hasPermission(player, "commandsigns.create.regular", false) || plugin.hasPermission(player, "commandsigns.create.super")) {
+				if (player == null) {
+					Messaging.sendMessage(sender, "failure.player_only");
+					return true;
+				}
+				if (plugin.hasPermission(player, "commandsigns.remove")) {
 					plugin.playerStates.remove(playerName);
 					plugin.playerText.remove(playerName);
-					MessageManager.sendMessage(player, "success.cleared");
+					Messaging.sendMessage(player, "success.cleared");
+				}
+			} else if (args[0].equalsIgnoreCase("save")) {
+				if (plugin.hasPermission(sender, "commandsigns.save", false)) {
+					plugin.saveFile();
+					Messaging.sendMessage(sender, "success.saved");
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
-				if (player.hasPermission("commandsigns.update")) {
+				if (sender.hasPermission("commandsigns.update")) {
 					if (plugin.version < plugin.newestVersion) {
 						if (!plugin.getUpdateFile().exists()) {
-							MessageManager.sendMessage(player, "update.start", "v", plugin.stringNew);
+							Messaging.sendMessage(sender, "update.start", "v", plugin.stringNew);
 							new Thread() {
 								
 								@Override
@@ -104,25 +149,25 @@ class CommandSignsCommand implements CommandExecutor {
 											totalBytesRead += bytesRead;
 										}
 										long endTime = System.currentTimeMillis();
-										MessageManager.sendMessage(player, "update.finish", "s", "" + (((totalBytesRead)) / 1000), "t", "" + (((double) (endTime - startTime)) / 1000));
+										Messaging.sendMessage(sender, "update.finish", "s", "" + (((totalBytesRead)) / 1000), "t", "" + (((double) (endTime - startTime)) / 1000));
 										writer.close();
 										reader.close();
 									} catch (MalformedURLException e) {
-										MessageManager.sendMessage(player, "update.fetch_error", "e", e.getMessage());
+										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
 									} catch (IOException e) {
-										MessageManager.sendMessage(player, "update.fetch_error", "e", e.getMessage());
+										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
 									}
 								}
 							}.start();
 						} else {
-							MessageManager.sendMessage(player, "update.already_downloaded");
+							Messaging.sendMessage(sender, "update.already_downloaded");
 						}
 					} else {
-						MessageManager.sendMessage(player, "update.up_to_date", "v", plugin.getDescription().getVersion());
+						Messaging.sendMessage(sender, "update.up_to_date", "v", plugin.getDescription().getVersion());
 					}
 				}
 			} else {
-				MessageManager.sendMessage(player, "failure.wrong_syntax");
+				Messaging.sendMessage(sender, "failure.wrong_syntax");
 			}
 			return true;
 		}

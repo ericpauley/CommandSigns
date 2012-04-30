@@ -10,17 +10,23 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MessageManager {
+public class Messaging {
 	
 	private static Map<String, String> messages = new ConcurrentHashMap<String, String>();
 	
 	public static void loadMessages(JavaPlugin plugin) {
 		File f = new File(plugin.getDataFolder(), "messages.yml");
+		Configuration included = YamlConfiguration.loadConfiguration(plugin.getResource("messages.yml"));
 		if (!f.exists()) {
 			plugin.getLogger().info("Creating default messages.yml.");
 			plugin.saveResource("messages.yml", true);
 		}
 		Configuration config = YamlConfiguration.loadConfiguration(f);
+		if (included.getInt("version", 0) > config.getInt("version", 0)) {
+			plugin.getLogger().info("Updating messages.yml.");
+			plugin.saveResource("messages.yml", true);
+		}
+		config = YamlConfiguration.loadConfiguration(f);
 		for (String k : config.getKeys(true)) {
 			if (config.isString(k)) {
 				messages.put(k, config.getString(k));
