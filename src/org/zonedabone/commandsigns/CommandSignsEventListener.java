@@ -1,6 +1,8 @@
 package org.zonedabone.commandsigns;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -31,13 +33,15 @@ public class CommandSignsEventListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerInteract(final PlayerInteractEvent event) {
+		if (event.getClickedBlock() == null)
+			return;
 		final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, event.getPlayer(), event.getClickedBlock());
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
 			new Thread() {
 				
 				@Override
 				public void run() {
-					signClickEvent.onRightClick();
+					signClickEvent.onInteract(event.getAction());
 				}
 			}.start();
 		}
@@ -57,18 +61,29 @@ public class CommandSignsEventListener implements Listener {
 	@EventHandler
 	public void onRedstoneChange(BlockRedstoneEvent event) {
 		if (event.getNewCurrent() != 0 && event.getOldCurrent() == 0) {
-			Location csl = event.getBlock().getLocation();
-			CommandSignsText cst = plugin.activeSigns.get(csl);
-			if (cst != null && cst.isRedstone()) {
-				final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, null, event.getBlock());
-				new Thread() {
-					
-					@Override
-					public void run() {
-						signClickEvent.runSign();
-					}
-				}.start();
-			}
+			Block b = event.getBlock();
+			handleRedstone(b);
+			handleRedstone(b.getRelative(BlockFace.NORTH));
+			handleRedstone(b.getRelative(BlockFace.SOUTH));
+			handleRedstone(b.getRelative(BlockFace.EAST));
+			handleRedstone(b.getRelative(BlockFace.WEST));
+			handleRedstone(b.getRelative(BlockFace.UP));
+			handleRedstone(b.getRelative(BlockFace.DOWN));
+		}
+	}
+	
+	public void handleRedstone(Block b) {
+		Location csl = b.getLocation();
+		CommandSignsText cst = plugin.activeSigns.get(csl);
+		if (cst != null && cst.isRedstone()) {
+			final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, null, b);
+			new Thread() {
+				
+				@Override
+				public void run() {
+					signClickEvent.runSign();
+				}
+			}.start();
 		}
 	}
 }

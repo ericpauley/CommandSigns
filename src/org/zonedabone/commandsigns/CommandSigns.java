@@ -43,6 +43,7 @@ public class CommandSigns extends JavaPlugin {
 	public final Map<String, CommandSignsText> playerText = new HashMap<String, CommandSignsText>();
 	public final Map<Location, Map<String, Long>> timeouts = new ConcurrentHashMap<Location, Map<String, Long>>();
 	public final Set<String> running = Collections.synchronizedSet(new HashSet<String>());
+	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
 	public int version, newestVersion;
 	public String downloadLocation, stringNew;

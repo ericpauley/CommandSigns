@@ -7,9 +7,11 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.permissions.PermissionAttachment;
 
 public class CommandSignsClickHandler {
@@ -21,16 +23,24 @@ public class CommandSignsClickHandler {
 	public List<String> parseCommandSign(Player player, Location loc, CommandSignsText commandSign) {
 		List<String> commandList = new ArrayList<String>();
 		for (String line : commandSign.getText()) {
-			if (player == null) {
-				line = line.replaceAll("(?iu)<x>", "" + loc.getX());
-				line = line.replaceAll("(?iu)<y>", "" + loc.getY());
-				line = line.replaceAll("(?iu)<z>", "" + loc.getZ());
-				line = line.replaceAll("(?iu)<world>", loc.getWorld().getName());
-			} else {
+			line = line.replaceAll("(?iu)<blockx>", "" + loc.getX());
+			line = line.replaceAll("(?iu)<blocky>", "" + loc.getY());
+			line = line.replaceAll("(?iu)<blockz>", "" + loc.getZ());
+			line = line.replaceAll("(?iu)<world>", loc.getWorld().getName());
+			Player clp = null;
+			int dist = Integer.MAX_VALUE;
+			for (Player p : loc.getWorld().getPlayers()) {
+				if (p.getLocation().distanceSquared(loc) < dist) {
+					clp = p;
+				}
+			}
+			if (clp != null) {
+				line = line.replaceAll("(?iu)<near>", clp.getName());
+			}
+			if (player != null) {
 				line = line.replaceAll("(?iu)<x>", "" + player.getLocation().getBlockX());
 				line = line.replaceAll("(?iu)<y>", "" + player.getLocation().getBlockY());
 				line = line.replaceAll("(?iu)<z>", "" + player.getLocation().getBlockZ());
-				line = line.replaceAll("(?iu)<world>", player.getWorld().getName());
 				line = line.replaceAll("(?iu)<name>", "" + player.getName());
 				line = line.replaceAll("(?iu)<display>", player.getDisplayName());
 				if (CommandSigns.economy != null && CommandSigns.economy.isEnabled()) {
@@ -112,6 +122,10 @@ public class CommandSignsClickHandler {
 				if (plugin.running.contains(player.getName()))
 					return;
 				plugin.running.add(player.getName());
+			} else {
+				if (plugin.redstoneLock.contains(location))
+					return;
+				plugin.redstoneLock.add(location);
 			}
 			boolean groupFiltered = false;
 			boolean moneyFiltered = false;
@@ -202,13 +216,21 @@ public class CommandSignsClickHandler {
 				if (setTime)
 					lastUse.put(player.getName(), System.currentTimeMillis());
 				plugin.running.remove(player.getName());
+			} else {
+				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+					
+					@Override
+					public void run() {
+						plugin.redstoneLock.remove(location);
+					}
+				});
 			}
 		}
 	}
 	
-	public void onRightClick() {
+	public void onInteract(Action action) {
 		CommandSignsPlayerState state = plugin.playerStates.get(player.getName());
-		if (state != null) {
+		if (state != null && action == Action.RIGHT_CLICK_BLOCK) {
 			switch (state) {
 				case ENABLE :
 					enableSign();
@@ -224,6 +246,9 @@ public class CommandSignsClickHandler {
 					break;
 			}
 		} else {
+			Material m = location.getBlock().getType();
+			if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && action == Action.RIGHT_CLICK_BLOCK)
+				return;
 			runSign();
 		}
 	}
