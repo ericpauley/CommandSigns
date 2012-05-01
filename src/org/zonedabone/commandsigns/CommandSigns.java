@@ -23,6 +23,7 @@ import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -39,20 +40,20 @@ public class CommandSigns extends JavaPlugin {
 	// listeners
 	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
 	// plugin variables
-	public final Map<String, CommandSignsPlayerState> playerStates = new HashMap<String, CommandSignsPlayerState>();
-	public final Map<String, CommandSignsText> playerText = new HashMap<String, CommandSignsText>();
-	public final Map<Location, Map<String, Long>> timeouts = new ConcurrentHashMap<Location, Map<String, Long>>();
-	public final Set<String> running = Collections.synchronizedSet(new HashSet<String>());
+	public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
+	public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
+	public final Map<Location, Map<OfflinePlayer, Long>> timeouts = new ConcurrentHashMap<Location, Map<OfflinePlayer, Long>>();
+	public final Set<OfflinePlayer> running = Collections.synchronizedSet(new HashSet<OfflinePlayer>());
 	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
 	public int version, newestVersion;
 	public String downloadLocation, stringNew;
 	private int updateTask;
 	
-	public synchronized Map<String, Long> getSignTimeouts(Location csl) {
-		Map<String, Long> toReturn = timeouts.get(csl);
+	public synchronized Map<OfflinePlayer, Long> getSignTimeouts(Location csl) {
+		Map<OfflinePlayer, Long> toReturn = timeouts.get(csl);
 		if (toReturn == null) {
-			toReturn = new ConcurrentHashMap<String, Long>();
+			toReturn = new ConcurrentHashMap<OfflinePlayer, Long>();
 			timeouts.put(csl, toReturn);
 		}
 		return toReturn;

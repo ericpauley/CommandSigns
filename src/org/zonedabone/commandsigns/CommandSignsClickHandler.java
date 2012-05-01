@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -60,30 +61,28 @@ public class CommandSignsClickHandler {
 	}
 	
 	public void copySign() {
-		String playerName = player.getName();
 		CommandSignsText text = plugin.activeSigns.get(location).clone(player.getName());
 		if (text == null) {
 			Messaging.sendMessage(player, "failure.not_a_sign");
 		}
-		plugin.playerText.put(playerName, text);
+		plugin.playerText.put(player, text);
 		readSign();
 		Messaging.sendMessage(player, "success.copied");
-		plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
+		plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 	}
 	
 	public void disableSign() {
-		String playerName = player.getName();
 		if (!plugin.activeSigns.containsKey(location)) {
 			Messaging.sendMessage(player, "failure.not_a_sign");
-			plugin.playerStates.remove(playerName);
+			plugin.playerStates.remove(player);
 			return;
 		}
 		plugin.activeSigns.remove(location);
-		if (plugin.playerText.containsKey(playerName)) {
-			plugin.playerStates.put(playerName, CommandSignsPlayerState.ENABLE);
+		if (plugin.playerText.containsKey(player)) {
+			plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 			player.sendMessage("Sign disabled. You still have text in your clipboard.");
 		} else {
-			plugin.playerStates.remove(playerName);
+			plugin.playerStates.remove(player);
 			player.sendMessage("Sign disabled.");
 		}
 	}
@@ -93,10 +92,10 @@ public class CommandSignsClickHandler {
 			player.sendMessage("Sign is already enabled!");
 			return;
 		}
-		CommandSignsText text = plugin.playerText.get(player.getName());
+		CommandSignsText text = plugin.playerText.get(player);
 		plugin.activeSigns.put(location, text.clone(player.getName()));
-		plugin.playerStates.remove(player.getName());
-		plugin.playerText.remove(player.getName());
+		plugin.playerStates.remove(player);
+		plugin.playerText.remove(player);
 		player.sendMessage("CommandSign enabled");
 	}
 	
@@ -119,9 +118,9 @@ public class CommandSignsClickHandler {
 		if (player == null || plugin.hasPermission(player, "commandsigns.use.regular")) {
 			List<String> commandList = parseCommandSign(player, location, cst);
 			if (player != null) {
-				if (plugin.running.contains(player.getName()))
+				if (plugin.running.contains(player))
 					return;
-				plugin.running.add(player.getName());
+				plugin.running.add(player);
 			} else {
 				if (plugin.redstoneLock.contains(location))
 					return;
@@ -133,7 +132,7 @@ public class CommandSignsClickHandler {
 			boolean timeFiltered = false;
 			boolean setTime = true;
 			boolean elsed = false;
-			Map<String, Long> lastUse = plugin.getSignTimeouts(location);
+			Map<OfflinePlayer, Long> lastUse = plugin.getSignTimeouts(location);
 			for (String command : commandList) {
 				boolean show = true;
 				if (command.equals(""))
@@ -167,7 +166,7 @@ public class CommandSignsClickHandler {
 						amount = (int) (Double.parseDouble(command.substring(1)) * 1000);
 					} catch (NumberFormatException e) {
 					}
-					Long latest = lastUse.get(player.getName());
+					Long latest = lastUse.get(player);
 					if (latest != null && latest + amount > System.currentTimeMillis()) {
 						timeFiltered = true;
 						setTime = false;
@@ -214,8 +213,8 @@ public class CommandSignsClickHandler {
 			}
 			if (player != null) {
 				if (setTime)
-					lastUse.put(player.getName(), System.currentTimeMillis());
-				plugin.running.remove(player.getName());
+					lastUse.put(player, System.currentTimeMillis());
+				plugin.running.remove(player);
 			} else {
 				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 					
@@ -229,7 +228,7 @@ public class CommandSignsClickHandler {
 	}
 	
 	public void onInteract(Action action) {
-		CommandSignsPlayerState state = plugin.playerStates.get(player.getName());
+		CommandSignsPlayerState state = plugin.playerStates.get(player);
 		if (state != null && action == Action.RIGHT_CLICK_BLOCK) {
 			switch (state) {
 				case ENABLE :
@@ -266,7 +265,7 @@ public class CommandSignsClickHandler {
 			}
 			i++;
 		}
-		plugin.playerStates.remove(player.getName());
+		plugin.playerStates.remove(player);
 	}
 	private class RunHandler implements Runnable {
 		
