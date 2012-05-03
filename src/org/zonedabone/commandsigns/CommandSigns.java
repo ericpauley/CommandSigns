@@ -242,7 +242,7 @@ public class CommandSigns extends JavaPlugin {
 			public void run() {
 				try {
 					// open HTTP connection
-					URL url = new URL("http://cloud.github.com/downloads/zonedabone/CommandSigns/version.txt");
+					URL url = new URL("http://dl.dropbox.com/u/38069635/CommandSigns/version.txt");
 					URLConnection connection = url.openConnection();
 					BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					// just read first line
