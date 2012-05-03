@@ -46,7 +46,8 @@ public class CommandSigns extends JavaPlugin {
 	public final Set<OfflinePlayer> running = Collections.synchronizedSet(new HashSet<OfflinePlayer>());
 	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
-	public int version, newestVersion;
+	public int version = 1;
+	public int newestVersion;
 	public String downloadLocation, stringNew;
 	private int updateTask;
 	
@@ -234,30 +235,30 @@ public class CommandSigns extends JavaPlugin {
 	}
 	
 	public void startUpdateCheck() {
-		version = Integer.parseInt(getDescription().getVersion().replaceAll("\\.", ""));
 		newestVersion = version;
-		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					// open HTTP connection
-					URL url = new URL("http://dl.dropbox.com/u/38069635/CommandSigns/version.txt");
-					URLConnection connection = url.openConnection();
-					BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-					// just read first line
-					stringNew = in.readLine();
-					newestVersion = Integer.parseInt(stringNew.replaceAll("\\.", ""));
-					downloadLocation = in.readLine();
-					in.close();
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-				}
+		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Updater(), 0, 24000);
+	}
+	public class Updater implements Runnable {
+		
+		@Override
+		public void run() {
+			try {
+				// open HTTP connection
+				URL url = new URL("http://dl.dropbox.com/u/38069635/CommandSigns/version.txt");
+				URLConnection connection = url.openConnection();
+				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+				// just read first line
+				stringNew = in.readLine();
+				newestVersion = Integer.parseInt(in.readLine());
+				downloadLocation = in.readLine();
+				in.close();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
 			}
-		}, 0, 24000);
+		}
 	}
 	
 	public void saveFile() {

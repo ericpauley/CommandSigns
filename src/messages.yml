@@ -1,4 +1,4 @@
-version: 1
+version: 2
 prefix: "&4[CommandSigns]&f"
 success:
     cleared: "CommandSign text and status cleared."
@@ -34,8 +34,11 @@ update:
     finish: "Downloaded &5{SIZE}{PREFIX} KB in &5{TIME}{PREFIX} seconds. To complete the update, restart/reload your server."
     already_downloaded: "An update to CommandSigns is already waiting to be installed on reload/restart."
     up_to_date: "CommandSigns is already up to date. (&5{VERSION}{PREFIX})"
+    confirm_up_to_date: "CommandSigns is up to date. (&5{VERSION}{PREFIX})"
     notify: "CommandSigns is updated to &5{VERSION}{PREFIX}. You can update your install with &5/cs update{PREFIX}."
     fetch_error: "Error fetching update - {ERROR}"
+    check: "Checking for latest version..."
+    force: "Force updating CommandSigns to latest version..."
     
 metrics:
     success: "Plugin metrics enabled! Thank you!"

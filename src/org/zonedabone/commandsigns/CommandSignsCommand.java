@@ -26,10 +26,11 @@ class CommandSignsCommand implements CommandExecutor {
 			if (args.length < 1) {
 				return false;
 			}
-			Player player = null;
+			Player tp = null;
 			if (sender instanceof Player) {
-				player = (Player) sender;
+				tp = (Player) sender;
 			}
+			final Player player = tp;
 			if (args[0].indexOf("line") == 0) {
 				if (player == null) {
 					Messaging.sendMessage(sender, "failure.player_only");
@@ -158,7 +159,57 @@ class CommandSignsCommand implements CommandExecutor {
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
 				if (sender.hasPermission("commandsigns.update")) {
-					if (plugin.version < plugin.newestVersion) {
+					if (args.length == 2) {
+						if (args[1].equalsIgnoreCase("-f")) {
+							Messaging.sendMessage(sender, "update.force");
+							new Thread() {
+								
+								@Override
+								public void run() {
+									try {
+										plugin.startUpdateCheck();
+										long startTime = System.currentTimeMillis();
+										URL url = new URL(plugin.downloadLocation);
+										url.openConnection();
+										InputStream reader = url.openStream();
+										File f = plugin.getUpdateFile();
+										f.getParentFile().mkdirs();
+										FileOutputStream writer = new FileOutputStream(f);
+										byte[] buffer = new byte[153600];
+										int totalBytesRead = 0;
+										int bytesRead = 0;
+										while ((bytesRead = reader.read(buffer)) > 0) {
+											writer.write(buffer, 0, bytesRead);
+											buffer = new byte[153600];
+											totalBytesRead += bytesRead;
+										}
+										long endTime = System.currentTimeMillis();
+										Messaging.sendMessage(sender, "update.finish", "s", "" + (((totalBytesRead)) / 1000), "t", "" + (((double) (endTime - startTime)) / 1000));
+										writer.close();
+										reader.close();
+									} catch (MalformedURLException e) {
+										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
+									} catch (IOException e) {
+										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
+									}
+								}
+							}.start();
+						} else if (args[1].equalsIgnoreCase("-c")) {
+							Messaging.sendMessage(sender, "update.check");
+							new Thread() {
+								
+								@Override
+								public void run() {
+									plugin.new Updater().run();
+									if (plugin.version < plugin.newestVersion) {
+										Messaging.sendMessage(player, "update.notify", "v", plugin.stringNew);
+									} else {
+										Messaging.sendMessage(player, "update.confirm_up_to_date", "v", plugin.stringNew);
+									}
+								}
+							}.start();
+						}
+					} else if (plugin.version < plugin.newestVersion) {
 						if (!plugin.getUpdateFile().exists()) {
 							Messaging.sendMessage(sender, "update.start", "v", plugin.stringNew);
 							new Thread() {
