@@ -1,7 +1,7 @@
 name: CommandSigns
 main: org.zonedabone.commandsigns.CommandSigns
 authors: [zonedabone, HansAnderson]
-version: 1.7.0
+version: 1.7.1
 description: >
              Add commands to signs.
 depend: [Vault]
