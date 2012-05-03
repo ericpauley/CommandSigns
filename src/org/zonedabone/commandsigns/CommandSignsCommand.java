@@ -43,6 +43,10 @@ class CommandSignsCommand implements CommandExecutor {
 						Messaging.sendMessage(player, "failure.invalid_line");
 						return true;
 					}
+					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+						Messaging.sendMessage(player, "failure.must_select");
+						return true;
+					}
 					CommandSignsText text = plugin.playerText.get(player);
 					if (text == null) {
 						text = new CommandSignsText(player.getName(), false);
@@ -60,8 +64,10 @@ class CommandSignsCommand implements CommandExecutor {
 					text.trim();
 					String display = line.replace("$", "\\$");
 					Messaging.sendRaw(player, "success.line_print", "n", "" + lineNumber, "l", display);
-					plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
-					Messaging.sendMessage(player, "progress.add");
+					if (plugin.playerStates.get(player) != CommandSignsPlayerState.EDIT) {
+						plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
+						Messaging.sendMessage(player, "progress.add");
+					}
 				}
 			} else if (args[0].equalsIgnoreCase("redstone")) {
 				if (player == null) {
@@ -69,15 +75,21 @@ class CommandSignsCommand implements CommandExecutor {
 					return true;
 				}
 				if (plugin.hasPermission(player, "commandsigns.create.redstone")) {
+					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+						Messaging.sendMessage(player, "failure.must_select");
+						return true;
+					}
 					CommandSignsText text = plugin.playerText.get(player);
 					if (text == null) {
 						text = new CommandSignsText(player.getName(), false);
 						plugin.playerText.put(player, text);
 					}
 					text.setRedstone(!text.isRedstone());
-					plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 					Messaging.sendMessage(player, "progress.redstone", "s", ((text.isRedstone()) ? "enabled" : "disabled"));
-					Messaging.sendMessage(player, "progress.add");
+					if (plugin.playerStates.get(player) != CommandSignsPlayerState.EDIT) {
+						plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
+						Messaging.sendMessage(player, "progress.add");
+					}
 				}
 			} else if (args[0].equalsIgnoreCase("read")) {
 				if (player == null) {
@@ -85,6 +97,9 @@ class CommandSignsCommand implements CommandExecutor {
 					return true;
 				}
 				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
+					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+						finishEditing(player);
+					}
 					plugin.playerStates.put(player, CommandSignsPlayerState.READ);
 					Messaging.sendMessage(player, "progress.read");
 				}
@@ -94,6 +109,9 @@ class CommandSignsCommand implements CommandExecutor {
 					return true;
 				}
 				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
+					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+						finishEditing(player);
+					}
 					plugin.playerStates.put(player, CommandSignsPlayerState.COPY);
 					Messaging.sendMessage(player, "progress.copy");
 				}
@@ -103,7 +121,10 @@ class CommandSignsCommand implements CommandExecutor {
 					return true;
 				}
 				if (plugin.hasPermission(player, "commandsigns.remove")) {
-					plugin.playerStates.put(player, CommandSignsPlayerState.DISABLE);
+					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+						finishEditing(player);
+					}
+					plugin.playerStates.put(player, CommandSignsPlayerState.REMOVE);
 					Messaging.sendMessage(player, "progress.remove");
 				}
 			} else if (args[0].equalsIgnoreCase("clear")) {
@@ -112,6 +133,9 @@ class CommandSignsCommand implements CommandExecutor {
 					return true;
 				}
 				if (plugin.hasPermission(player, "commandsigns.remove")) {
+					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+						finishEditing(player);
+					}
 					plugin.playerStates.remove(player);
 					plugin.playerText.remove(player);
 					Messaging.sendMessage(player, "success.cleared");
@@ -120,6 +144,17 @@ class CommandSignsCommand implements CommandExecutor {
 				if (plugin.hasPermission(sender, "commandsigns.save", false)) {
 					plugin.saveFile();
 					Messaging.sendMessage(sender, "success.saved");
+				}
+			} else if (args[0].equalsIgnoreCase("edit")) {
+				if (plugin.hasPermission(sender, "commandsigns.edit", false)) {
+					CommandSignsPlayerState cs = plugin.playerStates.get(player);
+					if (cs == CommandSignsPlayerState.EDIT_SELECT || cs == CommandSignsPlayerState.EDIT) {
+						finishEditing(player);
+					} else {
+						plugin.playerStates.put(player, CommandSignsPlayerState.EDIT_SELECT);
+						plugin.playerText.remove(player);
+						Messaging.sendMessage(player, "progress.select_sign");
+					}
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
 				if (sender.hasPermission("commandsigns.update")) {
@@ -170,5 +205,11 @@ class CommandSignsCommand implements CommandExecutor {
 			return true;
 		}
 		return false;
+	}
+	
+	public void finishEditing(Player player) {
+		plugin.playerStates.remove(player);
+		plugin.playerText.remove(player);
+		Messaging.sendMessage(player, "success.done_editing");
 	}
 }

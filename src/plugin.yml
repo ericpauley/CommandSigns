@@ -26,6 +26,7 @@ permissions:
             commandsigns.group.*: true
             commandsigns.update: true
             commandsigns.save: true
+            commandsigns.edit: true
         default: op
     commandsigns.create.*:
         description: Gives access CommandSigns sign creation commands
@@ -65,4 +66,7 @@ permissions:
         default: false
     commandsigns.updates:
         description: Shows this player CommandSigns updates and allows them to update
+        default: false
+    commandsigns.edit:
+        description: Allows editing of CommandSigns
         default: false

@@ -36,7 +36,7 @@ public class CommandSigns extends JavaPlugin {
 	public static Economy economy = null;
 	public static Permission permission = null;
 	public final Map<Location, CommandSignsText> activeSigns = new HashMap<Location, CommandSignsText>();
-	private CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
+	public CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
 	// listeners
 	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
 	// plugin variables
@@ -272,10 +272,12 @@ public class CommandSigns extends JavaPlugin {
 			for (Map.Entry<Location, CommandSignsText> entry : activeSigns.entrySet()) {
 				String commands = "";
 				entry.getValue().trim();
+				boolean first = true;
 				for (String command : entry.getValue().getText()) {
-					if (!commands.equals(""))
+					if (!first)
 						commands += "\u00B6";
 					commands += command;
+					first = false;
 				}
 				Location csl = entry.getKey();
 				String sep = "\u00A7";

@@ -61,11 +61,13 @@ public class CommandSignsClickHandler {
 	}
 	
 	public void copySign() {
-		CommandSignsText text = plugin.activeSigns.get(location).clone(player.getName());
+		CommandSignsText text = plugin.activeSigns.get(location);
 		if (text == null) {
 			Messaging.sendMessage(player, "failure.not_a_sign");
+			return;
 		}
-		plugin.playerText.put(player, text);
+		CommandSignsText clone = plugin.activeSigns.get(location).clone(player.getName());
+		plugin.playerText.put(player, clone);
 		readSign();
 		Messaging.sendMessage(player, "success.copied");
 		plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
@@ -74,10 +76,11 @@ public class CommandSignsClickHandler {
 	public void disableSign() {
 		if (!plugin.activeSigns.containsKey(location)) {
 			Messaging.sendMessage(player, "failure.not_a_sign");
-			plugin.playerStates.remove(player);
 			return;
 		}
 		plugin.activeSigns.remove(location);
+		plugin.redstoneLock.remove(location);
+		plugin.timeouts.remove(location);
 		if (plugin.playerText.containsKey(player)) {
 			plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 			player.sendMessage("Sign disabled. You still have text in your clipboard.");
@@ -234,7 +237,7 @@ public class CommandSignsClickHandler {
 				case ENABLE :
 					enableSign();
 					break;
-				case DISABLE :
+				case REMOVE :
 					disableSign();
 					break;
 				case READ :
@@ -243,6 +246,15 @@ public class CommandSignsClickHandler {
 				case COPY :
 					copySign();
 					break;
+				case EDIT_SELECT :
+					editSign();
+					break;
+				default :
+					Material m = location.getBlock().getType();
+					if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && action == Action.RIGHT_CLICK_BLOCK)
+						return;
+					runSign();
+					break;
 			}
 		} else {
 			Material m = location.getBlock().getType();
@@ -250,6 +262,17 @@ public class CommandSignsClickHandler {
 				return;
 			runSign();
 		}
+	}
+	
+	public void editSign() {
+		CommandSignsText cst = plugin.activeSigns.get(location);
+		if (cst == null) {
+			Messaging.sendMessage(player, "failure.not_a_sign");
+			return;
+		}
+		Messaging.sendMessage(player, "progress.edit_started");
+		plugin.playerText.put(player, cst);
+		plugin.playerStates.put(player, CommandSignsPlayerState.EDIT);
 	}
 	
 	public void readSign() {
