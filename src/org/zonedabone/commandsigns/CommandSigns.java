@@ -46,7 +46,7 @@ public class CommandSigns extends JavaPlugin {
 	public final Set<OfflinePlayer> running = Collections.synchronizedSet(new HashSet<OfflinePlayer>());
 	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
-	public int version = 1;
+	public int version = 2;
 	public int newestVersion;
 	public String downloadLocation, stringNew;
 	private int updateTask;
@@ -164,7 +164,7 @@ public class CommandSigns extends JavaPlugin {
 						String line = scanner.nextLine();
 						if (!line.equals("")) {
 							// if (line.contains("\u00A7")) {
-							String[] raw = line.split("\u00A7");
+							String[] raw = line.split("[\u00A7\u001D]");
 							String world = raw[0];
 							int x = Integer.parseInt(raw[1]);
 							int y = Integer.parseInt(raw[2]);
@@ -175,7 +175,7 @@ public class CommandSigns extends JavaPlugin {
 							if (raw.length >= 7)
 								redstone = Boolean.parseBoolean(raw[6]);
 							CommandSignsText cst = new CommandSignsText(owner, redstone);
-							for (String command : raw[5].split("\u00B6")) {
+							for (String command : raw[5].split("[\u00B6\u001E]")) {
 								cst.getText().add(command);
 							}
 							activeSigns.put(csl, cst);
@@ -276,12 +276,13 @@ public class CommandSigns extends JavaPlugin {
 				boolean first = true;
 				for (String command : entry.getValue().getText()) {
 					if (!first)
-						commands += "\u00B6";
+						commands += "\u001E";
 					commands += command;
 					first = false;
 				}
 				Location csl = entry.getKey();
-				String sep = "\u00A7";
+				String sep = "\u001D";
+				System.out.println(sep);
 				String line = csl.getWorld().getName();
 				line += sep;
 				line += csl.getBlockX();
