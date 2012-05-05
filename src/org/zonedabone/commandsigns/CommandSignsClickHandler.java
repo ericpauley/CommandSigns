@@ -3,6 +3,9 @@ package org.zonedabone.commandsigns;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -115,11 +118,32 @@ public class CommandSignsClickHandler {
 	}
 	
 	public void runSign() {
-		CommandSignsText cst = plugin.activeSigns.get(location);
+		final CommandSignsText cst = plugin.activeSigns.get(location);
 		if (cst == null)
 			return;
 		if (player == null || plugin.hasPermission(player, "commandsigns.use.regular")) {
-			List<String> commandList = parseCommandSign(player, location, cst);
+			Future<List<String>> future = plugin.getServer().getScheduler().callSyncMethod(plugin, new Callable<List<String>>() {
+				
+				@Override
+				public List<String> call() throws Exception {
+					return parseCommandSign(player, location, cst);
+				}
+			});
+			List<String> commandList;
+			while (true) {
+				try {
+					commandList = future.get();
+					if (commandList != null) {
+						break;
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 			if (player != null) {
 				if (plugin.running.contains(player))
 					return;
