@@ -46,7 +46,7 @@ public class CommandSigns extends JavaPlugin {
 	public final Set<OfflinePlayer> running = Collections.synchronizedSet(new HashSet<OfflinePlayer>());
 	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
-	public int version = 2;
+	public int version = 3;
 	public int newestVersion;
 	public String downloadLocation, stringNew;
 	private int updateTask;
