@@ -160,25 +160,36 @@ public class CommandSignsClickHandler {
 			for (String command : commandList) {
 				if (command.equals(""))
 					continue;
-				// The - delimiter ends the current restriction block
-				if (command.equals("-") && !restrictions.isEmpty())
-					restrictions.pop();
+				
+				boolean silent = false;
+				boolean negate = false;
+				boolean meta = false;
+				do {
+					meta = false;
+					// The '-' delimiter ends the current restriction block
+				 	if (command.startsWith("-") && !restrictions.isEmpty()) {
+				 		restrictions.pop();
+				 		command = command.substring(1);
+				 		meta = true;
+				 	}
+				 	// If the restriction begins with a ?, make it silent
+				 	else if (command.startsWith("?")) {
+						silent = true;
+						command = command.substring(1);
+						meta = true;
+					}
+				 	// If the restriction starts with a !, negate the block
+					else if (command.startsWith("!")) {
+						negate = true;
+						command = command.substring(1);
+						meta = true;
+					}
+				} while(meta == true);
+				
 				// If a restriction block is denied, skip to next line
 				if (!restrictions.isEmpty() && restrictions.peek().equals(false))
 					continue;
-				// If the restriction begins with a ?, make it silent
-				boolean silent = false;
-				if (command.startsWith("?")) {
-					silent = true;
-					command = command.substring(1);
-				}
-				// If the restriction starts with a !, negate the block
-				boolean negate = false;
-				if (command.startsWith("!")) {
-					negate = true;
-					command = command.substring(1);
-				}
-				// If command has become empty, skip to next line
+
 				if (command.equals(""))
 					continue;
 
