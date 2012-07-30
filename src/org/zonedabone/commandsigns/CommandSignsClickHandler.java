@@ -166,10 +166,16 @@ public class CommandSignsClickHandler {
 				// If a restriction block is denied, skip to next line
 				if (!restrictions.isEmpty() && restrictions.peek().equals(false))
 					continue;
-				// If the command begins with a ?, make it silent
+				// If the restriction begins with a ?, make it silent
 				boolean silent = false;
 				if (command.startsWith("?")) {
 					silent = true;
+					command = command.substring(1);
+				}
+				// If the restriction starts with a !, negate the block
+				boolean negate = false;
+				if (command.startsWith("!")) {
+					negate = true;
 					command = command.substring(1);
 				}
 				// If command has become empty, skip to next line
@@ -183,16 +189,27 @@ public class CommandSignsClickHandler {
 					} catch (NumberFormatException e) {
 					}
 					Long latest = lastUse.get(player);
-					if (latest != null && latest + amount > System.currentTimeMillis()) {
-						// Set the current code block to be denied
-						restrictions.push(false);
-						// Show error if not silent
-						if (!silent)
-							player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
-					} else {
+					// If condition is true and negate is true, reject
+					// If condition is false and negate is false, reject
+					// If condition is true and negate is false or vice versa, accept (XOR)
+					if ((latest == null || System.currentTimeMillis() - latest > amount) ^ negate) {
 						lastUse.put(player, System.currentTimeMillis());
 						// Set the current code block to be enabled
 						restrictions.push(true);
+					} else {
+						// Set the current code block to be denied
+						restrictions.push(false);
+						// Show error if not silent
+						if (!silent) {
+							if (negate)
+								player.sendMessage("You must click again within " + amount / 1000 + " seconds to use this sign.");
+							else
+								player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
+						}
+						if (negate) {
+							lastUse.put(player, System.currentTimeMillis());
+							latest = lastUse.get(player);
+						}
 					}
 				} else if (command.startsWith("%")) {
 					double amount = 0;
@@ -205,7 +222,7 @@ public class CommandSignsClickHandler {
 					} catch (InterruptedException e) {
 					}
 				} else if (player != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
-					if (plugin.hasPermission(player, command.substring(1))) {
+					if (plugin.hasPermission(player, command.substring(1)) ^ negate) {
 						restrictions.push(true);
 					} else {
 						restrictions.push(false);
@@ -213,7 +230,7 @@ public class CommandSignsClickHandler {
 							player.sendMessage(ChatColor.RED + "You don't have permission to use this CommandSign.");
 					}
 				} else if (player != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
-					if (inGroup(command.substring(1))) {
+					if (inGroup(command.substring(1)) ^ negate) {
 						restrictions.push(true);
 					} else {
 						restrictions.push(false);
@@ -226,7 +243,7 @@ public class CommandSignsClickHandler {
 						amount = Double.parseDouble(command.substring(1));
 					} catch (NumberFormatException e) {
 					}
-					if (CommandSigns.economy.withdrawPlayer(player.getName(), amount).transactionSuccess()) {
+					if (CommandSigns.economy.withdrawPlayer(player.getName(), amount).transactionSuccess() ^ negate) {
 						restrictions.push(true);
 					} else {
 						restrictions.push(false);
