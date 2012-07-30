@@ -202,7 +202,7 @@ public class CommandSignsClickHandler {
 						// Show error if not silent
 						if (!silent) {
 							if (negate)
-								player.sendMessage("You must click again within " + amount / 1000 + " seconds to use this sign.");
+								player.sendMessage(ChatColor.RED + "You must click again within " + amount / 1000 + " seconds to use this sign.");
 							else
 								player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
 						}
