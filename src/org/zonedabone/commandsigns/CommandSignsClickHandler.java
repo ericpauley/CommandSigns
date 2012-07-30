@@ -205,10 +205,10 @@ public class CommandSignsClickHandler {
 					// If condition is true and negate is false or vice versa, accept (XOR)
 					if ((latest == null || System.currentTimeMillis() - latest > amount) ^ negate) {
 						lastUse.put(player, System.currentTimeMillis());
-						// Set the current code block to be enabled
+						// Set the current command block to be enabled
 						restrictions.push(true);
 					} else {
-						// Set the current code block to be denied
+						// Set the current command block to be denied
 						restrictions.push(false);
 						// Show error if not silent
 						if (!silent) {
