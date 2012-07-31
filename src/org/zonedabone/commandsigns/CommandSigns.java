@@ -305,7 +305,7 @@ public class CommandSigns extends JavaPlugin {
 		}
 	}
 	
-	private boolean setupEconomy() {
+	protected boolean setupEconomy() {
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 		if (economyProvider != null) {
 			economy = economyProvider.getProvider();
@@ -313,7 +313,7 @@ public class CommandSigns extends JavaPlugin {
 		return economy != null;
 	}
 	
-	private boolean setupPermissions() {
+	protected boolean setupPermissions() {
 		RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
 		if (permissionProvider != null) {
 			permission = permissionProvider.getProvider();
