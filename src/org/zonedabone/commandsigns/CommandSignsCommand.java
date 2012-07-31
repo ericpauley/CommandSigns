@@ -148,7 +148,12 @@ class CommandSignsCommand implements CommandExecutor {
 				}
 			} else if (args[0].equalsIgnoreCase("reload")) {
 				if (plugin.hasPermission(sender, "commandsigns.reload", false)) {
-					plugin.onEnable();
+					Messaging.loadMessages(plugin);
+					plugin.loadFile();
+					plugin.startUpdateCheck();
+					plugin.startMetrics();
+					plugin.setupPermissions();
+					plugin.setupEconomy();
 					Messaging.sendMessage(sender, "success.reloaded");
 				}
 			} else if (args[0].equalsIgnoreCase("edit")) {
