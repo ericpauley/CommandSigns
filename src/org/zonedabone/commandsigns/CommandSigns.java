@@ -24,6 +24,7 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -158,57 +159,49 @@ public class CommandSigns extends JavaPlugin {
 			if (file.exists()) {
 				FileInputStream inStream = new FileInputStream(file);
 				Scanner scanner = new Scanner(inStream);
-				int loaded = 0;
+				activeSigns.clear();
+				
+				String line = "";
+				String[] raw = null;
+				boolean redstone = false;
+				World world = null;
+				int x = 0;
+				int y = 0;
+				int z = 0;
+				int block = 0;
+				int lineNumber = 0;
+				
 				while (scanner.hasNextLine()) {
+					lineNumber++;
 					try {
-						String line = scanner.nextLine();
-						if (!line.equals("")) {
-							// if (line.contains("\u00A7")) {
-							String[] raw = line.split("[\u00A7\u001D]");
-							String world = raw[0];
-							int x = Integer.parseInt(raw[1]);
-							int y = Integer.parseInt(raw[2]);
-							int z = Integer.parseInt(raw[3]);
-							Location csl = new Location(Bukkit.getWorld(world), x, y, z);
-							String owner = raw[4];
-							boolean redstone = false;
-							if (raw.length >= 7)
-								redstone = Boolean.parseBoolean(raw[6]);
-							CommandSignsText cst = new CommandSignsText(owner, redstone);
-							for (String command : raw[5].split("[\u00B6\u001E]")) {
-								cst.getText().add(command);
-							}
-							activeSigns.put(csl, cst);
-							loaded++;
-							/*
-							 * } else {
-							 * String[] data = line.split(":", 2);
-							 * String[] extra = data[0].split("\\|");
-							 * CommandSignsLocation location = CommandSignsLocation.fromFileString(extra[0]);
-							 * if (location == null) {
-							 * continue;
-							 * }
-							 * String[] textData = data[1].split("\\[LINEBREAK]");
-							 * CommandSignsText text;
-							 * if (extra.length >= 2) {
-							 * text = new CommandSignsText(extra[1], false);
-							 * } else {
-							 * text = new CommandSignsText(null, false);
-							 * }
-							 * for (int i = 0; i < textData.length; i++) {
-							 * text.setLine(i, textData[i]);
-							 * }
-							 * activeSigns.put(location, text);
-							 * }
-							 */
+						line = scanner.nextLine();
+						raw = line.split("[\u00A7\u001D]");
+						
+						redstone = Boolean.parseBoolean(raw[6]);
+						
+						world = Bukkit.getWorld(raw[0]);
+						x = Integer.parseInt(raw[1]);
+						y = Integer.parseInt(raw[2]);
+						z = Integer.parseInt(raw[3]);
+						Location csl = new Location(world, x, y, z);
+						
+						// Throws exception for an invalid location AND if the location is air
+						block = csl.getBlock().getTypeId();
+						if(block == 0) throw new IllegalArgumentException("Location not valid.");
+						
+						String owner = raw[4];
+						CommandSignsText cst = new CommandSignsText(owner, redstone);
+						for (String command : raw[5].split("[\u00B6\u001E]")) {
+							cst.getText().add(command);
 						}
+						activeSigns.put(csl, cst);
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						getLogger().warning("Unable to load sign in signs.dat line " + lineNumber);
 					}
 				}
 				scanner.close();
 				inStream.close();
-				getLogger().info("Loaded " + loaded + " signs");
+				getLogger().info("Loaded " + activeSigns.size() + " signs");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -269,37 +262,50 @@ public class CommandSigns extends JavaPlugin {
 				file.createNewFile();
 			}
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			
+			Location csl = null;
+			String sep = "\u001D";
+			String line = "";
+			String commands = "";
+			boolean first = true;
+			int signNumber = 0;
+			
 			writer.write("");
 			for (Map.Entry<Location, CommandSignsText> entry : activeSigns.entrySet()) {
-				String commands = "";
-				entry.getValue().trim();
-				boolean first = true;
-				for (String command : entry.getValue().getText()) {
-					if (!first)
-						commands += "\u001E";
-					commands += command;
-					first = false;
+				try {
+					signNumber++;
+					entry.getValue().trim();
+					commands = "";
+					for (String command : entry.getValue().getText()) {
+						if (!first)
+							commands += "\u001E";
+						commands += command;
+						first = false;
+					}
+					csl = entry.getKey();
+					line = csl.getWorld().getName();
+					line += sep;
+					line += csl.getBlockX();
+					line += sep;
+					line += csl.getBlockY();
+					line += sep;
+					line += csl.getBlockZ();
+					line += sep;
+					line += entry.getValue().getOwner();
+					line += sep;
+					line += commands;
+					line += sep;
+					line += entry.getValue().isRedstone();
+					writer.write(line + "\n");
+				} catch (Exception ex) {
+					if(csl != null)
+						getLogger().warning("Unable to save sign #" + signNumber + " at " + csl.toString());
+					else
+						getLogger().warning("Unable to save sign #" + signNumber);
 				}
-				Location csl = entry.getKey();
-				String sep = "\u001D";
-				System.out.println(sep);
-				String line = csl.getWorld().getName();
-				line += sep;
-				line += csl.getBlockX();
-				line += sep;
-				line += csl.getBlockY();
-				line += sep;
-				line += csl.getBlockZ();
-				line += sep;
-				line += entry.getValue().getOwner();
-				line += sep;
-				line += commands;
-				line += sep;
-				line += entry.getValue().isRedstone();
-				writer.write(line + "\n");
 			}
 			writer.close();
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			getLogger().severe("Failed to save signs!");
 			ex.printStackTrace();
 		}
