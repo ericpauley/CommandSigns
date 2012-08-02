@@ -1,10 +1,11 @@
 version: 2
-prefix: "&4[CommandSigns]&f"
+prefix: "&4[CommandSigns]&f "
 success:
     cleared: "CommandSign text and status cleared."
     copied: "Added to CommandSigns clipboard. Click a block to enable."
     line_print: "{NUMBER} &4: &f{LINE}"
     saved: "Saved CommandSigns to file"
+    reloaded: "Reload complete"
     done_editing: "Finished editing sign"
     
 progress:

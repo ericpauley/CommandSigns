@@ -27,6 +27,7 @@ permissions:
             commandsigns.group.*: true
             commandsigns.update: true
             commandsigns.save: true
+            commandsigns.reload: true
             commandsigns.edit: true
         default: op
     commandsigns.create.*:
@@ -37,6 +38,9 @@ permissions:
             commandsigns.create.redstone: true
     commandsigns.save:
         description: Allows saving CommandSigns without reloading
+        default: false;
+    commandsigns.reload:
+        description: Reloads CommandSigns and all configuration
         default: false;
     commandsigns.use.*:
         description: Gives access to CommandSigns sign use
