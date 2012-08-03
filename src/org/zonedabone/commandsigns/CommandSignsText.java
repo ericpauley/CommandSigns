@@ -2,12 +2,28 @@ package org.zonedabone.commandsigns;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.bukkit.OfflinePlayer;
 
 public class CommandSignsText {
 	
 	private String owner;
 	private List<String> text;
 	private boolean redstone = false;
+	private Map<OfflinePlayer, Long> timeouts = new ConcurrentHashMap<OfflinePlayer, Long>();
+	private Map<OfflinePlayer, Long> uses = new ConcurrentHashMap<OfflinePlayer, Long>();
+	private long lastUse = 0, numUses = 0;
+	private boolean used = false;
+	
+	public boolean isUsed() {
+		return used;
+	}
+	
+	public void setUsed(boolean used) {
+		this.used = used;
+	}
 	
 	public boolean isRedstone() {
 		return redstone;
@@ -15,6 +31,42 @@ public class CommandSignsText {
 	
 	public void setRedstone(boolean redstone) {
 		this.redstone = redstone;
+	}
+	
+	public long getLastUse(OfflinePlayer p) {
+		if (timeouts.get(p) == null) {
+			return 0;
+		} else {
+			return timeouts.get(p);
+		}
+	}
+	
+	public void setLastUse(OfflinePlayer p) {
+		timeouts.put(p, System.currentTimeMillis());
+	}
+	
+	public long getUses(OfflinePlayer p) {
+		if (uses.get(p) == null) {
+			return 0;
+		} else {
+			return uses.get(p);
+		}
+	}
+	
+	public long getNumUses() {
+		return numUses;
+	}
+	
+	public void use() {
+		numUses++;
+	}
+	
+	public void setNumUses(long uses) {
+		numUses = uses;
+	}
+	
+	public void use(OfflinePlayer p) {
+		timeouts.put(p, getUses(p) + 1);
 	}
 	
 	public CommandSignsText(String owner, boolean redstone) {
@@ -85,5 +137,21 @@ public class CommandSignsText {
 			}
 		}
 		return string;
+	}
+	
+	public long getLastUse() {
+		return lastUse;
+	}
+	
+	public void setLastUse(long lastUse) {
+		this.lastUse = lastUse;
+	}
+	
+	public Map<OfflinePlayer, Long> getTimeouts() {
+		return timeouts;
+	}
+	
+	public Map<OfflinePlayer, Long> getUses() {
+		return uses;
 	}
 }

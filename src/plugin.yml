@@ -4,8 +4,7 @@ authors: [zonedabone, HansAnderson]
 version: 1.7.3
 description: >
              Add commands to signs.
-depend: [Vault]
-soft-depend: [TriggerCmds]
+soft-depend: [Vault,TriggerCmds, ServerSigns]
 dev-url: http://dev.bukkit.org/server-mods/command-signs/
 commands:
   commandsigns:

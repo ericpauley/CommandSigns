@@ -36,7 +36,7 @@ public class CommandSignsEventListener implements Listener {
 		if (event.getClickedBlock() == null)
 			return;
 		final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, event.getPlayer(), event.getClickedBlock());
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
 			new Thread() {
 				
 				@Override
@@ -75,13 +75,14 @@ public class CommandSignsEventListener implements Listener {
 	public void handleRedstone(Block b) {
 		Location csl = b.getLocation();
 		CommandSignsText cst = plugin.activeSigns.get(csl);
-		if (cst != null && cst.isRedstone()) {
+		if (cst != null && cst.isRedstone() && !cst.isUsed()) {
+			cst.setUsed(true);
 			final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, null, b);
 			new Thread() {
 				
 				@Override
 				public void run() {
-					signClickEvent.runSign();
+					signClickEvent.runSign(null);
 				}
 			}.start();
 		}

@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -24,7 +23,7 @@ public class CommandSignsClickHandler {
 	private Player player;
 	private Location location;
 	
-	public List<String> parseCommandSign(Player player, Location loc, CommandSignsText commandSign) {
+	private List<String> parseCommandSign(Player player, Location loc, CommandSignsText commandSign) {
 		List<String> commandList = new ArrayList<String>();
 		for (String line : commandSign.getText()) {
 			line = line.replaceAll("(?iu)<blockx>", "" + loc.getX());
@@ -82,8 +81,6 @@ public class CommandSignsClickHandler {
 			return;
 		}
 		plugin.activeSigns.remove(location);
-		plugin.redstoneLock.remove(location);
-		plugin.timeouts.remove(location);
 		if (plugin.playerText.containsKey(player)) {
 			plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 			player.sendMessage("Sign disabled. You still have text in your clipboard.");
@@ -112,15 +109,18 @@ public class CommandSignsClickHandler {
 				in = true;
 			}
 		}
-		in = in || plugin.hasPermission(player, "commandsigns.group." + group, false);
-		in = in || plugin.hasPermission(player, "commandsigns.group.*", false);
+		/*
+		 * in = in || plugin.hasPermission(player, "commandsigns.group." + group, false);
+		 * in = in || plugin.hasPermission(player, "commandsigns.group.*", false);
+		 */
 		return in;
 	}
 	
-	public void runSign() {
+	public void runSign(Action a) {
 		final CommandSignsText cst = plugin.activeSigns.get(location);
 		if (cst == null)
 			return;
+		System.out.println("TEST1");
 		if (player == null || plugin.hasPermission(player, "commandsigns.use.regular")) {
 			Future<List<String>> future = plugin.getServer().getScheduler().callSyncMethod(plugin, new Callable<List<String>>() {
 				
@@ -130,38 +130,31 @@ public class CommandSignsClickHandler {
 				}
 			});
 			List<String> commandList;
-			while (true) {
-				try {
-					commandList = future.get();
-					if (commandList != null) {
-						break;
-					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			try {
+				commandList = future.get();
+			} catch (InterruptedException e1) {
+				return;
+			} catch (ExecutionException e1) {
+				return;
 			}
+			System.out.println("TEST2");
 			if (player != null) {
 				if (plugin.running.contains(player))
 					return;
 				plugin.running.add(player);
-			} else {
-				if (plugin.redstoneLock.contains(location))
-					return;
-				plugin.redstoneLock.add(location);
 			}
 			boolean groupFiltered = false;
 			boolean moneyFiltered = false;
 			boolean permFiltered = false;
 			boolean timeFiltered = false;
+			boolean usesFiltered = false;
 			boolean setTime = true;
+			boolean randFiltered = false;
+			boolean clickFiltered = false;
 			boolean elsed = false;
-			Map<OfflinePlayer, Long> lastUse = plugin.getSignTimeouts(location);
 			for (String command : commandList) {
 				boolean show = true;
+				boolean global = false;
 				if (command.equals(""))
 					continue;
 				if (command.equals("@")) {
@@ -172,33 +165,93 @@ public class CommandSignsClickHandler {
 					permFiltered = false;
 				} else if (command.equals("~")) {
 					timeFiltered = false;
-				} else if (command.startsWith("!")) {
-					show = false;
-					command = command.substring(1);
+				} else if (command.equals("`")) {
+					usesFiltered = false;
 				} else if (command.equals("-")) {
 					elsed = !elsed;
+				} else if (command.equals("?")) {
+					elsed = !elsed;
+				} else if (command.equals("<")) {
+					elsed = !elsed;
+				}
+				while (command.startsWith("#") || command.startsWith("!")) {
+					if (command.startsWith("!")) {
+						show = false;
+						command = command.substring(1);
+					}
+					if (command.startsWith("#")) {
+						global = true;
+						command = command.substring(1);
+					}
 				}
 				if (!elsed) {
-					if (groupFiltered || moneyFiltered || permFiltered || timeFiltered) {
+					if (groupFiltered || moneyFiltered || permFiltered || timeFiltered || usesFiltered || randFiltered || clickFiltered) {
 						continue;
 					}
 				} else {
-					if (!(groupFiltered || moneyFiltered || permFiltered || timeFiltered)) {
+					if (!(groupFiltered || moneyFiltered || permFiltered || timeFiltered || usesFiltered || randFiltered || clickFiltered)) {
 						continue;
 					}
 				}
-				if (player != null && command.startsWith("~")) {
+				if (player != null && !global && command.startsWith("~")) {
 					int amount = 0;
 					try {
 						amount = (int) (Double.parseDouble(command.substring(1)) * 1000);
 					} catch (NumberFormatException e) {
 					}
-					Long latest = lastUse.get(player);
-					if (latest != null && latest + amount > System.currentTimeMillis()) {
+					long lastUse = cst.getLastUse(player);
+					if (lastUse + amount > System.currentTimeMillis()) {
 						timeFiltered = true;
 						setTime = false;
 						if (show)
-							player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
+							player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + lastUse - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
+					} else if (lastUse != 0 && amount == 0) {
+						timeFiltered = true;
+						setTime = false;
+						if (show)
+							player.sendMessage(ChatColor.RED + "This sign can only be used once.");
+					}
+				} else if (command.startsWith("~")) {
+					int amount = 0;
+					try {
+						amount = (int) (Double.parseDouble(command.substring(1)) * 1000);
+					} catch (NumberFormatException e) {
+					}
+					long lastUse = cst.getLastUse();
+					if (lastUse + amount > System.currentTimeMillis()) {
+						timeFiltered = true;
+						setTime = false;
+						if (show && player != null)
+							player.sendMessage(ChatColor.RED + "This sign will re-active in " + Math.round((amount + lastUse - System.currentTimeMillis()) / 1000 + 1) + " seconds.");
+					} else if (lastUse != 0 && amount == 0) {
+						timeFiltered = true;
+						setTime = false;
+						if (show && player != null)
+							player.sendMessage(ChatColor.RED + "This sign can only be used once globally.");
+					}
+				} else if (player != null && !global && command.startsWith("`")) {
+					int amount = 0;
+					try {
+						amount = (int) (Double.parseDouble(command.substring(1)));
+					} catch (NumberFormatException e) {
+					}
+					if (cst.getUses(player) > amount) {
+						usesFiltered = true;
+						setTime = false;
+						if (show && player != null)
+							player.sendMessage(ChatColor.RED + "You have already used this sign the maximum number of times. (" + amount + ")");
+					}
+				} else if (command.startsWith("`")) {
+					int amount = 0;
+					try {
+						amount = (int) (Double.parseDouble(command.substring(1)));
+					} catch (NumberFormatException e) {
+					}
+					if (cst.getNumUses() > amount) {
+						usesFiltered = true;
+						setTime = false;
+						if (show && player != null)
+							player.sendMessage(ChatColor.RED + "This sign has already been used too many times. (" + amount + ")");
 					}
 				} else if (command.startsWith("%")) {
 					double amount = 0;
@@ -210,6 +263,15 @@ public class CommandSignsClickHandler {
 						Thread.sleep((long) (amount * 1000));
 					} catch (InterruptedException e) {
 					}
+				} else if (command.startsWith("?")) {
+					double amount = 0;
+					try {
+						amount = Double.parseDouble(command.substring(1));
+					} catch (NumberFormatException e) {
+					}
+					randFiltered = Math.random() * 100 > amount;
+				} else if (command.equals("<<")) {
+					randFiltered = (a != Action.RIGHT_CLICK_BLOCK);
 				} else if (player != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
 					permFiltered = !plugin.hasPermission(player, command.substring(1));
 					if (permFiltered && show) {
@@ -217,6 +279,7 @@ public class CommandSignsClickHandler {
 					}
 				} else if (player != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
 					groupFiltered = !inGroup(command.substring(1));
+					System.out.println(groupFiltered);
 					if (groupFiltered && show)
 						player.sendMessage(ChatColor.RED + "You are not in the rquired group to run this command.");
 				} else if (player != null && CommandSigns.economy != null && CommandSigns.economy.isEnabled() && command.startsWith("$")) {
@@ -238,25 +301,23 @@ public class CommandSignsClickHandler {
 					continue;
 				}
 			}
+			if (setTime) {
+				cst.setLastUse(System.currentTimeMillis());
+				cst.use();
+			}
 			if (player != null) {
-				if (setTime)
-					lastUse.put(player, System.currentTimeMillis());
+				if (setTime) {
+					cst.setLastUse(player);
+					cst.use(player);
+				}
 				plugin.running.remove(player);
-			} else {
-				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-					
-					@Override
-					public void run() {
-						plugin.redstoneLock.remove(location);
-					}
-				});
 			}
 		}
 	}
 	
 	public void onInteract(Action action) {
 		CommandSignsPlayerState state = plugin.playerStates.get(player);
-		if (state != null && action == Action.RIGHT_CLICK_BLOCK) {
+		if (state != null) {
 			switch (state) {
 				case ENABLE :
 					enableSign();
@@ -277,14 +338,14 @@ public class CommandSignsClickHandler {
 					Material m = location.getBlock().getType();
 					if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && action == Action.RIGHT_CLICK_BLOCK)
 						return;
-					runSign();
+					runSign(action);
 					break;
 			}
 		} else {
 			Material m = location.getBlock().getType();
 			if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && action == Action.RIGHT_CLICK_BLOCK)
 				return;
-			runSign();
+			runSign(action);
 		}
 	}
 	
@@ -369,7 +430,11 @@ public class CommandSignsClickHandler {
 					} else if (command.startsWith("#")) {
 						command = command.substring(1);
 						if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-							ConsoleCommandSender ccs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), player);
+							ConsoleCommandSender ccs;
+							if (show)
+								ccs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), player);
+							else
+								ccs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), null);
 							plugin.getServer().dispatchCommand(ccs, command);
 						} else {
 							if (show)
@@ -394,8 +459,7 @@ public class CommandSignsClickHandler {
 				if (command.startsWith("*") || command.startsWith("^") || command.startsWith("#")) {
 					command = command.substring(1);
 				}
-				ConsoleCommandSender ccs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), plugin.getServer().getConsoleSender());
-				plugin.getServer().dispatchCommand(ccs, command);
+				plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
 			}
 		}
 	}
