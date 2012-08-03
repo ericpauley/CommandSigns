@@ -3,6 +3,7 @@ package org.zonedabone.commandsigns;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -153,40 +154,45 @@ public class CommandSignsClickHandler {
 					return;
 				plugin.redstoneLock.add(location);
 			}
-			boolean groupFiltered = false;
-			boolean moneyFiltered = false;
-			boolean permFiltered = false;
-			boolean timeFiltered = false;
-			boolean setTime = true;
-			boolean elsed = false;
+			// This stack holds booleans of whether the current restriction block is enabled or denied
+			Stack<Boolean> restrictions = new Stack<Boolean>();
 			Map<OfflinePlayer, Long> lastUse = plugin.getSignTimeouts(location);
 			for (String command : commandList) {
-				boolean show = true;
 				if (command.equals(""))
 					continue;
-				if (command.equals("@")) {
-					groupFiltered = false;
-				} else if (command.equals("$")) {
-					moneyFiltered = false;
-				} else if (command.equals("&")) {
-					permFiltered = false;
-				} else if (command.equals("~")) {
-					timeFiltered = false;
-				} else if (command.startsWith("!")) {
-					show = false;
-					command = command.substring(1);
-				} else if (command.equals("-")) {
-					elsed = !elsed;
-				}
-				if (!elsed) {
-					if (groupFiltered || moneyFiltered || permFiltered || timeFiltered) {
-						continue;
+				
+				boolean silent = false;
+				boolean negate = false;
+				boolean meta = false;
+				do {
+					meta = false;
+					// The '-' delimiter ends the current restriction block
+				 	if (command.startsWith("-") && !restrictions.isEmpty()) {
+				 		restrictions.pop();
+				 		command = command.substring(1);
+				 		meta = true;
+				 	}
+				 	// If the restriction begins with a ?, make it silent
+				 	else if (command.startsWith("?")) {
+						silent = true;
+						command = command.substring(1);
+						meta = true;
 					}
-				} else {
-					if (!(groupFiltered || moneyFiltered || permFiltered || timeFiltered)) {
-						continue;
+				 	// If the restriction starts with a !, negate the block
+					else if (command.startsWith("!")) {
+						negate = true;
+						command = command.substring(1);
+						meta = true;
 					}
-				}
+				} while(meta == true);
+				
+				// If a restriction block is denied, skip to next line
+				if (!restrictions.isEmpty() && restrictions.peek().equals(false))
+					continue;
+
+				if (command.equals(""))
+					continue;
+
 				if (player != null && command.startsWith("~")) {
 					int amount = 0;
 					try {
@@ -194,11 +200,27 @@ public class CommandSignsClickHandler {
 					} catch (NumberFormatException e) {
 					}
 					Long latest = lastUse.get(player);
-					if (latest != null && latest + amount > System.currentTimeMillis()) {
-						timeFiltered = true;
-						setTime = false;
-						if (show)
-							player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
+					// If condition is true and negate is true, reject
+					// If condition is false and negate is false, reject
+					// If condition is true and negate is false or vice versa, accept (XOR)
+					if ((latest == null || System.currentTimeMillis() - latest > amount) ^ negate) {
+						lastUse.put(player, System.currentTimeMillis());
+						// Set the current command block to be enabled
+						restrictions.push(true);
+					} else {
+						// Set the current command block to be denied
+						restrictions.push(false);
+						// Show error if not silent
+						if (!silent) {
+							if (negate)
+								player.sendMessage("You must click again within " + amount / 1000 + " seconds to use this sign.");
+							else
+								player.sendMessage(ChatColor.RED + "You must wait another " + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) + " seconds before using this sign again.");
+						}
+						if (negate) {
+							lastUse.put(player, System.currentTimeMillis());
+							latest = lastUse.get(player);
+						}
 					}
 				} else if (command.startsWith("%")) {
 					double amount = 0;
@@ -211,36 +233,44 @@ public class CommandSignsClickHandler {
 					} catch (InterruptedException e) {
 					}
 				} else if (player != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
-					permFiltered = !plugin.hasPermission(player, command.substring(1));
-					if (permFiltered && show) {
-						player.sendMessage(ChatColor.RED + "You don't have permission to use this CommandSign.");
+					if (plugin.hasPermission(player, command.substring(1)) ^ negate) {
+						restrictions.push(true);
+					} else {
+						restrictions.push(false);
+						if (!silent)
+							player.sendMessage(ChatColor.RED + "You don't have permission to use this CommandSign.");
 					}
 				} else if (player != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
-					groupFiltered = !inGroup(command.substring(1));
-					if (groupFiltered && show)
-						player.sendMessage(ChatColor.RED + "You are not in the rquired group to run this command.");
+					if (inGroup(command.substring(1)) ^ negate) {
+						restrictions.push(true);
+					} else {
+						restrictions.push(false);
+						if (!silent)
+							player.sendMessage(ChatColor.RED + "You are not in the required group to run this command.");
+					}
 				} else if (player != null && CommandSigns.economy != null && CommandSigns.economy.isEnabled() && command.startsWith("$")) {
 					double amount = 0;
 					try {
 						amount = Double.parseDouble(command.substring(1));
 					} catch (NumberFormatException e) {
 					}
-					moneyFiltered = !CommandSigns.economy.withdrawPlayer(player.getName(), amount).transactionSuccess();
-					if (moneyFiltered && show) {
-						player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
+					if (CommandSigns.economy.withdrawPlayer(player.getName(), amount).transactionSuccess() ^ negate) {
+						restrictions.push(true);
+					} else {
+						restrictions.push(false);
+						if (!silent)
+							player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
 					}
 				} else if (command.startsWith("/")) {
-					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RunHandler(show, command));
+					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RunHandler(!silent, command));
 				} else if (command.startsWith("\\")) {
 					String msg = command.substring(1);
-					if (show)
+					if (!silent)
 						player.sendMessage(msg.replaceAll("&([0-9A-FK-OR])", "\u00A7$1"));
 					continue;
 				}
 			}
 			if (player != null) {
-				if (setTime)
-					lastUse.put(player, System.currentTimeMillis());
 				plugin.running.remove(player);
 			} else {
 				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {

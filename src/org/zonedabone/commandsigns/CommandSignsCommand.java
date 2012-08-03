@@ -146,6 +146,16 @@ class CommandSignsCommand implements CommandExecutor {
 					plugin.saveFile();
 					Messaging.sendMessage(sender, "success.saved");
 				}
+			} else if (args[0].equalsIgnoreCase("reload")) {
+				if (plugin.hasPermission(sender, "commandsigns.reload", false)) {
+					Messaging.loadMessages(plugin);
+					plugin.loadFile();
+					plugin.startUpdateCheck();
+					plugin.startMetrics();
+					plugin.setupPermissions();
+					plugin.setupEconomy();
+					Messaging.sendMessage(sender, "success.reloaded");
+				}
 			} else if (args[0].equalsIgnoreCase("edit")) {
 				if (plugin.hasPermission(sender, "commandsigns.edit", false)) {
 					CommandSignsPlayerState cs = plugin.playerStates.get(player);
