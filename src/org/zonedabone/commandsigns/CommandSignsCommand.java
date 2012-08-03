@@ -57,8 +57,12 @@ class CommandSignsCommand implements CommandExecutor {
 					for (int i = 1; i < args.length; i++) {
 						line = line.concat((i == 0 ? "" : " ") + args[i]);
 					}
-					if ((line.startsWith("/*") || line.startsWith("/^") || line.startsWith("/#")) && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
+					if (line.startsWith("/*")) && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
 						Messaging.sendMessage(player, "failure.no_super");
+						return true;
+					}
+					if ((line.startsWith("/^") || line.startsWith("/#")) && !plugin.hasPermission(player, "commandsigns.create.op", false)) {
+						Messaging.sendMessage(player, "failure.no_op");
 						return true;
 					}
 					text.setLine(lineNumber, line);
