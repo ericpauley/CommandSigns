@@ -36,6 +36,7 @@ permissions:
             commandsigns.create.regular: true
             commandsigns.create.super: true
             commandsigns.create.redstone: true
+            commandsigns.create.op: true
     commandsigns.save:
         description: Allows saving CommandSigns without reloading
         default: false;
@@ -56,6 +57,9 @@ permissions:
         default: false
     commandsigns.create.redstone:
         description: Allows you to create redstone-activated signs
+        default: false
+    commandisgns.create.op:
+        description: Allows you to create op-level CommandSigns
         default: false
     commandsigns.remove:
         description: Allows you to remove a CommandSign
