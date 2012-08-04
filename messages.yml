@@ -1,3 +1,4 @@
+version: 2.1
 prefix: "&4[CommandSigns]&f "
 success:
     cleared: "CommandSign text and status cleared."

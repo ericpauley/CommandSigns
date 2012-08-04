@@ -8,13 +8,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.zonedabone.commandsigns.CommandSignsUpdater.Version;
 
 public class Messaging {
 	
 	private static Map<String, String> messages = new ConcurrentHashMap<String, String>();
 	
-	public static void loadMessages(JavaPlugin plugin) {
+	public static void loadMessages(CommandSigns plugin) {
 		File f = new File(plugin.getDataFolder(), "messages.yml");
 		Configuration included = YamlConfiguration.loadConfiguration(plugin.getResource("messages.yml"));
 		if (!f.exists()) {
@@ -22,7 +22,10 @@ public class Messaging {
 			plugin.saveResource("messages.yml", true);
 		}
 		Configuration config = YamlConfiguration.loadConfiguration(f);
-		if (included.getInt("version", 0) > config.getInt("version", 0)) {
+		CommandSignsUpdater updaterClass = new CommandSignsUpdater(plugin);
+		Version curVersion = updaterClass.new Version(config.getString("version"));
+		Version incVersion = updaterClass.new Version(included.getString("version"));
+		if (incVersion.compareTo(curVersion) > 0) {
 			plugin.getLogger().info("Updating messages.yml.");
 			plugin.saveResource("messages.yml", true);
 		}
