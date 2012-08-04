@@ -1,12 +1,5 @@
 package org.zonedabone.commandsigns;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -57,7 +50,7 @@ class CommandSignsCommand implements CommandExecutor {
 					for (int i = 1; i < args.length; i++) {
 						line = line.concat((i == 0 ? "" : " ") + args[i]);
 					}
-					if (line.startsWith("/*")) && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
+					if (line.startsWith("/*") && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
 						Messaging.sendMessage(player, "failure.no_super");
 						return true;
 					}
@@ -172,96 +165,35 @@ class CommandSignsCommand implements CommandExecutor {
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
-				if (sender.hasPermission("commandsigns.update")) {
+				if (sender.hasPermission("clickcommand.update")) {
 					if (args.length == 2) {
-						if (args[1].equalsIgnoreCase("-f")) {
+						if (args[1].equalsIgnoreCase("force")) {
 							Messaging.sendMessage(sender, "update.force");
-							new Thread() {
-								
-								@Override
-								public void run() {
-									try {
-										plugin.startUpdateCheck();
-										long startTime = System.currentTimeMillis();
-										URL url = new URL(plugin.downloadLocation);
-										url.openConnection();
-										InputStream reader = url.openStream();
-										File f = plugin.getUpdateFile();
-										f.getParentFile().mkdirs();
-										FileOutputStream writer = new FileOutputStream(f);
-										byte[] buffer = new byte[153600];
-										int totalBytesRead = 0;
-										int bytesRead = 0;
-										while ((bytesRead = reader.read(buffer)) > 0) {
-											writer.write(buffer, 0, bytesRead);
-											buffer = new byte[153600];
-											totalBytesRead += bytesRead;
-										}
-										long endTime = System.currentTimeMillis();
-										Messaging.sendMessage(sender, "update.finish", "s", "" + (((totalBytesRead)) / 1000), "t", "" + (((double) (endTime - startTime)) / 1000));
-										writer.close();
-										reader.close();
-									} catch (MalformedURLException e) {
-										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
-									} catch (IOException e) {
-										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
-									}
-								}
-							}.start();
-						} else if (args[1].equalsIgnoreCase("-c")) {
+							plugin.updateHandler.new Updater(sender).start();
+						} else if (args[1].equalsIgnoreCase("check")) {
 							Messaging.sendMessage(sender, "update.check");
 							new Thread() {
 								
 								@Override
 								public void run() {
-									plugin.new Updater().run();
-									if (plugin.version < plugin.newestVersion) {
-										Messaging.sendMessage(player, "update.notify", "v", plugin.stringNew);
+									plugin.updateHandler.new Checker().run();
+									if (plugin.updateHandler.newAvailable) {
+										Messaging.sendMessage(player, "update.notify", "v", plugin.updateHandler.newestVersion.toString());
 									} else {
-										Messaging.sendMessage(player, "update.confirm_up_to_date", "v", plugin.stringNew);
+										Messaging.sendMessage(player, "update.confirm_up_to_date", "v", plugin.updateHandler.currentVersion.toString());
 									}
 								}
 							}.start();
 						}
-					} else if (plugin.version < plugin.newestVersion) {
+					} else if (plugin.updateHandler.newAvailable) {
 						if (!plugin.getUpdateFile().exists()) {
-							Messaging.sendMessage(sender, "update.start", "v", plugin.stringNew);
-							new Thread() {
-								
-								@Override
-								public void run() {
-									try {
-										long startTime = System.currentTimeMillis();
-										URL url = new URL(plugin.downloadLocation);
-										url.openConnection();
-										InputStream reader = url.openStream();
-										File f = plugin.getUpdateFile();
-										f.getParentFile().mkdirs();
-										FileOutputStream writer = new FileOutputStream(f);
-										byte[] buffer = new byte[153600];
-										int totalBytesRead = 0;
-										int bytesRead = 0;
-										while ((bytesRead = reader.read(buffer)) > 0) {
-											writer.write(buffer, 0, bytesRead);
-											buffer = new byte[153600];
-											totalBytesRead += bytesRead;
-										}
-										long endTime = System.currentTimeMillis();
-										Messaging.sendMessage(sender, "update.finish", "s", "" + (((totalBytesRead)) / 1000), "t", "" + (((double) (endTime - startTime)) / 1000));
-										writer.close();
-										reader.close();
-									} catch (MalformedURLException e) {
-										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
-									} catch (IOException e) {
-										Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
-									}
-								}
-							}.start();
+							Messaging.sendMessage(sender, "update.start", "v", plugin.updateHandler.newestVersion.toString());
+							plugin.updateHandler.new Updater(sender).start();
 						} else {
 							Messaging.sendMessage(sender, "update.already_downloaded");
 						}
 					} else {
-						Messaging.sendMessage(sender, "update.up_to_date", "v", plugin.getDescription().getVersion());
+						Messaging.sendMessage(sender, "update.up_to_date", "v", plugin.updateHandler.currentVersion.toString());
 					}
 				}
 			} else {

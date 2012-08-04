@@ -50,9 +50,9 @@ public class CommandSignsEventListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (event.getPlayer().hasPermission("commandsigns.update")) {
-			if (plugin.version < plugin.newestVersion) {
+			if (plugin.updateHandler.newAvailable) {
 				if (!plugin.getUpdateFile().exists()) {
-					Messaging.sendMessage(event.getPlayer(), "update.notify", "v", plugin.stringNew);
+					Messaging.sendMessage(event.getPlayer(), "update.notify", "v", plugin.updateHandler.newestVersion.toString());
 				}
 			}
 		}
