@@ -1,15 +1,10 @@
 package org.zonedabone.commandsigns;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +33,8 @@ public class CommandSigns extends JavaPlugin {
 	public static Permission permission = null;
 	public final Map<Location, CommandSignsText> activeSigns = new HashMap<Location, CommandSignsText>();
 	public CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
+	public CommandSignsUpdater updateHandler = new CommandSignsUpdater(this);
+	private int updateTask;
 	// listeners
 	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
 	// plugin variables
@@ -47,10 +44,6 @@ public class CommandSigns extends JavaPlugin {
 	public final Set<OfflinePlayer> running = Collections.synchronizedSet(new HashSet<OfflinePlayer>());
 	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
-	public int version = 3;
-	public int newestVersion;
-	public String downloadLocation, stringNew;
-	private int updateTask;
 	
 	public synchronized Map<OfflinePlayer, Long> getSignTimeouts(Location csl) {
 		Map<OfflinePlayer, Long> toReturn = timeouts.get(csl);
@@ -228,30 +221,8 @@ public class CommandSigns extends JavaPlugin {
 	}
 	
 	public void startUpdateCheck() {
-		newestVersion = version;
-		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Updater(), 0, 24000);
-	}
-	public class Updater implements Runnable {
-		
-		@Override
-		public void run() {
-			try {
-				// open HTTP connection
-				URL url = new URL("http://dl.dropbox.com/u/38069635/CommandSigns/version.txt");
-				URLConnection connection = url.openConnection();
-				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-				// just read first line
-				stringNew = in.readLine();
-				newestVersion = Integer.parseInt(in.readLine());
-				downloadLocation = in.readLine();
-				in.close();
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-			}
-		}
+		Runnable checker = updateHandler.new Checker();
+		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, checker, 0, 1728000L);
 	}
 	
 	public void saveFile() {
