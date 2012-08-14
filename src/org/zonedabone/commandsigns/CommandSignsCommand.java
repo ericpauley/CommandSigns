@@ -165,7 +165,7 @@ class CommandSignsCommand implements CommandExecutor {
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
-				if (sender.hasPermission("clickcommand.update")) {
+				if (sender.hasPermission("commandsigns.update")) {
 					if (args.length == 2) {
 						if (args[1].equalsIgnoreCase("force")) {
 							Messaging.sendMessage(sender, "update.force");

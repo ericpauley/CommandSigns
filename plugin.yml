@@ -73,7 +73,7 @@ permissions:
     commandsigns.group.*:
         description: Allows you to use all group commands
         default: false
-    commandsigns.updates:
+    commandsigns.update:
         description: Shows this player CommandSigns updates and allows them to update
         default: false
     commandsigns.edit:
