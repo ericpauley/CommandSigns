@@ -4,34 +4,28 @@ import java.util.Set;
 
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 
-public class CommandSignsProxy implements ConsoleCommandSender {
+public class CommandSignsProxy implements CommandSender {
 	
-	private ConsoleCommandSender original;
+	private CommandSender original;
 	private CommandSender receiver;
+	private boolean silent;
 	
-	public CommandSignsProxy(ConsoleCommandSender original, CommandSender receiver) {
+	public CommandSignsProxy(CommandSender original, CommandSender receiver, boolean silent) {
 		this.original = original;
 		this.receiver = receiver;
+		this.silent = silent;
 	}
 	
 	@Override
 	public boolean isOp() {
 		return original.isOp();
 	}
-	
-	@Override
-	public boolean isConversing() {
-		return original.isConversing();
-	}
-	
+
 	@Override
 	public boolean isPermissionSet(String name) {
 		return original.isPermissionSet(name);
@@ -40,11 +34,6 @@ public class CommandSignsProxy implements ConsoleCommandSender {
 	@Override
 	public void setOp(boolean value) {
 		original.setOp(value);
-	}
-	
-	@Override
-	public void acceptConversationInput(String input) {
-		original.acceptConversationInput(input);
 	}
 	
 	@Override
@@ -63,33 +52,13 @@ public class CommandSignsProxy implements ConsoleCommandSender {
 	}
 	
 	@Override
-	public boolean beginConversation(Conversation conversation) {
-		return original.beginConversation(conversation);
-	}
-	
-	@Override
 	public boolean hasPermission(String name) {
 		return original.hasPermission(name);
 	}
 	
 	@Override
-	public void abandonConversation(Conversation conversation) {
-		original.abandonConversation(conversation);
-	}
-	
-	@Override
 	public boolean hasPermission(Permission perm) {
 		return original.hasPermission(perm);
-	}
-	
-	@Override
-	public void abandonConversation(Conversation conversation, ConversationAbandonedEvent details) {
-		original.abandonConversation(conversation, details);
-	}
-	
-	@Override
-	public void sendRawMessage(String message) {
-		original.sendRawMessage(message);
 	}
 	
 	@Override
@@ -129,14 +98,14 @@ public class CommandSignsProxy implements ConsoleCommandSender {
 	
 	@Override
 	public void sendMessage(String message) {
-		if (receiver != null) {
+		if (receiver != null && !silent) {
 			receiver.sendMessage(message);
 		}
 	}
 	
 	@Override
 	public void sendMessage(String[] messages) {
-		if (receiver != null) {
+		if (receiver != null && !silent) {
 			receiver.sendMessage(messages);
 		}
 	}

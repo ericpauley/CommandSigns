@@ -14,7 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.permissions.PermissionAttachment;
@@ -262,7 +262,7 @@ public class CommandSignsClickHandler {
 							player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
 					}
 				} else if (command.startsWith("/")) {
-					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RunHandler(!silent, command));
+					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RunHandler(command, silent));
 				} else if (command.startsWith("\\")) {
 					String msg = command.substring(1);
 					if (!silent)
@@ -346,11 +346,11 @@ public class CommandSignsClickHandler {
 	}
 	private class RunHandler implements Runnable {
 		
-		private boolean show;
 		private String command;
+		private boolean silent;
 		
-		public RunHandler(boolean show, String command) {
-			this.show = show;
+		public RunHandler(String command, boolean silent) {
+			this.silent = silent;
 			this.command = command;
 		}
 		
@@ -377,9 +377,10 @@ public class CommandSignsClickHandler {
 								}
 							}
 							given.add(player.addAttachment(plugin, "commandsigns.permissions", true));
-							player.performCommand(command);
+							CommandSender cs = new CommandSignsProxy(player, player, silent);
+							plugin.getServer().dispatchCommand(cs, command);
 						} else {
-							if (show)
+							if (!silent)
 								Messaging.sendMessage(player, "cannot_use");
 							return;
 						}
@@ -390,24 +391,26 @@ public class CommandSignsClickHandler {
 								op = true;
 								player.setOp(true);
 							}
-							player.performCommand(command);
+							CommandSender cs = new CommandSignsProxy(player, player, silent);
+							plugin.getServer().dispatchCommand(cs, command);
 						} else {
-							if (show)
+							if (!silent)
 								Messaging.sendMessage(player, "cannot_use");
 							return;
 						}
 					} else if (command.startsWith("#")) {
 						command = command.substring(1);
 						if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-							ConsoleCommandSender ccs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), player);
-							plugin.getServer().dispatchCommand(ccs, command);
+							CommandSender cs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), player, silent);
+							plugin.getServer().dispatchCommand(cs, command);
 						} else {
-							if (show)
+							if (!silent)
 								Messaging.sendMessage(player, "cannot_use");
 							return;
 						}
 					} else {
-						player.performCommand(command);
+						CommandSender cs = new CommandSignsProxy(player, player, silent);
+						plugin.getServer().dispatchCommand(cs, command);
 					}
 				} finally {
 					for (PermissionAttachment pa : given) {
@@ -424,8 +427,8 @@ public class CommandSignsClickHandler {
 				if (command.startsWith("*") || command.startsWith("^") || command.startsWith("#")) {
 					command = command.substring(1);
 				}
-				ConsoleCommandSender ccs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), plugin.getServer().getConsoleSender());
-				plugin.getServer().dispatchCommand(ccs, command);
+				CommandSender cs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), plugin.getServer().getConsoleSender(), silent);
+				plugin.getServer().dispatchCommand(cs, command);
 			}
 		}
 	}

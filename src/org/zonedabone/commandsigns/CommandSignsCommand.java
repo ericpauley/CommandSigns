@@ -147,7 +147,6 @@ class CommandSignsCommand implements CommandExecutor {
 				if (plugin.hasPermission(sender, "commandsigns.reload", false)) {
 					Messaging.loadMessages(plugin);
 					plugin.loadFile();
-					plugin.startUpdateCheck();
 					plugin.startMetrics();
 					plugin.setupPermissions();
 					plugin.setupEconomy();
