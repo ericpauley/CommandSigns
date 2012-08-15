@@ -367,6 +367,7 @@ public class CommandSignsClickHandler {
 						if (command.startsWith("*")) {
 							command = command.substring(1);
 							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
+								// This needs to be fixed!
 								for (Map.Entry<String, Boolean> s : Bukkit.getPluginManager().getPermission("commandsigns.permissions").getChildren().entrySet()) {
 									given.add(player.addAttachment(plugin, s.getKey(), s.getValue()));
 									if (CommandSigns.permission.playerHas(player, s.getKey()) != s.getValue()) {
@@ -376,8 +377,12 @@ public class CommandSignsClickHandler {
 									}
 								}
 								given.add(player.addAttachment(plugin, "commandsigns.permissions", true));
-								CommandSender cs = new CommandSignsProxy(player, player, silent);
-								plugin.getServer().dispatchCommand(cs, command);
+								player.performCommand(command);
+								
+								// Sending commands this way allows it to be sent 'silently'
+								// BUT for commands like /warp, it gives an error. Not sure why.
+								//CommandSender cs = new CommandSignsProxy(player, player, silent);
+								//plugin.getServer().dispatchCommand(cs, command);
 							} else {
 								if (!silent)
 									Messaging.sendMessage(player, "cannot_use");
@@ -390,8 +395,9 @@ public class CommandSignsClickHandler {
 									op = true;
 									player.setOp(true);
 								}
-								CommandSender cs = new CommandSignsProxy(player, player, silent);
-								plugin.getServer().dispatchCommand(cs, command);
+								player.performCommand(command);
+								//CommandSender cs = new CommandSignsProxy(player, player, silent);
+								//plugin.getServer().dispatchCommand(cs, command);
 							} else {
 								if (!silent)
 									Messaging.sendMessage(player, "cannot_use");
@@ -408,8 +414,18 @@ public class CommandSignsClickHandler {
 								return;
 							}
 						} else {
-							CommandSender cs = new CommandSignsProxy(player, player, silent);
-							plugin.getServer().dispatchCommand(cs, command);
+							player.performCommand(command);
+							//CommandSender sender = new CommandSignsProxy(player, player, silent);
+							//Bukkit.dispatchCommand(sender, command);
+							
+							/*String[] splitCommand = command.split(" ");
+							String[] args = new String[splitCommand.length - 1];
+							if (splitCommand.length > 0) {
+								for(int i=1; i < splitCommand.length; i++) args[i-1] = splitCommand[i];
+						        Command target = plugin.getServer().getPluginCommand(splitCommand[0]);
+						        target.execute(sender, splitCommand[0], args);
+					        }*/
+					        
 						}
 					} finally {
 						for (PermissionAttachment pa : given) {
