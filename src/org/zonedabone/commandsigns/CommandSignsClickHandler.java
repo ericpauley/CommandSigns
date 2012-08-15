@@ -261,13 +261,8 @@ public class CommandSignsClickHandler {
 						if (!silent)
 							player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
 					}
-				} else if (command.startsWith("/")) {
+				} else if (command.startsWith("/") || command.startsWith("\\")) {
 					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RunHandler(command, silent));
-				} else if (command.startsWith("\\")) {
-					String msg = command.substring(1);
-					if (!silent)
-						player.sendMessage(msg.replaceAll("&([0-9A-FK-OR])", "\u00A7$1"));
-					continue;
 				}
 			}
 			if (player != null) {
@@ -359,76 +354,81 @@ public class CommandSignsClickHandler {
 			boolean op = false;
 			List<PermissionAttachment> given = new ArrayList<PermissionAttachment>();
 			List<String> vGiven = new ArrayList<String>();
-			command = command.substring(1);
-			if (command.length() == 0) {
-				return;
-			}
-			if (player != null) {
-				try {
-					if (command.startsWith("*")) {
-						command = command.substring(1);
-						if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-							for (Map.Entry<String, Boolean> s : Bukkit.getPluginManager().getPermission("commandsigns.permissions").getChildren().entrySet()) {
-								given.add(player.addAttachment(plugin, s.getKey(), s.getValue()));
-								if (CommandSigns.permission.playerHas(player, s.getKey()) != s.getValue()) {
-									String node = (s.getValue() ? "" : "-") + s.getKey();
-									CommandSigns.permission.playerAdd(player, node);
-									vGiven.add(node);
+			if(command.startsWith("\\")) {
+				command = command.substring(1);
+				player.sendMessage(command.replaceAll("&([0-9A-FK-OR])", "\u00A7$1"));
+			} else if(command.startsWith("/")) {
+				command = command.substring(1);
+				if (command.length() == 0) {
+					return;
+				}
+				if (player != null) {
+					try {
+						if (command.startsWith("*")) {
+							command = command.substring(1);
+							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
+								for (Map.Entry<String, Boolean> s : Bukkit.getPluginManager().getPermission("commandsigns.permissions").getChildren().entrySet()) {
+									given.add(player.addAttachment(plugin, s.getKey(), s.getValue()));
+									if (CommandSigns.permission.playerHas(player, s.getKey()) != s.getValue()) {
+										String node = (s.getValue() ? "" : "-") + s.getKey();
+										CommandSigns.permission.playerAdd(player, node);
+										vGiven.add(node);
+									}
 								}
+								given.add(player.addAttachment(plugin, "commandsigns.permissions", true));
+								CommandSender cs = new CommandSignsProxy(player, player, silent);
+								plugin.getServer().dispatchCommand(cs, command);
+							} else {
+								if (!silent)
+									Messaging.sendMessage(player, "cannot_use");
+								return;
 							}
-							given.add(player.addAttachment(plugin, "commandsigns.permissions", true));
+						} else if (command.startsWith("^")) {
+							command = command.substring(1);
+							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
+								if (!player.isOp()) {
+									op = true;
+									player.setOp(true);
+								}
+								CommandSender cs = new CommandSignsProxy(player, player, silent);
+								plugin.getServer().dispatchCommand(cs, command);
+							} else {
+								if (!silent)
+									Messaging.sendMessage(player, "cannot_use");
+								return;
+							}
+						} else if (command.startsWith("#")) {
+							command = command.substring(1);
+							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
+								CommandSender cs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), player, silent);
+								plugin.getServer().dispatchCommand(cs, command);
+							} else {
+								if (!silent)
+									Messaging.sendMessage(player, "cannot_use");
+								return;
+							}
+						} else {
 							CommandSender cs = new CommandSignsProxy(player, player, silent);
 							plugin.getServer().dispatchCommand(cs, command);
-						} else {
-							if (!silent)
-								Messaging.sendMessage(player, "cannot_use");
-							return;
 						}
-					} else if (command.startsWith("^")) {
+					} finally {
+						for (PermissionAttachment pa : given) {
+							pa.remove();
+						}
+						for (String s : vGiven) {
+							CommandSigns.permission.playerRemove(player, s);
+						}
+						if (op) {
+							player.setOp(false);
+						}
+					}
+				} else {
+					if (command.startsWith("*") || command.startsWith("^") || command.startsWith("#")) {
 						command = command.substring(1);
-						if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-							if (!player.isOp()) {
-								op = true;
-								player.setOp(true);
-							}
-							CommandSender cs = new CommandSignsProxy(player, player, silent);
-							plugin.getServer().dispatchCommand(cs, command);
-						} else {
-							if (!silent)
-								Messaging.sendMessage(player, "cannot_use");
-							return;
-						}
-					} else if (command.startsWith("#")) {
-						command = command.substring(1);
-						if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-							CommandSender cs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), player, silent);
-							plugin.getServer().dispatchCommand(cs, command);
-						} else {
-							if (!silent)
-								Messaging.sendMessage(player, "cannot_use");
-							return;
-						}
-					} else {
-						CommandSender cs = new CommandSignsProxy(player, player, silent);
-						plugin.getServer().dispatchCommand(cs, command);
 					}
-				} finally {
-					for (PermissionAttachment pa : given) {
-						pa.remove();
-					}
-					for (String s : vGiven) {
-						CommandSigns.permission.playerRemove(player, s);
-					}
-					if (op) {
-						player.setOp(false);
-					}
+					CommandSender cs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), plugin.getServer().getConsoleSender(), silent);
+					plugin.getServer().dispatchCommand(cs, command);
 				}
-			} else {
-				if (command.startsWith("*") || command.startsWith("^") || command.startsWith("#")) {
-					command = command.substring(1);
-				}
-				CommandSender cs = new CommandSignsProxy(plugin.getServer().getConsoleSender(), plugin.getServer().getConsoleSender(), silent);
-				plugin.getServer().dispatchCommand(cs, command);
 			}
 		}
 	}
