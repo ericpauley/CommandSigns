@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,9 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -147,6 +151,45 @@ public class CommandSigns extends JavaPlugin {
 	}
 	
 	public void loadFile() {
+		activeSigns.clear();
+		if (new File(getDataFolder(), "signs.dat").exists()) {
+			loadOldFile();
+			if (!new File(getDataFolder(), "signs.dat").exists()) {
+				saveFile();
+			}
+			new File(getDataFolder(), "signs.dat").renameTo(new File(getDataFolder(), "signs.bak"));
+		}
+		Configuration data = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "signs.yml"));
+		for (String key : data.getKeys(false)) {
+			String[] locText = key.split(",");
+			World world = Bukkit.getWorld(locText[0]);
+			if (world == null)
+				continue;
+			int x = Integer.parseInt(locText[1]);
+			int y = Integer.parseInt(locText[2]);
+			int z = Integer.parseInt(locText[3]);
+			Location loc = new Location(world, x, y, z);
+			boolean redstone = data.getBoolean(key + ".redstone", false);
+			String owner = data.getString(key + ".owner", null);
+			CommandSignsText cst = new CommandSignsText(owner, redstone);
+			for (Object o : data.getList(key + ".text", new ArrayList<String>())) {
+				cst.getText().add(o.toString());
+			}
+			/*cst.setLastUse(data.getLong(key + ".lastuse", 0));
+			cst.setNumUses(data.getLong(key + ".numuses", 0));
+			for (Object useData : data.getList(key + ".usedata", new ArrayList<String>())) {
+				String[] sections = useData.toString().split(",");
+				OfflinePlayer user = Bukkit.getOfflinePlayer(sections[0]);
+				long lastUse = Long.parseLong(sections[1]);
+				long numUses = Long.parseLong(sections[2]);
+				cst.getTimeouts().put(user, lastUse);
+				cst.getUses().put(user, numUses);
+			}*/
+			activeSigns.put(loc, cst);
+		}
+	}
+
+	public void loadOldFile() {
 		try {
 			File file = new File(getDataFolder(), "signs.dat");
 			if (file.exists()) {
@@ -226,6 +269,33 @@ public class CommandSigns extends JavaPlugin {
 	}
 	
 	public void saveFile() {
+		long t = System.currentTimeMillis();
+		FileConfiguration data = new YamlConfiguration();
+		for (Map.Entry<Location, CommandSignsText> sign : activeSigns.entrySet()) {
+			Location loc = sign.getKey();
+			CommandSignsText cst = sign.getValue();
+			String key = loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
+			data.set(key + ".redstone", cst.isRedstone());
+			data.set(key + ".owner", cst.getOwner());
+			data.set(key + ".text", cst.getText());
+			/*data.set(key + ".lastuse", cst.getLastUse());
+			data.set(key + ".numuses", cst.getNumUses());
+			List<String> useData = new ArrayList<String>(cst.getUses().size());
+			for (OfflinePlayer user : cst.getTimeouts().keySet()) {
+				useData.add(user.getName() + "," + cst.getLastUse(user) + "," + cst.getUses(user));
+			}
+			data.set(key + ".usedata", useData);*/
+			try {
+				data.save(new File(getDataFolder(), "signs.yml"));
+			} catch (IOException e) {
+				getLogger().severe("Failed to save CommandSigns");
+				e.printStackTrace();
+			}
+		}
+		System.out.println(System.currentTimeMillis() - t);
+	}
+
+	public void saveOldFile() {
 		try {
 			File file = new File(getDataFolder(), "signs.dat");
 			if (!file.exists()) {
