@@ -36,7 +36,7 @@ public class CommandSignsEventListener implements Listener {
 		if (event.getClickedBlock() == null)
 			return;
 		final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, event.getPlayer(), event.getClickedBlock());
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL) {
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.PHYSICAL || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 			new Thread() {
 				
 				@Override
@@ -81,7 +81,7 @@ public class CommandSignsEventListener implements Listener {
 				
 				@Override
 				public void run() {
-					signClickEvent.runSign();
+					signClickEvent.runSign(null);
 				}
 			}.start();
 		}

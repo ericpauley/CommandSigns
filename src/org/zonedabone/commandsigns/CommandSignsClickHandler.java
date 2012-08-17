@@ -118,7 +118,7 @@ public class CommandSignsClickHandler {
 		return in;
 	}
 	
-	public void runSign() {
+	public void runSign(Action a) {
 		final CommandSignsText cst = plugin.activeSigns.get(location);
 		if (cst == null)
 			return;
@@ -261,6 +261,12 @@ public class CommandSignsClickHandler {
 						if (!silent)
 							player.sendMessage(ChatColor.RED + "You cannot afford to use this CommandSign. (" + CommandSigns.economy.format(amount) + ")");
 					}
+				} else if (player != null && command.startsWith(">>")) {
+					if (a == Action.RIGHT_CLICK_BLOCK) {
+						restrictions.push(true);
+					} else {
+						restrictions.push(false);
+					}
 				} else if (command.startsWith("/") || command.startsWith("\\")) {
 					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new RunHandler(command, silent));
 				}
@@ -281,7 +287,7 @@ public class CommandSignsClickHandler {
 	
 	public void onInteract(Action action) {
 		CommandSignsPlayerState state = plugin.playerStates.get(player);
-		if (state != null && action == Action.RIGHT_CLICK_BLOCK) {
+		if (state != null) {
 			switch (state) {
 				case ENABLE :
 					enableSign();
@@ -300,16 +306,16 @@ public class CommandSignsClickHandler {
 					break;
 				default :
 					Material m = location.getBlock().getType();
-					if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && action == Action.RIGHT_CLICK_BLOCK)
+					if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
 						return;
-					runSign();
+					runSign(action);
 					break;
 			}
 		} else {
 			Material m = location.getBlock().getType();
-			if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && action == Action.RIGHT_CLICK_BLOCK)
+			if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
 				return;
-			runSign();
+			runSign(action);
 		}
 	}
 	
