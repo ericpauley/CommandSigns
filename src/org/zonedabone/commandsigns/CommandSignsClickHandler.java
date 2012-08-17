@@ -186,11 +186,15 @@ public class CommandSignsClickHandler {
 					}
 				} while(meta == true);
 				
+				// If an empty line is negated, invert the top of the stack. (For else)
+				if (command.equals("")){
+					if(negate && !restrictions.isEmpty())
+						restrictions.push(!restrictions.pop());
+					continue;
+				}
+					
 				// If a restriction block is denied, skip to next line
 				if (!restrictions.isEmpty() && restrictions.peek().equals(false))
-					continue;
-
-				if (command.equals(""))
 					continue;
 
 				if (player != null && command.startsWith("~")) {
