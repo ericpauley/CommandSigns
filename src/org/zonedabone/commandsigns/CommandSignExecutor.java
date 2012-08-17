@@ -253,7 +253,7 @@ public class CommandSignExecutor {
 			}
 		}
 		if(wait!=0){
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
+			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
 
 				@Override
 				public void run() {
