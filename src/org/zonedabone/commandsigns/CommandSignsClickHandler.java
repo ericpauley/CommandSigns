@@ -62,31 +62,35 @@ public class CommandSignsClickHandler {
 	
 	public void onInteract(Action action) {
 		CommandSignsPlayerState state = plugin.playerStates.get(player);
-		if (state == null) state = CommandSignsPlayerState.NONE;
-		switch (state) {
-			case ENABLE :
-				enableSign();
-				break;
-			case REMOVE :
-				disableSign();
-				break;
-			case READ :
-				readSign();
-				break;
-			case COPY :
-				copySign();
-				break;
-			case EDIT_SELECT :
-				editSign();
-				break;
-			default :
-				if (plugin.activeSigns.containsKey(location)) {
+		if (state != null) {
+			switch (state) {
+				case ENABLE :
+					enableSign();
+					break;
+				case REMOVE :
+					disableSign();
+					break;
+				case READ :
+					readSign();
+					break;
+				case COPY :
+					copySign();
+					break;
+				case EDIT_SELECT :
+					editSign();
+					break;
+				default :
 					Material m = location.getBlock().getType();
 					if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
 						return;
 					new CommandSignExecutor(plugin, player, location, action);
-				}
-				break;
+					break;
+			}
+		} else {
+			Material m = location.getBlock().getType();
+			if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
+				return;
+			new CommandSignExecutor(plugin, player, location, action);
 		}
 	}
 	

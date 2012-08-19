@@ -129,7 +129,6 @@ public class CommandSignExecutor {
 	private LinkedList<String> parseCommandSign(Player player, Location loc) {
 		LinkedList<String> commandList = new LinkedList<String>();
 		CommandSignsText commandSign = plugin.activeSigns.get(location);
-		assert commandSign != null;
 		for (String line : commandSign.getText()) {
 			line = line.replaceAll("(?iu)<blockx>", "" + loc.getX());
 			line = line.replaceAll("(?iu)<blocky>", "" + loc.getY());
