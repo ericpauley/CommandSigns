@@ -9,13 +9,13 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 
-public class CommandSignsProxy implements CommandSender {
+public class CommandSignsConsoleProxy implements CommandSender {
 	
 	private CommandSender original;
 	private CommandSender receiver;
 	private boolean silent;
 	
-	public CommandSignsProxy(CommandSender original, CommandSender receiver, boolean silent) {
+	public CommandSignsConsoleProxy(CommandSender original, CommandSender receiver, boolean silent) {
 		this.original = original;
 		this.receiver = receiver;
 		this.silent = silent;
