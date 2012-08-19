@@ -23,7 +23,7 @@ public class CommandSignExecutor {
 	private final CommandSigns plugin;
 	private final Player player;
 	private final Location location;
-	private final LinkedList<String> lines;
+	private LinkedList<String> lines;
 	private final Stack<Boolean> restrictions = new Stack<Boolean>();
 	private final Action action;
 	private double wait;
@@ -46,12 +46,15 @@ public class CommandSignExecutor {
 		this.player = player;
 		this.action = action;
 		this.location = location;
-		if (player == null || plugin.hasPermission(player, "commandsigns.use.regular")) {
-			lines = parseCommandSign(player, location);
-		} else {
-			lines = new LinkedList<String>();
+		if (plugin.activeSigns.get(location) != null) {
+			if (player == null || plugin.hasPermission(player, "commandsigns.use.regular")) {
+				lines = parseCommandSign(player, location);
+			} else {
+				lines = new LinkedList<String>();
+			}
+			runLines();
 		}
-		runLines();
+
 	}
 
 	public static void registerHandler(Handler handler) {
