@@ -171,34 +171,53 @@ public class CommandSigns extends JavaPlugin {
 			getLogger().info("No signs found.");
 			return;
 		}
+		String[] locText;
+		World world;
+		int x, y, z, block;
+		Location loc;
+		int attempts = 0;
 		for (String key : data.getKeys(false)) {
-			String[] locText = key.split(",");
-			World world = Bukkit.getWorld(locText[0]);
-			if (world == null)
-				continue;
-			int x = Integer.parseInt(locText[1]);
-			int y = Integer.parseInt(locText[2]);
-			int z = Integer.parseInt(locText[3]);
-			Location loc = new Location(world, x, y, z);
-			boolean redstone = data.getBoolean(key + ".redstone", false);
-			String owner = data.getString(key + ".owner", null);
-			CommandSignsText cst = new CommandSignsText(owner, redstone);
-			for (Object o : data
-					.getList(key + ".text", new ArrayList<String>())) {
-				cst.getText().add(o.toString());
+			try {
+				attempts++;
+				locText = key.split(",");
+				world = Bukkit.getWorld(locText[0]);
+				if (world == null)
+					continue;
+				x = Integer.parseInt(locText[1]);
+				y = Integer.parseInt(locText[2]);
+				z = Integer.parseInt(locText[3]);
+				loc = new Location(world, x, y, z);
+				
+				// Throws exception for an invalid location AND if the
+				// location is air
+				block = loc.getBlock().getTypeId();
+				if (block == 0)
+					throw new IllegalArgumentException(
+							"Location not valid.");
+				
+				boolean redstone = data.getBoolean(key + ".redstone", false);
+				String owner = data.getString(key + ".owner", null);
+				CommandSignsText cst = new CommandSignsText(owner, redstone);
+				for (Object o : data
+						.getList(key + ".text", new ArrayList<String>())) {
+					cst.getText().add(o.toString());
+				}
+				/*
+				 * cst.setLastUse(data.getLong(key + ".lastuse", 0));
+				 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for (Object
+				 * useData : data.getList(key + ".usedata", new
+				 * ArrayList<String>())) { String[] sections =
+				 * useData.toString().split(","); OfflinePlayer user =
+				 * Bukkit.getOfflinePlayer(sections[0]); long lastUse =
+				 * Long.parseLong(sections[1]); long numUses =
+				 * Long.parseLong(sections[2]); cst.getTimeouts().put(user,
+				 * lastUse); cst.getUses().put(user, numUses); }
+				 */
+				activeSigns.put(loc, cst);
+			} catch (Exception ex) {
+				getLogger().warning(
+						"Unable to load sign "+attempts+" in signs.yml. " + ex.getMessage());
 			}
-			/*
-			 * cst.setLastUse(data.getLong(key + ".lastuse", 0));
-			 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for (Object
-			 * useData : data.getList(key + ".usedata", new
-			 * ArrayList<String>())) { String[] sections =
-			 * useData.toString().split(","); OfflinePlayer user =
-			 * Bukkit.getOfflinePlayer(sections[0]); long lastUse =
-			 * Long.parseLong(sections[1]); long numUses =
-			 * Long.parseLong(sections[2]); cst.getTimeouts().put(user,
-			 * lastUse); cst.getUses().put(user, numUses); }
-			 */
-			activeSigns.put(loc, cst);
 		}
 		getLogger().info("Loaded "+activeSigns.size()+" signs.");
 	}
@@ -300,6 +319,7 @@ public class CommandSigns extends JavaPlugin {
 				.entrySet()) {
 			Location loc = sign.getKey();
 			CommandSignsText cst = sign.getValue();
+			cst.trim();
 			String key = loc.getWorld().getName() + "," + loc.getBlockX() + ","
 					+ loc.getBlockY() + "," + loc.getBlockZ();
 			data.set(key + ".redstone", cst.isRedstone());

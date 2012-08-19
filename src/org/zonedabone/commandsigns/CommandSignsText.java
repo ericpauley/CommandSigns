@@ -54,24 +54,12 @@ public class CommandSignsText {
 		return true;
 	}
 	
-	public String toFileString() {
-		String string = "";
-		for (String line : text) {
-			if (!string.equals("")) {
-				string = string + "\u00A7";
-			}
-			string = string + line;
-		}
-		return string;
-	}
-	
 	public void trim() {
-		while (text.size() > 0 && text.get(text.size() - 1).equals("")) {
-			text.remove(text.size() - 1);
-		}
-		for (int i = 0; i < text.size(); i++) {
-			text.set(i, text.get(i).trim());
-		}
+		int blank;
+		while ((blank = text.indexOf("")) > -1)
+			text.remove(blank);
+		for (String line : text)
+			line.trim();
 	}
 	
 	@Override
