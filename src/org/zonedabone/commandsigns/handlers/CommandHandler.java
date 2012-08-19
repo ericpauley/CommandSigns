@@ -1,13 +1,7 @@
 package org.zonedabone.commandsigns.handlers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachment;
 import org.zonedabone.commandsigns.CommandSignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
 import org.zonedabone.commandsigns.CommandSignsProxy;
@@ -19,8 +13,7 @@ public class CommandHandler extends Handler {
 	public void handle(CommandSignExecutor e, String command, boolean silent, boolean negate) {
 		if (command.startsWith("/") || command.startsWith("\\")) {
 			boolean op = false;
-			List<PermissionAttachment> given = new ArrayList<PermissionAttachment>();
-			List<String> vGiven = new ArrayList<String>();
+			boolean all = false;
 			Player player = e.getPlayer();
 			CommandSigns plugin = e.getPlugin();
 			if(command.startsWith("/")) {
@@ -33,16 +26,11 @@ public class CommandHandler extends Handler {
 						if (command.startsWith("*")) {
 							command = command.substring(1);
 							if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-								// This needs to be fixed!
-								for (Map.Entry<String, Boolean> s : Bukkit.getPluginManager().getPermission("commandsigns.permissions").getChildren().entrySet()) {
-									given.add(player.addAttachment(plugin, s.getKey(), s.getValue()));
-									if (CommandSigns.permission.playerHas(player, s.getKey()) != s.getValue()) {
-										String node = (s.getValue() ? "" : "-") + s.getKey();
-										CommandSigns.permission.playerAdd(player, node);
-										vGiven.add(node);
-									}
+								// Give player access to the '*' permission node temporarily
+								if( !CommandSigns.permission.playerHas(player, "*") ) {
+									all = true;
+									CommandSigns.permission.playerAddTransient(player, "*");
 								}
-								given.add(player.addAttachment(plugin, "commandsigns.permissions", true));
 								player.performCommand(command);
 								
 								// Sending commands this way allows it to be sent 'silently'
@@ -93,16 +81,13 @@ public class CommandHandler extends Handler {
 					        }*/
 					        
 						}
+					} catch (Exception ex) {
+						plugin.getLogger().severe("Unable to run command: " + ex.getMessage());
 					} finally {
-						for (PermissionAttachment pa : given) {
-							pa.remove();
-						}
-						for (String s : vGiven) {
-							CommandSigns.permission.playerRemove(player, s);
-						}
-						if (op) {
+						if (all)
+							CommandSigns.permission.playerRemoveTransient(player, "*");
+						if (op)
 							player.setOp(false);
-						}
 					}
 				} else {
 					if (command.startsWith("*") || command.startsWith("^") || command.startsWith("#")) {
