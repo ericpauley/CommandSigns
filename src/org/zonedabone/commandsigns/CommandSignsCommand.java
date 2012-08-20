@@ -24,19 +24,29 @@ class CommandSignsCommand implements CommandExecutor {
 				tp = (Player) sender;
 			}
 			final Player player = tp;
-			if (args[0].indexOf("line") == 0) {
+			if (args[0].indexOf("line") == 0 || args[0].indexOf("l") == 0) {
 				if (player == null) {
 					Messaging.sendMessage(sender, "failure.player_only");
 					return true;
 				}
 				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 					int lineNumber;
-					try {
-						lineNumber = Integer.parseInt(args[0].substring(4));
-					} catch (NumberFormatException ex) {
-						Messaging.sendMessage(player, "failure.invalid_line");
-						return true;
+					if(args[0].indexOf("line")==0){
+						try {
+							lineNumber = Integer.parseInt(args[0].substring(4));
+						} catch (NumberFormatException ex) {
+							Messaging.sendMessage(player, "failure.invalid_line");
+							return true;
+						}
+					}else{
+						try {
+							lineNumber = Integer.parseInt(args[0].substring(1));
+						} catch (NumberFormatException ex) {
+							Messaging.sendMessage(player, "failure.invalid_line");
+							return true;
+						}
 					}
+					
 					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
 						Messaging.sendMessage(player, "failure.must_select");
 						return true;
