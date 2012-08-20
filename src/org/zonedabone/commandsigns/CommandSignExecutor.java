@@ -15,6 +15,7 @@ import org.zonedabone.commandsigns.handlers.GroupHandler;
 import org.zonedabone.commandsigns.handlers.Handler;
 import org.zonedabone.commandsigns.handlers.MoneyHandler;
 import org.zonedabone.commandsigns.handlers.PermissionHandler;
+import org.zonedabone.commandsigns.handlers.RandomHandler;
 import org.zonedabone.commandsigns.handlers.SendHandler;
 import org.zonedabone.commandsigns.handlers.WaitHandler;
 
@@ -40,6 +41,7 @@ public class CommandSignExecutor {
 		registerHandler(new ClickTypeHandler());
 		registerHandler(new SendHandler());
 		registerHandler(new CommandHandler());
+		registerHandler(new RandomHandler());
 	}
 
 	public CommandSignExecutor(CommandSigns plugin, Player player, Location location, Action action) {
