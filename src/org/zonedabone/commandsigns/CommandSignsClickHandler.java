@@ -96,6 +96,7 @@ public class CommandSignsClickHandler {
 				break;
 			case EDIT_SELECT:
 				editSign();
+				readSign(false);
 				break;
 			default:
 				Material m = location.getBlock().getType();
