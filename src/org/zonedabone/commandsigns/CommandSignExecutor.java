@@ -8,6 +8,7 @@ import java.util.Stack;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.zonedabone.commandsigns.handlers.ChatHandler;
 import org.zonedabone.commandsigns.handlers.ClickTypeHandler;
 import org.zonedabone.commandsigns.handlers.CommandHandler;
 import org.zonedabone.commandsigns.handlers.CooldownHandler;
@@ -42,6 +43,7 @@ public class CommandSignExecutor {
 		registerHandler(new SendHandler());
 		registerHandler(new CommandHandler());
 		registerHandler(new RandomHandler());
+		registerHandler(new ChatHandler());
 	}
 
 	public CommandSignExecutor(CommandSigns plugin, Player player, Location location, Action action) {
