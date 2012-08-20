@@ -1,6 +1,7 @@
 package org.zonedabone.commandsigns;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -195,6 +196,19 @@ class CommandSignsCommand implements CommandExecutor {
 						Messaging.sendMessage(player, "progress.select_sign");
 					}
 				}
+			} else if (args[0].equalsIgnoreCase("toggle")) {
+					CommandSignsPlayerState cs = plugin.playerStates.get(player);
+					if (cs == CommandSignsPlayerState.EDIT || cs == CommandSignsPlayerState.EDIT) {
+						CommandSignsText cst = plugin.playerText.get(player);
+						cst.setEnabled(!cst.isEnabled());
+						if(cst.isEnabled()){
+							player.sendMessage("CommandBlock active.");
+						}else{
+							player.sendMessage("CommandBlock inactive.");
+						}
+					} else {
+						player.sendMessage(ChatColor.RED+"You must have a sign slected to edit in order to toggle.");
+					}
 			} else if (args[0].equalsIgnoreCase("update")) {
 				if (sender.hasPermission("commandsigns.update")) {
 					if (args.length == 2) {

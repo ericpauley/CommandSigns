@@ -182,6 +182,7 @@ public class CommandSigns extends JavaPlugin {
 				for (Object o : data.getList(key + ".text", new ArrayList<String>())) {
 					cst.getText().add(o.toString());
 				}
+				cst.setEnabled(data.getBoolean(key+".active", true));
 				Map<String, Long> timeouts = cst.getTimeouts();
 				ConfigurationSection cooldowns = data.getConfigurationSection(key+".cooldowns");
 				if(cooldowns == null){
@@ -312,6 +313,7 @@ public class CommandSigns extends JavaPlugin {
 			signData.set("redstone", cst.isRedstone());
 			signData.set("owner", cst.getOwner());
 			signData.set("text", cst.getText());
+			signData.set("active", cst.isEnabled());
 			signData.createSection("cooldowns", cst.getTimeouts());
 			/*
 			 * data.set(key + ".lastuse", cst.getLastUse()); data.set(key +

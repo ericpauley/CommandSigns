@@ -11,6 +11,15 @@ public class CommandSignsText {
 	private List<String> text;
 	private boolean redstone = false;
 	private final Map<String, Long> timeouts = new HashMap<String, Long>();
+	private boolean enabled = true;
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
 	public boolean isRedstone() {
 		return redstone;

@@ -48,7 +48,7 @@ public class CommandSignExecutor {
 		this.action = action;
 		this.location = location;
 		this.text = plugin.activeSigns.get(location);
-		if (text != null) {
+		if (text != null && text.isEnabled()) {
 			if (player == null || plugin.hasPermission(player, "commandsigns.use.regular")) {
 				lines = parseCommandSign(player, location);
 			} else {
