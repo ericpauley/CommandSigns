@@ -113,6 +113,26 @@ class CommandSignsCommand implements CommandExecutor {
 					plugin.playerStates.put(player, CommandSignsPlayerState.READ);
 					Messaging.sendMessage(player, "progress.read");
 				}
+			} else if (args[0].equalsIgnoreCase("view")) {
+				if (player == null) {
+					Messaging.sendMessage(sender, "failure.player_only");
+					return true;
+				}
+				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
+					CommandSignsText text = plugin.playerText.get(player);
+					if (text == null) {
+						player.sendMessage("No text in clipboard");
+						return true;
+					}
+					int i = 0;
+					for (String s : text.getText()) {
+						if (!s.equals("")) {
+							player.sendMessage(i + ": " + s);
+						}
+						i++;
+					}
+					plugin.playerStates.remove(player);
+				}
 			} else if (args[0].equalsIgnoreCase("copy")) {
 				if (player == null) {
 					Messaging.sendMessage(sender, "failure.player_only");
