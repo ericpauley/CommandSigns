@@ -37,7 +37,6 @@ public class CommandSignsClickHandler {
 			return;
 		}
 		plugin.activeSigns.remove(location);
-		plugin.redstoneLock.remove(location);
 		plugin.timeouts.remove(location);
 		if (plugin.playerText.containsKey(player)) {
 			plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);

@@ -54,6 +54,7 @@ public class CommandSignsEventListener implements Listener {
 
 	@EventHandler
 	public void onRedstoneChange(BlockRedstoneEvent event) {
+		System.out.println(event.getOldCurrent()+" - "+event.getNewCurrent());
 		if (event.getNewCurrent() != 0 && event.getOldCurrent() == 0) {
 			Block b = event.getBlock();
 			handleRedstone(b);
@@ -69,8 +70,9 @@ public class CommandSignsEventListener implements Listener {
 	public void handleRedstone(Block b) {
 		Location csl = b.getLocation();
 		CommandSignsText cst = plugin.activeSigns.get(csl);
-		if (cst != null && cst.isRedstone()) {
-			new CommandSignExecutor(plugin, null, b.getLocation(), null);
+		if (cst != null && cst.isRedstone() && !plugin.redstone.contains(csl)) {
+			plugin.redstone.add(csl);
+			new CommandSignExecutor(plugin, null, csl, null);
 		}
 	}
 }

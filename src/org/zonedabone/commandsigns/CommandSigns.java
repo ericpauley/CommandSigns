@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,9 +44,8 @@ public class CommandSigns extends JavaPlugin {
 	public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
 	public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
 	public final Map<Location, Map<OfflinePlayer, Long>> timeouts = new ConcurrentHashMap<Location, Map<OfflinePlayer, Long>>();
-	public final Set<OfflinePlayer> running = Collections.synchronizedSet(new HashSet<OfflinePlayer>());
-	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
+	public Set<Location> redstone = new HashSet<Location>();
 
 	public synchronized Map<OfflinePlayer, Long> getSignTimeouts(Location csl) {
 		Map<OfflinePlayer, Long> toReturn = timeouts.get(csl);
@@ -288,6 +286,14 @@ public class CommandSigns extends JavaPlugin {
 		startMetrics();
 		setupPermissions();
 		setupEconomy();
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+
+			@Override
+			public void run() {
+				redstone.clear();
+			}
+
+		}, 0, 1);
 	}
 
 	public void startUpdateCheck() {
