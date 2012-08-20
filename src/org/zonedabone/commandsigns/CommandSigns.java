@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -43,18 +42,8 @@ public class CommandSigns extends JavaPlugin {
 	// plugin variables
 	public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
 	public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
-	public final Map<Location, Map<OfflinePlayer, Long>> timeouts = new ConcurrentHashMap<Location, Map<OfflinePlayer, Long>>();
 	private Metrics metrics;
 	public Set<Location> redstone = new HashSet<Location>();
-
-	public synchronized Map<OfflinePlayer, Long> getSignTimeouts(Location csl) {
-		Map<OfflinePlayer, Long> toReturn = timeouts.get(csl);
-		if (toReturn == null) {
-			toReturn = new ConcurrentHashMap<OfflinePlayer, Long>();
-			timeouts.put(csl, toReturn);
-		}
-		return toReturn;
-	}
 
 	public boolean hasPermission(CommandSender player, String string) {
 		return hasPermission(player, string, true);
@@ -193,6 +182,14 @@ public class CommandSigns extends JavaPlugin {
 				for (Object o : data.getList(key + ".text", new ArrayList<String>())) {
 					cst.getText().add(o.toString());
 				}
+				Map<String, Long> timeouts = cst.getTimeouts();
+				ConfigurationSection cooldowns = data.getConfigurationSection(key+".cooldowns");
+				if(cooldowns == null){
+					cooldowns = data.createSection(key+"cooldowns");
+				}
+				for(String subKey:cooldowns.getKeys(false)){
+					timeouts.put(subKey, cooldowns.getLong(subKey));
+				}
 				/*
 				 * cst.setLastUse(data.getLong(key + ".lastuse", 0));
 				 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for
@@ -207,6 +204,7 @@ public class CommandSigns extends JavaPlugin {
 				activeSigns.put(loc, cst);
 			} catch (Exception ex) {
 				getLogger().warning("Unable to load sign " + attempts + " in signs.yml. " + ex.getMessage());
+				ex.printStackTrace();
 			}
 		}
 		getLogger().info("Loaded " + activeSigns.size() + " signs.");
@@ -303,18 +301,18 @@ public class CommandSigns extends JavaPlugin {
 
 	public void saveFile() {
 		FileConfiguration config = new YamlConfiguration();
-		ConfigurationSection data = config.getConfigurationSection("signs");
-		if (data == null) {
-			data = config.createSection("signs");
-		}
+		ConfigurationSection data = config.createSection("signs");
 		for (Map.Entry<Location, CommandSignsText> sign : activeSigns.entrySet()) {
 			Location loc = sign.getKey();
 			CommandSignsText cst = sign.getValue();
 			cst.trim();
+			cst.getText().remove(0);
 			String key = loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
-			data.set(key + ".redstone", cst.isRedstone());
-			data.set(key + ".owner", cst.getOwner());
-			data.set(key + ".text", cst.getText());
+			ConfigurationSection signData = data.createSection(key);
+			signData.set("redstone", cst.isRedstone());
+			signData.set("owner", cst.getOwner());
+			signData.set("text", cst.getText());
+			signData.createSection("cooldowns", cst.getTimeouts());
 			/*
 			 * data.set(key + ".lastuse", cst.getLastUse()); data.set(key +
 			 * ".numuses", cst.getNumUses()); List<String> useData = new

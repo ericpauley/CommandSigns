@@ -27,6 +27,7 @@ public class CommandSignExecutor {
 	private final Stack<Boolean> restrictions = new Stack<Boolean>();
 	private final Action action;
 	private double wait;
+	private final CommandSignsText text;
 
 	private static Set<Handler> handlers = new HashSet<Handler>();
 
@@ -46,7 +47,8 @@ public class CommandSignExecutor {
 		this.player = player;
 		this.action = action;
 		this.location = location;
-		if (plugin.activeSigns.get(location) != null) {
+		this.text = plugin.activeSigns.get(location);
+		if (text != null) {
 			if (player == null || plugin.hasPermission(player, "commandsigns.use.regular")) {
 				lines = parseCommandSign(player, location);
 			} else {
@@ -197,6 +199,10 @@ public class CommandSignExecutor {
 
 	public Action getAction() {
 		return action;
+	}
+
+	public CommandSignsText getText() {
+		return text;
 	}
 
 }

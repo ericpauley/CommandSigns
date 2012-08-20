@@ -1,13 +1,16 @@
 package org.zonedabone.commandsigns;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CommandSignsText {
 
 	private String owner;
 	private List<String> text;
 	private boolean redstone = false;
+	private final Map<String, Long> timeouts = new HashMap<String, Long>();
 
 	public boolean isRedstone() {
 		return redstone;
@@ -56,10 +59,13 @@ public class CommandSignsText {
 
 	public void trim() {
 		int blank;
-		while ((blank = text.indexOf("")) > -1)
+		while ((blank = text.lastIndexOf("")) > 0)
 			text.remove(blank);
 		for (int i = 0; i < text.size(); i++) {
 			text.set(i, text.get(i).trim());
+		}
+		if(text.size() == 0 || !text.get(0).equals("")){
+			text.add(0, "");
 		}
 	}
 
@@ -74,5 +80,9 @@ public class CommandSignsText {
 			}
 		}
 		return string;
+	}
+
+	public Map<String, Long> getTimeouts() {
+		return timeouts;
 	}
 }
