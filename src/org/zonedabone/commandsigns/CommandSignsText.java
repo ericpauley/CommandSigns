@@ -58,8 +58,9 @@ public class CommandSignsText {
 		int blank;
 		while ((blank = text.indexOf("")) > -1)
 			text.remove(blank);
-		for (String line : text)
-			line.trim();
+		for(int i = 0;i<text.size();i++){
+			text.set(i, text.get(i).trim());
+		}
 	}
 	
 	@Override

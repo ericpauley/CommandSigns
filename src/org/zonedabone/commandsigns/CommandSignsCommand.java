@@ -1,18 +1,19 @@
 package org.zonedabone.commandsigns;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 class CommandSignsCommand implements CommandExecutor {
-	
+
 	private CommandSigns plugin;
-	
+
 	public CommandSignsCommand(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	@Override
 	public boolean onCommand(final CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("commandsigns")) {
@@ -31,14 +32,14 @@ class CommandSignsCommand implements CommandExecutor {
 				}
 				if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 					int lineNumber;
-					if(args[0].indexOf("line")==0){
+					if (args[0].indexOf("line") == 0) {
 						try {
 							lineNumber = Integer.parseInt(args[0].substring(4));
 						} catch (NumberFormatException ex) {
 							Messaging.sendMessage(player, "failure.invalid_line");
 							return true;
 						}
-					}else{
+					} else {
 						try {
 							lineNumber = Integer.parseInt(args[0].substring(1));
 						} catch (NumberFormatException ex) {
@@ -46,7 +47,11 @@ class CommandSignsCommand implements CommandExecutor {
 							return true;
 						}
 					}
-					
+					if (lineNumber <= 0) {
+						Messaging.sendMessage(player, "failure.invalid_line");
+						return true;
+					}
+
 					if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
 						Messaging.sendMessage(player, "failure.must_select");
 						return true;
@@ -56,10 +61,7 @@ class CommandSignsCommand implements CommandExecutor {
 						text = new CommandSignsText(player.getName(), false);
 						plugin.playerText.put(player, text);
 					}
-					String line = "";
-					for (int i = 1; i < args.length; i++) {
-						line = line.concat((i == 0 ? "" : " ") + args[i]);
-					}
+					String line = StringUtils.join(args, " ", 1, args.length);
 					if (line.startsWith("/*") && !plugin.hasPermission(player, "commandsigns.create.super", false)) {
 						Messaging.sendMessage(player, "failure.no_super");
 						return true;
@@ -182,7 +184,7 @@ class CommandSignsCommand implements CommandExecutor {
 						} else if (args[1].equalsIgnoreCase("check")) {
 							Messaging.sendMessage(sender, "update.check");
 							new Thread() {
-								
+
 								@Override
 								public void run() {
 									plugin.updateHandler.new Checker().run();
@@ -212,7 +214,7 @@ class CommandSignsCommand implements CommandExecutor {
 		}
 		return false;
 	}
-	
+
 	public void finishEditing(Player player) {
 		plugin.playerStates.remove(player);
 		plugin.playerText.remove(player);

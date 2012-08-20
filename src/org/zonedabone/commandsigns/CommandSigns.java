@@ -198,6 +198,7 @@ public class CommandSigns extends JavaPlugin {
 				boolean redstone = data.getBoolean(key + ".redstone", false);
 				String owner = data.getString(key + ".owner", null);
 				CommandSignsText cst = new CommandSignsText(owner, redstone);
+				cst.getText().add("");
 				for (Object o : data
 						.getList(key + ".text", new ArrayList<String>())) {
 					cst.getText().add(o.toString());

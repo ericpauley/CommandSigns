@@ -54,7 +54,6 @@ public class CommandSignExecutor {
 			}
 			runLines();
 		}
-
 	}
 
 	public static void registerHandler(Handler handler) {
