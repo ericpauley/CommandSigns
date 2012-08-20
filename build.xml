@@ -31,6 +31,7 @@
 	<target name="dist" description="generate the distribution">
 		<jar jarfile="${bin}/CommandSigns.jar" basedir="${bin}" encoding="Cp1252">
 			<zipfileset dir="." includes="*.yml" />
+			<zipfileset dir="." includes="LICENSE.txt" />
 		</jar>
 	</target>
 	<target name="clean" description="clean up">
