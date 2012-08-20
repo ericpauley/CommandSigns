@@ -26,35 +26,41 @@ public class CommandSignsClickHandler {
 		}
 		CommandSignsText clone = plugin.activeSigns.get(location).clone(player.getName());
 		plugin.playerText.put(player, clone);
-		readSign();
+		readSign(true);
 		Messaging.sendMessage(player, "success.copied");
 		plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 	}
 
-	public void disableSign() {
+	public void disableSign(boolean batch) {
 		if (!plugin.activeSigns.containsKey(location)) {
 			Messaging.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
 		plugin.activeSigns.remove(location);
-		if (plugin.playerText.containsKey(player)) {
-			plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
-			player.sendMessage("Sign disabled. You still have text in your clipboard.");
-		} else {
-			plugin.playerStates.remove(player);
+		if (!batch) {
+			if (plugin.playerText.containsKey(player)) {
+				plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
+				player.sendMessage("Sign disabled. You still have text in your clipboard.");
+			} else {
+				plugin.playerStates.remove(player);
+				player.sendMessage("Sign disabled.");
+			}
+		}else{
 			player.sendMessage("Sign disabled.");
 		}
 	}
 
-	public void enableSign() {
+	public void enableSign(boolean batch) {
 		if (plugin.activeSigns.containsKey(location)) {
 			player.sendMessage("Sign is already enabled!");
 			return;
 		}
 		CommandSignsText text = plugin.playerText.get(player);
 		plugin.activeSigns.put(location, text.clone(player.getName()));
-		plugin.playerStates.remove(player);
-		plugin.playerText.remove(player);
+		if (!batch) {
+			plugin.playerStates.remove(player);
+			plugin.playerText.remove(player);
+		}
 		player.sendMessage("CommandSign enabled");
 	}
 
@@ -63,13 +69,22 @@ public class CommandSignsClickHandler {
 		if (state != null) {
 			switch (state) {
 			case ENABLE:
-				enableSign();
+				enableSign(false);
+				break;
+			case BATCH_ENABLE:
+				enableSign(true);
 				break;
 			case REMOVE:
-				disableSign();
+				disableSign(false);
+				break;
+			case BATCH_REMOVE:
+				disableSign(true);
 				break;
 			case READ:
-				readSign();
+				readSign(false);
+				break;
+			case BATCH_READ:
+				readSign(true);
 				break;
 			case COPY:
 				copySign();
@@ -103,7 +118,7 @@ public class CommandSignsClickHandler {
 		plugin.playerStates.put(player, CommandSignsPlayerState.EDIT);
 	}
 
-	public void readSign() {
+	public void readSign(boolean batch) {
 		CommandSignsText text = plugin.activeSigns.get(location);
 		if (text == null) {
 			player.sendMessage("Sign is not a CommandSign.");
@@ -116,6 +131,7 @@ public class CommandSignsClickHandler {
 			}
 			i++;
 		}
-		plugin.playerStates.remove(player);
+		if (!batch)
+			plugin.playerStates.remove(player);
 	}
 }

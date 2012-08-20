@@ -209,6 +209,37 @@ class CommandSignsCommand implements CommandExecutor {
 					} else {
 						player.sendMessage(ChatColor.RED+"You must have a sign slected to edit in order to toggle.");
 					}
+			} else if (args[0].equalsIgnoreCase("batch")) {
+				CommandSignsPlayerState cs = plugin.playerStates.get(player);
+				switch(cs){
+				case REMOVE:
+					player.sendMessage("Switched to batch remove mode.");
+					cs = CommandSignsPlayerState.BATCH_REMOVE;
+					break;
+				case BATCH_REMOVE:
+					player.sendMessage("Switched to single remove mode.");
+					cs = CommandSignsPlayerState.REMOVE;
+					break;
+				case ENABLE:
+					player.sendMessage("Switched to batch enable mode.");
+					cs = CommandSignsPlayerState.BATCH_ENABLE;
+					break;
+				case BATCH_ENABLE:
+					player.sendMessage("Switched to single enable mode.");
+					cs = CommandSignsPlayerState.ENABLE;
+					break;
+				case READ:
+					player.sendMessage("Switched to batch read mode.");
+					cs = CommandSignsPlayerState.BATCH_READ;
+					break;
+				case BATCH_READ:
+					player.sendMessage("Switched to single read mode.");
+					cs = CommandSignsPlayerState.READ;
+					break;
+				default:
+					player.sendMessage(ChatColor.RED+"The mode you are in doesn't support batch processing.");
+				}
+				plugin.playerStates.put(player, cs);
 			} else if (args[0].equalsIgnoreCase("update")) {
 				if (sender.hasPermission("commandsigns.update")) {
 					if (args.length == 2) {

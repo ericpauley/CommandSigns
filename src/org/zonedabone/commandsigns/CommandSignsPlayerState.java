@@ -1,5 +1,5 @@
 package org.zonedabone.commandsigns;
 
 public enum CommandSignsPlayerState {
-	COPY, REMOVE, ENABLE, READ, EDIT_SELECT, EDIT;
+	COPY, REMOVE, BATCH_REMOVE, ENABLE, BATCH_ENABLE, READ, BATCH_READ, EDIT_SELECT, EDIT;
 }
