@@ -197,21 +197,21 @@ class CommandSignsCommand implements CommandExecutor {
 					}
 				}
 			} else if (args[0].equalsIgnoreCase("toggle")) {
-					CommandSignsPlayerState cs = plugin.playerStates.get(player);
-					if (cs == CommandSignsPlayerState.EDIT || cs == CommandSignsPlayerState.EDIT) {
-						CommandSignsText cst = plugin.playerText.get(player);
-						cst.setEnabled(!cst.isEnabled());
-						if(cst.isEnabled()){
-							player.sendMessage("CommandBlock active.");
-						}else{
-							player.sendMessage("CommandBlock inactive.");
-						}
+				CommandSignsPlayerState cs = plugin.playerStates.get(player);
+				if (cs == CommandSignsPlayerState.EDIT || cs == CommandSignsPlayerState.EDIT) {
+					CommandSignsText cst = plugin.playerText.get(player);
+					cst.setEnabled(!cst.isEnabled());
+					if (cst.isEnabled()) {
+						player.sendMessage("CommandBlock active.");
 					} else {
-						player.sendMessage(ChatColor.RED+"You must have a sign slected to edit in order to toggle.");
+						player.sendMessage("CommandBlock inactive.");
 					}
+				} else {
+					player.sendMessage(ChatColor.RED + "You must have a sign slected to edit in order to toggle.");
+				}
 			} else if (args[0].equalsIgnoreCase("batch")) {
 				CommandSignsPlayerState cs = plugin.playerStates.get(player);
-				switch(cs){
+				switch (cs) {
 				case REMOVE:
 					player.sendMessage("Switched to batch remove mode.");
 					cs = CommandSignsPlayerState.BATCH_REMOVE;
@@ -237,7 +237,7 @@ class CommandSignsCommand implements CommandExecutor {
 					cs = CommandSignsPlayerState.READ;
 					break;
 				default:
-					player.sendMessage(ChatColor.RED+"The mode you are in doesn't support batch processing.");
+					player.sendMessage(ChatColor.RED + "The mode you are in doesn't support batch processing.");
 				}
 				plugin.playerStates.put(player, cs);
 			} else if (args[0].equalsIgnoreCase("update")) {

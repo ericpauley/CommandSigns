@@ -73,7 +73,7 @@ public class CommandSignsText {
 		for (int i = 0; i < text.size(); i++) {
 			text.set(i, text.get(i).trim());
 		}
-		if(text.size() == 0 || !text.get(0).equals("")){
+		if (text.size() == 0 || !text.get(0).equals("")) {
 			text.add(0, "");
 		}
 	}

@@ -54,7 +54,7 @@ public class CommandSignsEventListener implements Listener {
 
 	@EventHandler
 	public void onRedstoneChange(BlockRedstoneEvent event) {
-		System.out.println(event.getOldCurrent()+" - "+event.getNewCurrent());
+		System.out.println(event.getOldCurrent() + " - " + event.getNewCurrent());
 		if (event.getNewCurrent() != 0 && event.getOldCurrent() == 0) {
 			Block b = event.getBlock();
 			handleRedstone(b);
