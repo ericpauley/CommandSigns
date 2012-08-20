@@ -4,25 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandSignsText {
-	
+
 	private String owner;
 	private List<String> text;
 	private boolean redstone = false;
-	
+
 	public boolean isRedstone() {
 		return redstone;
 	}
-	
+
 	public void setRedstone(boolean redstone) {
 		this.redstone = redstone;
 	}
-	
+
 	public CommandSignsText(String owner, boolean redstone) {
 		this.owner = owner;
 		text = new ArrayList<String>();
 		this.redstone = redstone;
 	}
-	
+
 	public CommandSignsText clone(String owner) {
 		CommandSignsText cst = new CommandSignsText(owner, redstone);
 		for (String s : text) {
@@ -30,22 +30,22 @@ public class CommandSignsText {
 		}
 		return cst;
 	}
-	
+
 	public String getLine(int index) {
 		if (index < 0 || index >= text.size()) {
 			return null;
 		}
 		return text.get(index);
 	}
-	
+
 	public String getOwner() {
 		return owner;
 	}
-	
+
 	public List<String> getText() {
 		return text;
 	}
-	
+
 	public boolean setLine(int index, String line) {
 		while (text.size() <= index) {
 			text.add("");
@@ -53,16 +53,16 @@ public class CommandSignsText {
 		text.set(index, line);
 		return true;
 	}
-	
+
 	public void trim() {
 		int blank;
 		while ((blank = text.indexOf("")) > -1)
 			text.remove(blank);
-		for(int i = 0;i<text.size();i++){
+		for (int i = 0; i < text.size(); i++) {
 			text.set(i, text.get(i).trim());
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		String string = "";

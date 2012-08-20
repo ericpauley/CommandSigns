@@ -11,9 +11,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.zonedabone.commandsigns.CommandSignsUpdater.Version;
 
 public class Messaging {
-	
+
 	private static Map<String, String> messages = new ConcurrentHashMap<String, String>();
-	
+
 	public static void loadMessages(CommandSigns plugin) {
 		File f = new File(plugin.getDataFolder(), "messages.yml");
 		Configuration included = YamlConfiguration.loadConfiguration(plugin.getResource("messages.yml"));
@@ -37,7 +37,7 @@ public class Messaging {
 		}
 		plugin.getLogger().info("Loaded " + messages.size() + " messages.");
 	}
-	
+
 	public static String parseMessage(String message, String... replacements) {
 		String raw = parseRaw(message, replacements);
 		String prefix = messages.get("prefix");
@@ -47,7 +47,7 @@ public class Messaging {
 			return "Could not find message " + prefix + ".";
 		}
 	}
-	
+
 	public static String parseRaw(String message, String... replacements) {
 		message = message.toLowerCase();
 		String prefix = messages.get(message.split("\\.")[0] + ".prefix");
@@ -62,11 +62,11 @@ public class Messaging {
 			return "Could not find message " + message + ".";
 		}
 	}
-	
+
 	public static void sendMessage(CommandSender cs, String message, String... replacements) {
 		cs.sendMessage(parseMessage(message, replacements));
 	}
-	
+
 	public static void sendRaw(CommandSender cs, String message, String... replacements) {
 		cs.sendMessage(parseRaw(message, replacements));
 	}

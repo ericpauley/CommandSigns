@@ -12,13 +12,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class CommandSignsEventListener implements Listener {
-	
+
 	private CommandSigns plugin;
-	
+
 	public CommandSignsEventListener(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (event.isCancelled()) {
@@ -30,7 +30,7 @@ public class CommandSignsEventListener implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteract(final PlayerInteractEvent event) {
 		if (event.getClickedBlock() == null)
@@ -40,7 +40,7 @@ public class CommandSignsEventListener implements Listener {
 			signClickEvent.onInteract(event.getAction());
 		}
 	}
-	
+
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (event.getPlayer().hasPermission("commandsigns.update")) {
@@ -51,7 +51,7 @@ public class CommandSignsEventListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onRedstoneChange(BlockRedstoneEvent event) {
 		if (event.getNewCurrent() != 0 && event.getOldCurrent() == 0) {
@@ -65,7 +65,7 @@ public class CommandSignsEventListener implements Listener {
 			handleRedstone(b.getRelative(BlockFace.DOWN));
 		}
 	}
-	
+
 	public void handleRedstone(Block b) {
 		Location csl = b.getLocation();
 		CommandSignsText cst = plugin.activeSigns.get(csl);

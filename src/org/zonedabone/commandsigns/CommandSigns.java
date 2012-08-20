@@ -40,16 +40,13 @@ public class CommandSigns extends JavaPlugin {
 	public CommandSignsUpdater updateHandler = new CommandSignsUpdater(this);
 	private int updateTask;
 	// listeners
-	private final CommandSignsEventListener listener = new CommandSignsEventListener(
-			this);
+	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
 	// plugin variables
 	public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
 	public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
 	public final Map<Location, Map<OfflinePlayer, Long>> timeouts = new ConcurrentHashMap<Location, Map<OfflinePlayer, Long>>();
-	public final Set<OfflinePlayer> running = Collections
-			.synchronizedSet(new HashSet<OfflinePlayer>());
-	public final Set<Location> redstoneLock = Collections
-			.synchronizedSet(new HashSet<Location>());
+	public final Set<OfflinePlayer> running = Collections.synchronizedSet(new HashSet<OfflinePlayer>());
+	public final Set<Location> redstoneLock = Collections.synchronizedSet(new HashSet<Location>());
 	private Metrics metrics;
 
 	public synchronized Map<OfflinePlayer, Long> getSignTimeouts(Location csl) {
@@ -65,8 +62,7 @@ public class CommandSigns extends JavaPlugin {
 		return hasPermission(player, string, true);
 	}
 
-	public boolean hasPermission(CommandSender player, String string,
-			boolean notify) {
+	public boolean hasPermission(CommandSender player, String string, boolean notify) {
 		boolean perm;
 		if (permission == null) {
 			perm = player.hasPermission(string);
@@ -161,11 +157,9 @@ public class CommandSigns extends JavaPlugin {
 			if (!new File(getDataFolder(), "signs.dat").exists()) {
 				saveFile();
 			}
-			new File(getDataFolder(), "signs.dat").renameTo(new File(
-					getDataFolder(), "signs.bak"));
+			new File(getDataFolder(), "signs.dat").renameTo(new File(getDataFolder(), "signs.bak"));
 		}
-		FileConfiguration config = YamlConfiguration
-				.loadConfiguration(new File(getDataFolder(), "signs.yml"));
+		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "signs.yml"));
 		ConfigurationSection data = config.getConfigurationSection("signs");
 		if (data == null) {
 			getLogger().info("No signs found.");
@@ -187,26 +181,24 @@ public class CommandSigns extends JavaPlugin {
 				y = Integer.parseInt(locText[2]);
 				z = Integer.parseInt(locText[3]);
 				loc = new Location(world, x, y, z);
-				
+
 				// Throws exception for an invalid location AND if the
 				// location is air
 				block = loc.getBlock().getTypeId();
 				if (block == 0)
-					throw new IllegalArgumentException(
-							"Location not valid.");
-				
+					throw new IllegalArgumentException("Location not valid.");
+
 				boolean redstone = data.getBoolean(key + ".redstone", false);
 				String owner = data.getString(key + ".owner", null);
 				CommandSignsText cst = new CommandSignsText(owner, redstone);
 				cst.getText().add("");
-				for (Object o : data
-						.getList(key + ".text", new ArrayList<String>())) {
+				for (Object o : data.getList(key + ".text", new ArrayList<String>())) {
 					cst.getText().add(o.toString());
 				}
 				/*
 				 * cst.setLastUse(data.getLong(key + ".lastuse", 0));
-				 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for (Object
-				 * useData : data.getList(key + ".usedata", new
+				 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for
+				 * (Object useData : data.getList(key + ".usedata", new
 				 * ArrayList<String>())) { String[] sections =
 				 * useData.toString().split(","); OfflinePlayer user =
 				 * Bukkit.getOfflinePlayer(sections[0]); long lastUse =
@@ -216,11 +208,10 @@ public class CommandSigns extends JavaPlugin {
 				 */
 				activeSigns.put(loc, cst);
 			} catch (Exception ex) {
-				getLogger().warning(
-						"Unable to load sign "+attempts+" in signs.yml. " + ex.getMessage());
+				getLogger().warning("Unable to load sign " + attempts + " in signs.yml. " + ex.getMessage());
 			}
 		}
-		getLogger().info("Loaded "+activeSigns.size()+" signs.");
+		getLogger().info("Loaded " + activeSigns.size() + " signs.");
 	}
 
 	public void loadOldFile() {
@@ -259,26 +250,21 @@ public class CommandSigns extends JavaPlugin {
 						// location is air
 						block = csl.getBlock().getTypeId();
 						if (block == 0)
-							throw new IllegalArgumentException(
-									"Location not valid.");
+							throw new IllegalArgumentException("Location not valid.");
 
 						String owner = raw[4];
-						CommandSignsText cst = new CommandSignsText(owner,
-								redstone);
+						CommandSignsText cst = new CommandSignsText(owner, redstone);
 						for (String command : raw[5].split("[\u00B6\u001E]")) {
 							cst.getText().add(command);
 						}
 						activeSigns.put(csl, cst);
 					} catch (Exception ex) {
-						getLogger().warning(
-								"Unable to load sign in signs.dat line "
-										+ lineNumber);
+						getLogger().warning("Unable to load sign in signs.dat line " + lineNumber);
 					}
 				}
 				scanner.close();
 				inStream.close();
-				getLogger().info(
-						"Imported " + activeSigns.size() + " old signs");
+				getLogger().info("Imported " + activeSigns.size() + " old signs");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -306,8 +292,7 @@ public class CommandSigns extends JavaPlugin {
 
 	public void startUpdateCheck() {
 		Runnable checker = updateHandler.new Checker();
-		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(
-				this, checker, 0, 1728000L);
+		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, checker, 0, 1728000L);
 	}
 
 	public void saveFile() {
@@ -316,13 +301,11 @@ public class CommandSigns extends JavaPlugin {
 		if (data == null) {
 			data = config.createSection("signs");
 		}
-		for (Map.Entry<Location, CommandSignsText> sign : activeSigns
-				.entrySet()) {
+		for (Map.Entry<Location, CommandSignsText> sign : activeSigns.entrySet()) {
 			Location loc = sign.getKey();
 			CommandSignsText cst = sign.getValue();
 			cst.trim();
-			String key = loc.getWorld().getName() + "," + loc.getBlockX() + ","
-					+ loc.getBlockY() + "," + loc.getBlockZ();
+			String key = loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
 			data.set(key + ".redstone", cst.isRedstone());
 			data.set(key + ".owner", cst.getOwner());
 			data.set(key + ".text", cst.getText());
@@ -360,8 +343,7 @@ public class CommandSigns extends JavaPlugin {
 			int signNumber = 0;
 
 			writer.write("");
-			for (Map.Entry<Location, CommandSignsText> entry : activeSigns
-					.entrySet()) {
+			for (Map.Entry<Location, CommandSignsText> entry : activeSigns.entrySet()) {
 				try {
 					signNumber++;
 					entry.getValue().trim();
@@ -389,12 +371,9 @@ public class CommandSigns extends JavaPlugin {
 					writer.write(line + "\n");
 				} catch (Exception ex) {
 					if (csl != null)
-						getLogger().warning(
-								"Unable to save sign #" + signNumber + " at "
-										+ csl.toString());
+						getLogger().warning("Unable to save sign #" + signNumber + " at " + csl.toString());
 					else
-						getLogger().warning(
-								"Unable to save sign #" + signNumber);
+						getLogger().warning("Unable to save sign #" + signNumber);
 				}
 			}
 			writer.close();
@@ -405,9 +384,7 @@ public class CommandSigns extends JavaPlugin {
 	}
 
 	protected boolean setupEconomy() {
-		RegisteredServiceProvider<Economy> economyProvider = getServer()
-				.getServicesManager().getRegistration(
-						net.milkbowl.vault.economy.Economy.class);
+		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 		if (economyProvider != null) {
 			economy = economyProvider.getProvider();
 		}
@@ -415,9 +392,7 @@ public class CommandSigns extends JavaPlugin {
 	}
 
 	protected boolean setupPermissions() {
-		RegisteredServiceProvider<Permission> permissionProvider = getServer()
-				.getServicesManager().getRegistration(
-						net.milkbowl.vault.permission.Permission.class);
+		RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
 		if (permissionProvider != null) {
 			permission = permissionProvider.getProvider();
 		}
@@ -425,7 +400,6 @@ public class CommandSigns extends JavaPlugin {
 	}
 
 	public File getUpdateFile() {
-		return new File(getServer().getUpdateFolderFile().getAbsoluteFile(),
-				super.getFile().getName());
+		return new File(getServer().getUpdateFolderFile().getAbsoluteFile(), super.getFile().getName());
 	}
 }

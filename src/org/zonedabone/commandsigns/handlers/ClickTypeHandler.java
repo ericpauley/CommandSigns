@@ -7,7 +7,7 @@ public class ClickTypeHandler extends Handler {
 
 	@Override
 	public void handle(CommandSignExecutor e, String command, boolean silent, boolean negate) {
-		if (e.getPlayer()!= null && command.startsWith(">>")) {
+		if (e.getPlayer() != null && command.startsWith(">>")) {
 			if (e.getAction() == Action.RIGHT_CLICK_BLOCK ^ negate) {
 				e.getRestrictions().push(true);
 			} else {

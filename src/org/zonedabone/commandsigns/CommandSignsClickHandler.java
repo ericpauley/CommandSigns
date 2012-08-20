@@ -7,17 +7,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 
 public class CommandSignsClickHandler {
-	
+
 	private CommandSigns plugin;
 	private Player player;
 	private Location location;
-	
+
 	public CommandSignsClickHandler(CommandSigns plugin, Player player, Block block) {
 		this.plugin = plugin;
 		this.player = player;
 		location = block.getLocation();
 	}
-	
+
 	public void copySign() {
 		CommandSignsText text = plugin.activeSigns.get(location);
 		if (text == null) {
@@ -30,7 +30,7 @@ public class CommandSignsClickHandler {
 		Messaging.sendMessage(player, "success.copied");
 		plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 	}
-	
+
 	public void disableSign() {
 		if (!plugin.activeSigns.containsKey(location)) {
 			Messaging.sendMessage(player, "failure.not_a_sign");
@@ -47,7 +47,7 @@ public class CommandSignsClickHandler {
 			player.sendMessage("Sign disabled.");
 		}
 	}
-	
+
 	public void enableSign() {
 		if (plugin.activeSigns.containsKey(location)) {
 			player.sendMessage("Sign is already enabled!");
@@ -59,32 +59,32 @@ public class CommandSignsClickHandler {
 		plugin.playerText.remove(player);
 		player.sendMessage("CommandSign enabled");
 	}
-	
+
 	public void onInteract(Action action) {
 		CommandSignsPlayerState state = plugin.playerStates.get(player);
 		if (state != null) {
 			switch (state) {
-				case ENABLE :
-					enableSign();
-					break;
-				case REMOVE :
-					disableSign();
-					break;
-				case READ :
-					readSign();
-					break;
-				case COPY :
-					copySign();
-					break;
-				case EDIT_SELECT :
-					editSign();
-					break;
-				default :
-					Material m = location.getBlock().getType();
-					if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
-						return;
-					new CommandSignExecutor(plugin, player, location, action);
-					break;
+			case ENABLE:
+				enableSign();
+				break;
+			case REMOVE:
+				disableSign();
+				break;
+			case READ:
+				readSign();
+				break;
+			case COPY:
+				copySign();
+				break;
+			case EDIT_SELECT:
+				editSign();
+				break;
+			default:
+				Material m = location.getBlock().getType();
+				if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
+					return;
+				new CommandSignExecutor(plugin, player, location, action);
+				break;
 			}
 		} else {
 			Material m = location.getBlock().getType();
@@ -93,7 +93,7 @@ public class CommandSignsClickHandler {
 			new CommandSignExecutor(plugin, player, location, action);
 		}
 	}
-	
+
 	public void editSign() {
 		CommandSignsText cst = plugin.activeSigns.get(location);
 		if (cst == null) {
@@ -104,7 +104,7 @@ public class CommandSignsClickHandler {
 		plugin.playerText.put(player, cst);
 		plugin.playerStates.put(player, CommandSignsPlayerState.EDIT);
 	}
-	
+
 	public void readSign() {
 		CommandSignsText text = plugin.activeSigns.get(location);
 		if (text == null) {

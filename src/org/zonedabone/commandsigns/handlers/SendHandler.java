@@ -7,7 +7,7 @@ public class SendHandler extends Handler {
 
 	@Override
 	public void handle(CommandSignExecutor e, String command, boolean silent, boolean negate) {
-		if(command.startsWith("\\")) {
+		if (command.startsWith("\\")) {
 			command = command.substring(1);
 			e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', command));
 		}
