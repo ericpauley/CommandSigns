@@ -3,6 +3,8 @@ package org.zonedabone.commandsigns.handlers;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.plugin.PluginManager;
 import org.zonedabone.commandsigns.CommandSignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
 import org.zonedabone.commandsigns.CommandSignsConsoleProxy;
@@ -11,11 +13,21 @@ import org.zonedabone.commandsigns.Messaging;
 
 public class CommandHandler extends Handler {
 
-	private void run(Player p, String command, boolean silent) {
+	private void run(CommandSigns plugin, Player p, String command, boolean silent) {
+		CommandSignsPlayerProxy csp = null;
 		if (silent) {
-			p = new CommandSignsPlayerProxy(p);
+			csp = new CommandSignsPlayerProxy(p);
+			p = csp;
 		}
-		Bukkit.dispatchCommand(p, command);
+		PluginManager pm = Bukkit.getPluginManager();
+		PlayerCommandPreprocessEvent e = new PlayerCommandPreprocessEvent(p, "/" + command);
+		pm.callEvent(e);
+		if (!e.isCancelled()) {
+			Bukkit.dispatchCommand(p, command);
+		}
+		if (csp != null)
+			csp.setSilent(false);
+
 	}
 
 	@Override
@@ -41,7 +53,7 @@ public class CommandHandler extends Handler {
 									all = true;
 									CommandSigns.permission.playerAddTransient(player, "*");
 								}
-								run(player, command, silent);
+								run(plugin, player, command, silent);
 							} else {
 								if (!silent)
 									Messaging.sendMessage(player, "cannot_use");
@@ -54,7 +66,7 @@ public class CommandHandler extends Handler {
 									op = true;
 									player.setOp(true);
 								}
-								run(player, command, silent);
+								run(plugin, player, command, silent);
 							} else {
 								if (!silent)
 									Messaging.sendMessage(player, "cannot_use");
@@ -71,7 +83,7 @@ public class CommandHandler extends Handler {
 								return;
 							}
 						} else {
-							run(player, command, silent);
+							run(plugin, player, command, silent);
 						}
 					} finally {
 						if (all)

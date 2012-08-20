@@ -33,9 +33,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.InventoryView.Property;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.InventoryView.Property;
 import org.bukkit.map.MapView;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.permissions.Permission;
@@ -49,8 +49,17 @@ import org.bukkit.util.Vector;
 public class CommandSignsPlayerProxy implements Player {
 
 	private Player proxy;
-	
-	public CommandSignsPlayerProxy(Player proxy){
+	boolean silent = true;
+
+	public boolean isSilent() {
+		return silent;
+	}
+
+	public void setSilent(boolean silent) {
+		this.silent = silent;
+	}
+
+	public CommandSignsPlayerProxy(Player proxy) {
 		this.proxy = proxy;
 	}
 
@@ -579,9 +588,13 @@ public class CommandSignsPlayerProxy implements Player {
 	}
 
 	public void sendMessage(String message) {
+		if (!silent)
+			proxy.sendMessage(message);
 	}
 
 	public void sendMessage(String[] messages) {
+		if (!silent)
+			proxy.sendMessage(messages);
 	}
 
 	public void sendPluginMessage(Plugin source, String channel, byte[] message) {
@@ -589,7 +602,8 @@ public class CommandSignsPlayerProxy implements Player {
 	}
 
 	public void sendRawMessage(String message) {
-		proxy.sendRawMessage(message);
+		if (!silent)
+			proxy.sendRawMessage(message);
 	}
 
 	public Map<String, Object> serialize() {
