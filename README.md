@@ -22,3 +22,7 @@ you don't export the /lib folder into the jar.
 Alternatively, you can use the ant build-file, build.xml. While this file is mainly
 for use by the automated build server, running it locally will export CommandSigns.jar
 to the /bin directory.
+Automatic Builds
+---------------------------------
+Automatic builds can be found at:
+http://mysticrealms.net:8080/job/CommandSigns/
