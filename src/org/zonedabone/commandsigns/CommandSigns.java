@@ -30,382 +30,382 @@ import org.zonedabone.commandsigns.Metrics.Graph;
 import org.zonedabone.commandsigns.Metrics.Plotter;
 
 public class CommandSigns extends JavaPlugin {
-
-	public static Economy economy = null;
-	public static Permission permission = null;
-	public final Map<Location, CommandSignsText> activeSigns = new HashMap<Location, CommandSignsText>();
-	public CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
-	public CommandSignsUpdater updateHandler = new CommandSignsUpdater(this);
-	private int updateTask;
-	// listeners
-	private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
-	// plugin variables
-	public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
-	public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
-	private Metrics metrics;
-	public Set<Location> redstone = new HashSet<Location>();
-
-	public boolean hasPermission(CommandSender player, String string) {
-		return hasPermission(player, string, true);
-	}
-
-	public boolean hasPermission(CommandSender player, String string, boolean notify) {
-		boolean perm;
-		if (permission == null) {
-			perm = player.hasPermission(string);
-		} else {
-			perm = permission.has(player, string);
-		}
-		if (perm == false && notify) {
-			Messaging.sendMessage(player, "failure.no_perms");
-		}
-		return perm;
-	}
-
-	public void startMetrics() {
-		try {
-			metrics = new Metrics(this);
-		} catch (IOException e) {
-			getLogger().warning(Messaging.parseRaw("metrics.failure"));
-		}
-		Graph g = metrics.createGraph("Number of CommandSigns");
-		g.addPlotter(new Plotter() {
-
-			@Override
-			public int getValue() {
-				return activeSigns.size();
-			}
-		});
-		Graph g3 = metrics.createGraph("CommandSigns Version");
-		g3.addPlotter(new Plotter(getDescription().getVersion()) {
-
-			@Override
-			public int getValue() {
-				return 1;
-			}
-		});
-		Graph g2 = metrics.createGraph("Super Signs Used");
-		g2.addPlotter(new Plotter("Permission") {
-
-			@Override
-			public int getValue() {
-				int number = 0;
-				for (CommandSignsText cst : activeSigns.values()) {
-					for (String s : cst.getText()) {
-						if (s.startsWith("/*") || s.startsWith("!/*")) {
-							number++;
-						}
-					}
-				}
-				return number;
-			}
-		});
-		g2.addPlotter(new Plotter("Op") {
-
-			@Override
-			public int getValue() {
-				int number = 0;
-				for (CommandSignsText cst : activeSigns.values()) {
-					for (String s : cst.getText()) {
-						if (s.startsWith("/^") || s.startsWith("!/^")) {
-							number++;
-						}
-					}
-				}
-				return number;
-			}
-		});
-		g2.addPlotter(new Plotter("Console") {
-
-			@Override
-			public int getValue() {
-				int number = 0;
-				for (CommandSignsText cst : activeSigns.values()) {
-					for (String s : cst.getText()) {
-						if (s.startsWith("/#") || s.startsWith("!/#")) {
-							number++;
-						}
-					}
-				}
-				return number;
-			}
-		});
-		if (metrics.start()) {
-			getLogger().info(Messaging.parseRaw("metrics.success"));
-		} else {
-			getLogger().info(Messaging.parseRaw("metrics.optout"));
-		}
-	}
-
-	public void loadFile() {
-		activeSigns.clear();
-		if (new File(getDataFolder(), "signs.dat").exists()) {
-			loadOldFile();
-			if (!new File(getDataFolder(), "signs.dat").exists()) {
-				saveFile();
-			}
-			new File(getDataFolder(), "signs.dat").renameTo(new File(getDataFolder(), "signs.bak"));
-		}
-		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "signs.yml"));
-		ConfigurationSection data = config.getConfigurationSection("signs");
-		if (data == null) {
-			getLogger().info("No signs found.");
-			return;
-		}
-		String[] locText;
-		World world;
-		int x, y, z, block;
-		Location loc;
-		int attempts = 0;
-		for (String key : data.getKeys(false)) {
-			try {
-				attempts++;
-				locText = key.split(",");
-				world = Bukkit.getWorld(locText[0]);
-				if (world == null)
-					continue;
-				x = Integer.parseInt(locText[1]);
-				y = Integer.parseInt(locText[2]);
-				z = Integer.parseInt(locText[3]);
-				loc = new Location(world, x, y, z);
-
-				// Throws exception for an invalid location AND if the
-				// location is air
-				block = loc.getBlock().getTypeId();
-				if (block == 0)
-					throw new IllegalArgumentException("Location not valid.");
-
-				boolean redstone = data.getBoolean(key + ".redstone", false);
-				String owner = data.getString(key + ".owner", null);
-				CommandSignsText cst = new CommandSignsText(owner, redstone);
-				cst.getText().add("");
-				for (Object o : data.getList(key + ".text", new ArrayList<String>())) {
-					cst.getText().add(o.toString());
-				}
-				cst.setEnabled(data.getBoolean(key+".active", true));
-				Map<String, Long> timeouts = cst.getTimeouts();
-				ConfigurationSection cooldowns = data.getConfigurationSection(key+".cooldowns");
-				if(cooldowns == null){
-					cooldowns = data.createSection(key+"cooldowns");
-				}
-				for(String subKey:cooldowns.getKeys(false)){
-					timeouts.put(subKey, cooldowns.getLong(subKey));
-				}
-				/*
-				 * cst.setLastUse(data.getLong(key + ".lastuse", 0));
-				 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for
-				 * (Object useData : data.getList(key + ".usedata", new
-				 * ArrayList<String>())) { String[] sections =
-				 * useData.toString().split(","); OfflinePlayer user =
-				 * Bukkit.getOfflinePlayer(sections[0]); long lastUse =
-				 * Long.parseLong(sections[1]); long numUses =
-				 * Long.parseLong(sections[2]); cst.getTimeouts().put(user,
-				 * lastUse); cst.getUses().put(user, numUses); }
-				 */
-				activeSigns.put(loc, cst);
-			} catch (Exception ex) {
-				getLogger().warning("Unable to load sign " + attempts + " in signs.yml. " + ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
-		getLogger().info("Loaded " + activeSigns.size() + " signs.");
-	}
-
-	public void loadOldFile() {
-		try {
-			File file = new File(getDataFolder(), "signs.dat");
-			if (file.exists()) {
-				FileInputStream inStream = new FileInputStream(file);
-				Scanner scanner = new Scanner(inStream);
-				activeSigns.clear();
-
-				String line = "";
-				String[] raw = null;
-				boolean redstone = false;
-				World world = null;
-				int x = 0;
-				int y = 0;
-				int z = 0;
-				int block = 0;
-				int lineNumber = 0;
-
-				while (scanner.hasNextLine()) {
-					lineNumber++;
-					try {
-						line = scanner.nextLine();
-						raw = line.split("[\u00A7\u001D]");
-
-						redstone = Boolean.parseBoolean(raw[6]);
-
-						world = Bukkit.getWorld(raw[0]);
-						x = Integer.parseInt(raw[1]);
-						y = Integer.parseInt(raw[2]);
-						z = Integer.parseInt(raw[3]);
-						Location csl = new Location(world, x, y, z);
-
-						// Throws exception for an invalid location AND if the
-						// location is air
-						block = csl.getBlock().getTypeId();
-						if (block == 0)
-							throw new IllegalArgumentException("Location not valid.");
-
-						String owner = raw[4];
-						CommandSignsText cst = new CommandSignsText(owner, redstone);
-						for (String command : raw[5].split("[\u00B6\u001E]")) {
-							cst.getText().add(command);
-						}
-						activeSigns.put(csl, cst);
-					} catch (Exception ex) {
-						getLogger().warning("Unable to load sign in signs.dat line " + lineNumber);
-					}
-				}
-				scanner.close();
-				inStream.close();
-				getLogger().info("Imported " + activeSigns.size() + " old signs");
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	@Override
-	public void onDisable() {
-		getServer().getScheduler().cancelTask(updateTask);
-		saveFile();
-	}
-
-	@Override
-	public void onEnable() {
-		Messaging.loadMessages(this);
-		loadFile();
-		PluginManager pm = getServer().getPluginManager();
-		getCommand("commandsigns").setExecutor(commandExecutor);
-		pm.registerEvents(listener, this);
-		startUpdateCheck();
-		startMetrics();
-		setupPermissions();
-		setupEconomy();
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-
-			@Override
-			public void run() {
-				redstone.clear();
-			}
-
-		}, 0, 1);
-	}
-
-	public void startUpdateCheck() {
-		Runnable checker = updateHandler.new Checker();
-		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, checker, 0, 1728000L);
-	}
-
-	public void saveFile() {
-		FileConfiguration config = new YamlConfiguration();
-		ConfigurationSection data = config.createSection("signs");
-		for (Map.Entry<Location, CommandSignsText> sign : activeSigns.entrySet()) {
-			Location loc = sign.getKey();
-			CommandSignsText cst = sign.getValue();
-			cst.trim();
-			cst.getText().remove(0);
-			String key = loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
-			ConfigurationSection signData = data.createSection(key);
-			signData.set("redstone", cst.isRedstone());
-			signData.set("owner", cst.getOwner());
-			signData.set("text", cst.getText());
-			signData.set("active", cst.isEnabled());
-			signData.createSection("cooldowns", cst.getTimeouts());
-			/*
-			 * data.set(key + ".lastuse", cst.getLastUse()); data.set(key +
-			 * ".numuses", cst.getNumUses()); List<String> useData = new
-			 * ArrayList<String>(cst.getUses().size()); for (OfflinePlayer user
-			 * : cst.getTimeouts().keySet()) { useData.add(user.getName() + ","
-			 * + cst.getLastUse(user) + "," + cst.getUses(user)); } data.set(key
-			 * + ".usedata", useData);
-			 */
-			try {
-				config.save(new File(getDataFolder(), "signs.yml"));
-			} catch (IOException e) {
-				getLogger().severe("Failed to save CommandSigns");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void saveOldFile() {
-		try {
-			File file = new File(getDataFolder(), "signs.dat");
-			if (!file.exists()) {
-				getDataFolder().mkdir();
-				file.createNewFile();
-			}
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-
-			Location csl = null;
-			String sep = "\u001D";
-			String line = "";
-			String commands = "";
-			boolean first = true;
-			int signNumber = 0;
-
-			writer.write("");
-			for (Map.Entry<Location, CommandSignsText> entry : activeSigns.entrySet()) {
-				try {
-					signNumber++;
-					entry.getValue().trim();
-					commands = "";
-					for (String command : entry.getValue().getText()) {
-						if (!first)
-							commands += "\u001E";
-						commands += command;
-						first = false;
-					}
-					csl = entry.getKey();
-					line = csl.getWorld().getName();
-					line += sep;
-					line += csl.getBlockX();
-					line += sep;
-					line += csl.getBlockY();
-					line += sep;
-					line += csl.getBlockZ();
-					line += sep;
-					line += entry.getValue().getOwner();
-					line += sep;
-					line += commands;
-					line += sep;
-					line += entry.getValue().isRedstone();
-					writer.write(line + "\n");
-				} catch (Exception ex) {
-					if (csl != null)
-						getLogger().warning("Unable to save sign #" + signNumber + " at " + csl.toString());
-					else
-						getLogger().warning("Unable to save sign #" + signNumber);
-				}
-			}
-			writer.close();
-		} catch (Exception ex) {
-			getLogger().severe("Failed to save signs!");
-			ex.printStackTrace();
-		}
-	}
-
-	protected boolean setupEconomy() {
-		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-		if (economyProvider != null) {
-			economy = economyProvider.getProvider();
-		}
-		return economy != null;
-	}
-
-	protected boolean setupPermissions() {
-		RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-		if (permissionProvider != null) {
-			permission = permissionProvider.getProvider();
-		}
-		return permission != null;
-	}
-
-	public File getUpdateFile() {
-		return new File(getServer().getUpdateFolderFile().getAbsoluteFile(), super.getFile().getName());
-	}
+    
+    public static Economy economy = null;
+    public static Permission permission = null;
+    public final Map<Location, CommandSignsText> activeSigns = new HashMap<Location, CommandSignsText>();
+    public CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
+    public CommandSignsUpdater updateHandler = new CommandSignsUpdater(this);
+    private int updateTask;
+    // listeners
+    private final CommandSignsEventListener listener = new CommandSignsEventListener(this);
+    // plugin variables
+    public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
+    public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
+    private Metrics metrics;
+    public Set<Location> redstone = new HashSet<Location>();
+    
+    public boolean hasPermission(CommandSender player, String string) {
+        return hasPermission(player, string, true);
+    }
+    
+    public boolean hasPermission(CommandSender player, String string, boolean notify) {
+        boolean perm;
+        if (permission == null) {
+            perm = player.hasPermission(string);
+        } else {
+            perm = permission.has(player, string);
+        }
+        if (perm == false && notify) {
+            Messaging.sendMessage(player, "failure.no_perms");
+        }
+        return perm;
+    }
+    
+    public void startMetrics() {
+        try {
+            metrics = new Metrics(this);
+        } catch (IOException e) {
+            getLogger().warning(Messaging.parseRaw("metrics.failure"));
+        }
+        Graph g = metrics.createGraph("Number of CommandSigns");
+        g.addPlotter(new Plotter() {
+            
+            @Override
+            public int getValue() {
+                return activeSigns.size();
+            }
+        });
+        Graph g3 = metrics.createGraph("CommandSigns Version");
+        g3.addPlotter(new Plotter(getDescription().getVersion()) {
+            
+            @Override
+            public int getValue() {
+                return 1;
+            }
+        });
+        Graph g2 = metrics.createGraph("Super Signs Used");
+        g2.addPlotter(new Plotter("Permission") {
+            
+            @Override
+            public int getValue() {
+                int number = 0;
+                for (CommandSignsText cst : activeSigns.values()) {
+                    for (String s : cst.getText()) {
+                        if (s.startsWith("/*") || s.startsWith("!/*")) {
+                            number++;
+                        }
+                    }
+                }
+                return number;
+            }
+        });
+        g2.addPlotter(new Plotter("Op") {
+            
+            @Override
+            public int getValue() {
+                int number = 0;
+                for (CommandSignsText cst : activeSigns.values()) {
+                    for (String s : cst.getText()) {
+                        if (s.startsWith("/^") || s.startsWith("!/^")) {
+                            number++;
+                        }
+                    }
+                }
+                return number;
+            }
+        });
+        g2.addPlotter(new Plotter("Console") {
+            
+            @Override
+            public int getValue() {
+                int number = 0;
+                for (CommandSignsText cst : activeSigns.values()) {
+                    for (String s : cst.getText()) {
+                        if (s.startsWith("/#") || s.startsWith("!/#")) {
+                            number++;
+                        }
+                    }
+                }
+                return number;
+            }
+        });
+        if (metrics.start()) {
+            getLogger().info(Messaging.parseRaw("metrics.success"));
+        } else {
+            getLogger().info(Messaging.parseRaw("metrics.optout"));
+        }
+    }
+    
+    public void loadFile() {
+        activeSigns.clear();
+        if (new File(getDataFolder(), "signs.dat").exists()) {
+            loadOldFile();
+            if (!new File(getDataFolder(), "signs.dat").exists()) {
+                saveFile();
+            }
+            new File(getDataFolder(), "signs.dat").renameTo(new File(getDataFolder(), "signs.bak"));
+        }
+        FileConfiguration config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "signs.yml"));
+        ConfigurationSection data = config.getConfigurationSection("signs");
+        if (data == null) {
+            getLogger().info("No signs found.");
+            return;
+        }
+        String[] locText;
+        World world;
+        int x, y, z, block;
+        Location loc;
+        int attempts = 0;
+        for (String key : data.getKeys(false)) {
+            try {
+                attempts++;
+                locText = key.split(",");
+                world = Bukkit.getWorld(locText[0]);
+                if (world == null)
+                    continue;
+                x = Integer.parseInt(locText[1]);
+                y = Integer.parseInt(locText[2]);
+                z = Integer.parseInt(locText[3]);
+                loc = new Location(world, x, y, z);
+                
+                // Throws exception for an invalid location AND if the
+                // location is air
+                block = loc.getBlock().getTypeId();
+                if (block == 0)
+                    throw new IllegalArgumentException("Location not valid.");
+                
+                boolean redstone = data.getBoolean(key + ".redstone", false);
+                String owner = data.getString(key + ".owner", null);
+                CommandSignsText cst = new CommandSignsText(owner, redstone);
+                cst.getText().add("");
+                for (Object o : data.getList(key + ".text", new ArrayList<String>())) {
+                    cst.getText().add(o.toString());
+                }
+                cst.setEnabled(data.getBoolean(key + ".active", true));
+                Map<String, Long> timeouts = cst.getTimeouts();
+                ConfigurationSection cooldowns = data.getConfigurationSection(key + ".cooldowns");
+                if (cooldowns == null) {
+                    cooldowns = data.createSection(key + "cooldowns");
+                }
+                for (String subKey : cooldowns.getKeys(false)) {
+                    timeouts.put(subKey, cooldowns.getLong(subKey));
+                }
+                /*
+                 * cst.setLastUse(data.getLong(key + ".lastuse", 0));
+                 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for
+                 * (Object useData : data.getList(key + ".usedata", new
+                 * ArrayList<String>())) { String[] sections =
+                 * useData.toString().split(","); OfflinePlayer user =
+                 * Bukkit.getOfflinePlayer(sections[0]); long lastUse =
+                 * Long.parseLong(sections[1]); long numUses =
+                 * Long.parseLong(sections[2]); cst.getTimeouts().put(user,
+                 * lastUse); cst.getUses().put(user, numUses); }
+                 */
+                activeSigns.put(loc, cst);
+            } catch (Exception ex) {
+                getLogger().warning("Unable to load sign " + attempts + " in signs.yml. " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+        getLogger().info("Loaded " + activeSigns.size() + " signs.");
+    }
+    
+    public void loadOldFile() {
+        try {
+            File file = new File(getDataFolder(), "signs.dat");
+            if (file.exists()) {
+                FileInputStream inStream = new FileInputStream(file);
+                Scanner scanner = new Scanner(inStream);
+                activeSigns.clear();
+                
+                String line = "";
+                String[] raw = null;
+                boolean redstone = false;
+                World world = null;
+                int x = 0;
+                int y = 0;
+                int z = 0;
+                int block = 0;
+                int lineNumber = 0;
+                
+                while (scanner.hasNextLine()) {
+                    lineNumber++;
+                    try {
+                        line = scanner.nextLine();
+                        raw = line.split("[\u00A7\u001D]");
+                        
+                        redstone = Boolean.parseBoolean(raw[6]);
+                        
+                        world = Bukkit.getWorld(raw[0]);
+                        x = Integer.parseInt(raw[1]);
+                        y = Integer.parseInt(raw[2]);
+                        z = Integer.parseInt(raw[3]);
+                        Location csl = new Location(world, x, y, z);
+                        
+                        // Throws exception for an invalid location AND if the
+                        // location is air
+                        block = csl.getBlock().getTypeId();
+                        if (block == 0)
+                            throw new IllegalArgumentException("Location not valid.");
+                        
+                        String owner = raw[4];
+                        CommandSignsText cst = new CommandSignsText(owner, redstone);
+                        for (String command : raw[5].split("[\u00B6\u001E]")) {
+                            cst.getText().add(command);
+                        }
+                        activeSigns.put(csl, cst);
+                    } catch (Exception ex) {
+                        getLogger().warning("Unable to load sign in signs.dat line " + lineNumber);
+                    }
+                }
+                scanner.close();
+                inStream.close();
+                getLogger().info("Imported " + activeSigns.size() + " old signs");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void onDisable() {
+        getServer().getScheduler().cancelTask(updateTask);
+        saveFile();
+    }
+    
+    @Override
+    public void onEnable() {
+        Messaging.loadMessages(this);
+        loadFile();
+        PluginManager pm = getServer().getPluginManager();
+        getCommand("commandsigns").setExecutor(commandExecutor);
+        pm.registerEvents(listener, this);
+        startUpdateCheck();
+        startMetrics();
+        setupPermissions();
+        setupEconomy();
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            
+            @Override
+            public void run() {
+                redstone.clear();
+            }
+            
+        }, 0, 1);
+    }
+    
+    public void startUpdateCheck() {
+        Runnable checker = updateHandler.new Checker();
+        updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, checker, 0, 1728000L);
+    }
+    
+    public void saveFile() {
+        FileConfiguration config = new YamlConfiguration();
+        ConfigurationSection data = config.createSection("signs");
+        for (Map.Entry<Location, CommandSignsText> sign : activeSigns.entrySet()) {
+            Location loc = sign.getKey();
+            CommandSignsText cst = sign.getValue();
+            cst.trim();
+            cst.getText().remove(0);
+            String key = loc.getWorld().getName() + "," + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
+            ConfigurationSection signData = data.createSection(key);
+            signData.set("redstone", cst.isRedstone());
+            signData.set("owner", cst.getOwner());
+            signData.set("text", cst.getText());
+            signData.set("active", cst.isEnabled());
+            signData.createSection("cooldowns", cst.getTimeouts());
+            /*
+             * data.set(key + ".lastuse", cst.getLastUse()); data.set(key +
+             * ".numuses", cst.getNumUses()); List<String> useData = new
+             * ArrayList<String>(cst.getUses().size()); for (OfflinePlayer user
+             * : cst.getTimeouts().keySet()) { useData.add(user.getName() + ","
+             * + cst.getLastUse(user) + "," + cst.getUses(user)); } data.set(key
+             * + ".usedata", useData);
+             */
+            try {
+                config.save(new File(getDataFolder(), "signs.yml"));
+            } catch (IOException e) {
+                getLogger().severe("Failed to save CommandSigns");
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void saveOldFile() {
+        try {
+            File file = new File(getDataFolder(), "signs.dat");
+            if (!file.exists()) {
+                getDataFolder().mkdir();
+                file.createNewFile();
+            }
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            
+            Location csl = null;
+            String sep = "\u001D";
+            String line = "";
+            String commands = "";
+            boolean first = true;
+            int signNumber = 0;
+            
+            writer.write("");
+            for (Map.Entry<Location, CommandSignsText> entry : activeSigns.entrySet()) {
+                try {
+                    signNumber++;
+                    entry.getValue().trim();
+                    commands = "";
+                    for (String command : entry.getValue().getText()) {
+                        if (!first)
+                            commands += "\u001E";
+                        commands += command;
+                        first = false;
+                    }
+                    csl = entry.getKey();
+                    line = csl.getWorld().getName();
+                    line += sep;
+                    line += csl.getBlockX();
+                    line += sep;
+                    line += csl.getBlockY();
+                    line += sep;
+                    line += csl.getBlockZ();
+                    line += sep;
+                    line += entry.getValue().getOwner();
+                    line += sep;
+                    line += commands;
+                    line += sep;
+                    line += entry.getValue().isRedstone();
+                    writer.write(line + "\n");
+                } catch (Exception ex) {
+                    if (csl != null)
+                        getLogger().warning("Unable to save sign #" + signNumber + " at " + csl.toString());
+                    else
+                        getLogger().warning("Unable to save sign #" + signNumber);
+                }
+            }
+            writer.close();
+        } catch (Exception ex) {
+            getLogger().severe("Failed to save signs!");
+            ex.printStackTrace();
+        }
+    }
+    
+    protected boolean setupEconomy() {
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
+        return economy != null;
+    }
+    
+    protected boolean setupPermissions() {
+        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        if (permissionProvider != null) {
+            permission = permissionProvider.getProvider();
+        }
+        return permission != null;
+    }
+    
+    public File getUpdateFile() {
+        return new File(getServer().getUpdateFolderFile().getAbsoluteFile(), super.getFile().getName());
+    }
 }
