@@ -89,11 +89,6 @@ public class CommandSignsClickHandler {
 			case COPY:
 				copySign();
 				break;
-			case EDIT:
-				plugin.playerStates.remove(player);
-				plugin.playerText.remove(player);
-				Messaging.sendMessage(player, "success.done_editing");
-				break;
 			case EDIT_SELECT:
 				editSign();
 				readSign(false);
