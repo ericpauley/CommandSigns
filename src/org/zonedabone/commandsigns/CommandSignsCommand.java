@@ -26,14 +26,14 @@ class CommandSignsCommand implements CommandExecutor {
                 tp = (Player) sender;
             }
             final Player player = tp;
-            if (args[0].matches("line\\d") || args[0].matches("\\d")) {
+            if (args[0].matches("line\\d+") || args[0].matches("\\d+")) {
                 if (player == null) {
                     Messaging.sendMessage(sender, "failure.player_only");
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.create.regular")) {
                     int lineNumber;
-                    if (args[0].matches("line\\d")) {
+                    if (args[0].matches("line\\d+")) {
                         try {
                             lineNumber = Integer.parseInt(args[0].substring(4));
                         } catch (NumberFormatException ex) {
