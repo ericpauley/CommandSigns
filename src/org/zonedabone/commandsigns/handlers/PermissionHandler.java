@@ -9,7 +9,11 @@ public class PermissionHandler extends Handler {
     @Override
     public void handle(CommandSignExecutor e, String command, boolean silent, boolean negate) {
         if (e.getPlayer() != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("&")) {
-            if (e.getPlugin().hasPermission(e.getPlayer(), command.substring(1), false) ^ negate) {
+            boolean allowed = false;
+            for(String s:command.substring(1).split(",")){
+                allowed = allowed || e.getPlugin().hasPermission(e.getPlayer(), s);
+            }
+            if (allowed ^ negate) {
                 e.getRestrictions().push(true);
             } else {
                 e.getRestrictions().push(false);

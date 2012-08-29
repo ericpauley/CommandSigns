@@ -9,7 +9,11 @@ public class GroupHandler extends Handler {
     @Override
     public void handle(CommandSignExecutor e, String command, boolean silent, boolean negate) {
         if (e.getPlayer() != null && CommandSigns.permission != null && CommandSigns.permission.isEnabled() && command.startsWith("@")) {
-            if (CommandSigns.permission.playerInGroup(e.getPlayer(), command.substring(1)) ^ negate) {
+            boolean allowed = false;
+            for(String s:command.substring(1).split(",")){
+                allowed = allowed || CommandSigns.permission.playerInGroup(e.getPlayer(), s);
+            }
+            if (allowed ^ negate) {
                 e.getRestrictions().push(true);
             } else {
                 e.getRestrictions().push(false);
