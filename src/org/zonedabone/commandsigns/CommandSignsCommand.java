@@ -1,5 +1,8 @@
 package org.zonedabone.commandsigns;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -26,33 +29,19 @@ class CommandSignsCommand implements CommandExecutor {
                 tp = (Player) sender;
             }
             final Player player = tp;
-            if (args[0].matches("line\\d+") || args[0].matches("\\d+")) {
+            Pattern pattern = Pattern.compile("(line|l|)(\\d+)");
+            Matcher matcher = pattern.matcher(args[0]);
+            if (matcher.matches()) {
                 if (player == null) {
                     Messaging.sendMessage(sender, "failure.player_only");
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.create.regular")) {
-                    int lineNumber;
-                    if (args[0].matches("line\\d+")) {
-                        try {
-                            lineNumber = Integer.parseInt(args[0].substring(4));
-                        } catch (NumberFormatException ex) {
-                            Messaging.sendMessage(player, "failure.invalid_line");
-                            return true;
-                        }
-                    } else {
-                        try {
-                            lineNumber = Integer.parseInt(args[0]);
-                        } catch (NumberFormatException ex) {
-                            Messaging.sendMessage(player, "failure.invalid_line");
-                            return true;
-                        }
-                    }
+                    int lineNumber = Integer.parseInt(matcher.group(2));
                     if (lineNumber <= 0) {
                         Messaging.sendMessage(player, "failure.invalid_line");
                         return true;
                     }
-                    
                     if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
                         Messaging.sendMessage(player, "failure.must_select");
                         return true;
@@ -80,7 +69,9 @@ class CommandSignsCommand implements CommandExecutor {
                         Messaging.sendMessage(player, "progress.add");
                     }
                 }
-            } else if (args[0].equalsIgnoreCase("redstone")) {
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("redstone")) {
                 if (player == null) {
                     Messaging.sendMessage(sender, "failure.player_only");
                     return true;
