@@ -64,7 +64,7 @@ public class CommandSignsClickHandler {
         player.sendMessage("CommandSign enabled");
     }
     
-    public void onInteract(Action action) {
+    public boolean onInteract(Action action) {
         CommandSignsPlayerState state = plugin.playerStates.get(player);
         if (state != null) {
             switch (state) {
@@ -96,15 +96,15 @@ public class CommandSignsClickHandler {
                 default:
                     Material m = location.getBlock().getType();
                     if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
-                        return;
-                    new CommandSignExecutor(plugin, player, location, action);
-                    break;
+                        return false;
+                    return new CommandSignExecutor(plugin, player, location, action).runLines();
             }
+            return true;
         } else {
             Material m = location.getBlock().getType();
             if ((m == Material.WOOD_PLATE || m == Material.STONE_PLATE) && (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK))
-                return;
-            new CommandSignExecutor(plugin, player, location, action);
+                return false;
+            return new CommandSignExecutor(plugin, player, location, action).runLines();
         }
     }
     

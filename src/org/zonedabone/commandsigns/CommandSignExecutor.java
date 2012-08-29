@@ -30,6 +30,7 @@ public class CommandSignExecutor {
     private final Action action;
     private double wait;
     private final CommandSignsText text;
+    boolean isValid = false;
     
     private static Set<Handler> handlers = new HashSet<Handler>();
     
@@ -58,7 +59,7 @@ public class CommandSignExecutor {
             } else {
                 lines = new LinkedList<String>();
             }
-            runLines();
+            isValid = true;
         }
     }
     
@@ -70,7 +71,10 @@ public class CommandSignExecutor {
         handlers.clear();
     }
     
-    private void runLines() {
+    public boolean runLines() {
+        if(!isValid){
+            return false;
+        }
         wait = 0;
         while (wait == 0 && !lines.isEmpty()) {
             String currentLine = lines.poll();
@@ -129,6 +133,7 @@ public class CommandSignExecutor {
                 
             }, (long) (wait * 20));
         }
+        return true;
     }
     
     private LinkedList<String> parseCommandSign(Player player, Location loc) {
