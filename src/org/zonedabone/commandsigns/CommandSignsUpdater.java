@@ -40,10 +40,8 @@ public class CommandSignsUpdater {
                 
                 if (currentVersion.compareTo(newestVersion) < 0)
                     newAvailable = true;
-            } catch (MalformedURLException e) {
-                plugin.getLogger().warning("Unable to check for update check - connection error");
-            } catch (IOException e) {
-                plugin.getLogger().warning("Unable to carry out update check - file error");
+            } catch (Exception e) {
+                plugin.getLogger().warning("Unable to check for updates - " + e.getMessage());
             }
         }
     }
