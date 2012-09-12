@@ -159,6 +159,7 @@ public class CommandSignExecutor {
                 line = line.replaceAll("(?iu)<y>", "" + player.getLocation().getBlockY());
                 line = line.replaceAll("(?iu)<z>", "" + player.getLocation().getBlockZ());
                 line = line.replaceAll("(?iu)<name>", "" + player.getName());
+                line = line.replaceAll("(?iu)<player>", "" + player.getName());
                 line = line.replaceAll("(?iu)<display>", player.getDisplayName());
                 if (CommandSigns.economy != null && CommandSigns.economy.isEnabled()) {
                     line = line.replaceAll("(?iu)<money>", "" + CommandSigns.economy.getBalance(player.getName()));
