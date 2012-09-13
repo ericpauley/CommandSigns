@@ -64,10 +64,14 @@ public class Messaging {
     }
     
     public static void sendMessage(CommandSender cs, String message, String... replacements) {
-        cs.sendMessage(parseMessage(message, replacements));
+    	if (cs != null) {
+    		cs.sendMessage(parseMessage(message, replacements));
+    	}
     }
     
     public static void sendRaw(CommandSender cs, String message, String... replacements) {
-        cs.sendMessage(parseRaw(message, replacements));
+    	if (cs != null) {
+    		cs.sendMessage(parseRaw(message, replacements));
+    	}
     }
 }
