@@ -89,6 +89,10 @@ public class CommandSignsUpdater {
         
         private List<Integer> parts = new ArrayList<Integer>();
         
+        public boolean add(int subversion) {
+        	return parts.add(subversion);
+        }
+        
         public Integer get(int index) {
             return parts.get(index);
         }
@@ -99,6 +103,10 @@ public class CommandSignsUpdater {
         
         public int length() {
             return parts.size();
+        }
+        
+        public Integer remove() {
+        	return parts.remove(parts.size() - 1);
         }
         
         public String toString() {
@@ -127,11 +135,13 @@ public class CommandSignsUpdater {
         @Override
         public int compareTo(Version anotherVersion) {
             try {
-                int max = 0;
-                if (this.length() < anotherVersion.length())
-                    max = this.length();
-                else
-                    max = anotherVersion.length();
+            	// Add .0s to the shortest version string to make lengths the same
+                for (int i = this.length(); i < anotherVersion.length(); i++)
+                	this.add(0);
+                for (int i = anotherVersion.length(); i < this.length(); i++)
+                	anotherVersion.add(0);
+                
+                int max = this.length();
                 
                 // Compare each integer in the string and stop at the first
                 // difference
@@ -142,7 +152,7 @@ public class CommandSignsUpdater {
                 
                 if (i >= max)
                     return 0;
-                if (this.get(i) < anotherVersion.get(i))
+                else if (this.get(i) < anotherVersion.get(i))
                     return -1;
                 else
                     return 1;
