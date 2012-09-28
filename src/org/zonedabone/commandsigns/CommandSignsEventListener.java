@@ -74,7 +74,8 @@ public class CommandSignsEventListener implements Listener {
     
     public void handleRedstone(Block b) {
     	Location csl = b.getLocation();
-    	if (plugin.activeSigns.containsKey(csl)) {
+    	CommandSignsText text = plugin.activeSigns.get(csl);
+    	if (text != null && text.isRedstone()) {
             new CommandSignExecutor(plugin, null, csl, null).runLines();
         }
     }
