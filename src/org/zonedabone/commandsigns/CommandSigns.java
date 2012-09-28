@@ -7,10 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -43,7 +41,6 @@ public class CommandSigns extends JavaPlugin {
     public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
     public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
     private Metrics metrics;
-    public Set<Location> redstone = new HashSet<Location>();
     
     public boolean hasPermission(CommandSender player, String string) {
         return hasPermission(player, string, true);
@@ -285,14 +282,6 @@ public class CommandSigns extends JavaPlugin {
         startMetrics();
         setupPermissions();
         setupEconomy();
-        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            
-            @Override
-            public void run() {
-                redstone.clear();
-            }
-            
-        }, 0, 1);
     }
     
     public void startUpdateCheck() {

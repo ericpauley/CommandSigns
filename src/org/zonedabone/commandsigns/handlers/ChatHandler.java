@@ -6,7 +6,7 @@ public class ChatHandler extends Handler {
     
     @Override
     public void handle(CommandSignExecutor e, String command, boolean silent, boolean negate) {
-        if (command.startsWith(".")) {
+        if (e.getPlayer() != null && command.startsWith(".")) {
             command = command.substring(1);
             e.getPlayer().chat(command);
         }

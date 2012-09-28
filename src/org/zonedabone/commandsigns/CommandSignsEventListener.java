@@ -35,23 +35,16 @@ public class CommandSignsEventListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerInteract(final PlayerInteractEvent event) {
         Block block = null;
-        Action a = event.getAction();
-        if (event.isCancelled() && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR)) {
-            block = event.getPlayer().getTargetBlock(null, 5);
-        } else {
+        Action action = event.getAction();
+        if (action == Action.RIGHT_CLICK_BLOCK || action == Action.LEFT_CLICK_BLOCK) {
             block = event.getClickedBlock();
+	        if (block != null) {
+	            final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, event.getPlayer(), block);
+	            if (signClickEvent.onInteract(action)) {
+	                event.setCancelled(true);
+	            }
+	        }
         }
-        if (a == Action.RIGHT_CLICK_AIR)
-            a = Action.RIGHT_CLICK_BLOCK;
-        if (a == Action.LEFT_CLICK_AIR)
-            a = Action.RIGHT_CLICK_BLOCK;
-        if (block != null) {
-            final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(plugin, event.getPlayer(), block);
-            if (signClickEvent.onInteract(event.getAction())) {
-                event.setCancelled(true);
-            }
-        }
-        
     }
     
     @EventHandler
@@ -80,11 +73,9 @@ public class CommandSignsEventListener implements Listener {
     }
     
     public void handleRedstone(Block b) {
-        Location csl = b.getLocation();
-        CommandSignsText cst = plugin.activeSigns.get(csl);
-        if (cst != null && cst.isRedstone() && !plugin.redstone.contains(csl)) {
-            plugin.redstone.add(csl);
-            new CommandSignExecutor(plugin, null, csl, null);
+    	Location csl = b.getLocation();
+    	if (plugin.activeSigns.containsKey(csl)) {
+            new CommandSignExecutor(plugin, null, csl, null).runLines();
         }
     }
 }
