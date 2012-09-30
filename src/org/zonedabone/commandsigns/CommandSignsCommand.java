@@ -78,7 +78,8 @@ class CommandSignsCommand implements CommandExecutor {
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.create.regular")) {
-                    if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+                	CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                    if (ps == CommandSignsPlayerState.EDIT || ps == CommandSignsPlayerState.EDIT_SELECT) {
                         finishEditing(player);
                     }
                     plugin.playerStates.put(player, CommandSignsPlayerState.READ);
@@ -114,7 +115,8 @@ class CommandSignsCommand implements CommandExecutor {
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.create.regular")) {
-                    if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+                	CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                    if (ps == CommandSignsPlayerState.EDIT || ps == CommandSignsPlayerState.EDIT_SELECT) {
                         finishEditing(player);
                     }
                     plugin.playerStates.put(player, CommandSignsPlayerState.COPY);
@@ -128,7 +130,8 @@ class CommandSignsCommand implements CommandExecutor {
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.remove")) {
-                    if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+                	CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                    if (ps == CommandSignsPlayerState.EDIT || ps == CommandSignsPlayerState.EDIT_SELECT) {
                         finishEditing(player);
                     }
                     plugin.playerStates.put(player, CommandSignsPlayerState.REMOVE);
@@ -142,7 +145,8 @@ class CommandSignsCommand implements CommandExecutor {
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.remove")) {
-                    if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+                	CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                    if (ps == CommandSignsPlayerState.EDIT || ps == CommandSignsPlayerState.EDIT_SELECT) {
                         finishEditing(player);
                     }
                     plugin.playerStates.remove(player);
@@ -169,8 +173,8 @@ class CommandSignsCommand implements CommandExecutor {
                 }
             } else if (args[0].equalsIgnoreCase("edit")) {
                 if (plugin.hasPermission(sender, "commandsigns.edit", false)) {
-                    CommandSignsPlayerState cs = plugin.playerStates.get(player);
-                    if (cs == CommandSignsPlayerState.EDIT_SELECT || cs == CommandSignsPlayerState.EDIT) {
+                    CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                    if (ps == CommandSignsPlayerState.EDIT_SELECT || ps == CommandSignsPlayerState.EDIT) {
                         finishEditing(player);
                     } else {
                         plugin.playerStates.put(player, CommandSignsPlayerState.EDIT_SELECT);
@@ -184,7 +188,8 @@ class CommandSignsCommand implements CommandExecutor {
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.toggle")) {
-                    if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+                	CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                    if (ps == CommandSignsPlayerState.EDIT || ps == CommandSignsPlayerState.EDIT_SELECT) {
                         finishEditing(player);
                     }
                     plugin.playerStates.put(player, CommandSignsPlayerState.TOGGLE);
@@ -198,7 +203,8 @@ class CommandSignsCommand implements CommandExecutor {
                     return true;
                 }
                 if (plugin.hasPermission(player, "commandsigns.create.redstone")) {
-                	if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT || plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+                	CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                	if (ps == CommandSignsPlayerState.EDIT || ps == CommandSignsPlayerState.EDIT_SELECT) {
                         finishEditing(player);
                     }
                     plugin.playerStates.put(player, CommandSignsPlayerState.REDSTONE);
@@ -207,52 +213,52 @@ class CommandSignsCommand implements CommandExecutor {
                 	 Messaging.sendMessage(player, "failure.no_perms");
                 }
             } else if (args[0].equalsIgnoreCase("batch")) {
-                CommandSignsPlayerState cs = plugin.playerStates.get(player);
-                switch (cs) {
+                CommandSignsPlayerState ps = plugin.playerStates.get(player);
+                switch (ps) {
                     case REMOVE:
                         player.sendMessage("Switched to batch remove mode.");
-                        cs = CommandSignsPlayerState.BATCH_REMOVE;
+                        ps = CommandSignsPlayerState.BATCH_REMOVE;
                         break;
                     case BATCH_REMOVE:
                         player.sendMessage("Switched to single remove mode.");
-                        cs = CommandSignsPlayerState.REMOVE;
+                        ps = CommandSignsPlayerState.REMOVE;
                         break;
                     case ENABLE:
                         player.sendMessage("Switched to batch enable mode.");
-                        cs = CommandSignsPlayerState.BATCH_ENABLE;
+                        ps = CommandSignsPlayerState.BATCH_ENABLE;
                         break;
                     case BATCH_ENABLE:
                         player.sendMessage("Switched to single enable mode.");
-                        cs = CommandSignsPlayerState.ENABLE;
+                        ps = CommandSignsPlayerState.ENABLE;
                         break;
                     case READ:
                         player.sendMessage("Switched to batch read mode.");
-                        cs = CommandSignsPlayerState.BATCH_READ;
+                        ps = CommandSignsPlayerState.BATCH_READ;
                         break;
                     case BATCH_READ:
                         player.sendMessage("Switched to single read mode.");
-                        cs = CommandSignsPlayerState.READ;
+                        ps = CommandSignsPlayerState.READ;
                         break;
                     case TOGGLE:
                         player.sendMessage("Switched to batch toggle mode.");
-                        cs = CommandSignsPlayerState.BATCH_TOGGLE;
+                        ps = CommandSignsPlayerState.BATCH_TOGGLE;
                         break;
                     case BATCH_TOGGLE:
                         player.sendMessage("Switched to single toggle mode.");
-                        cs = CommandSignsPlayerState.TOGGLE;
+                        ps = CommandSignsPlayerState.TOGGLE;
                         break;
                     case REDSTONE:
                         player.sendMessage("Switched to batch redstone mode.");
-                        cs = CommandSignsPlayerState.BATCH_REDSTONE;
+                        ps = CommandSignsPlayerState.BATCH_REDSTONE;
                         break;
                     case BATCH_REDSTONE:
                         player.sendMessage("Switched to single redstone mode.");
-                        cs = CommandSignsPlayerState.REDSTONE;
+                        ps = CommandSignsPlayerState.REDSTONE;
                         break;
                     default:
                         player.sendMessage(ChatColor.RED + "The mode you are in doesn't support batch processing.");
                 }
-                plugin.playerStates.put(player, cs);
+                plugin.playerStates.put(player, ps);
             } else if (args[0].equalsIgnoreCase("update")) {
                 if (sender.hasPermission("commandsigns.update")) {
                     if (args.length == 2 && args[1].equalsIgnoreCase("force")) {

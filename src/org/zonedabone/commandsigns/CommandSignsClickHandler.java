@@ -159,7 +159,7 @@ public class CommandSignsClickHandler {
                     break;
                 case EDIT_SELECT:
                     editSign();
-                    readSign(false);
+                    readSign(true);
                     break;
                 case TOGGLE:
                 	toggleSign(false);
