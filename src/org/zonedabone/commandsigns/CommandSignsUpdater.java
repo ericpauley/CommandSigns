@@ -8,11 +8,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import org.bukkit.command.CommandSender;
+
+import com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager;
 
 public class CommandSignsUpdater {
     
@@ -30,11 +36,20 @@ public class CommandSignsUpdater {
         
         @Override
         public void run() {
-            try {
+            try {	
                 currentVersion = new Version(plugin.getDescription().getVersion());
                 
                 URL url = new URL(upstream + "VERSION");
-                URLConnection connection = url.openConnection();
+                HttpsURLConnection connection;
+                connection = (HttpsURLConnection)url.openConnection();
+                
+                if (upstream.startsWith("https")) {
+                	// Special handling for HTTPS URLs if the user has insufficient Cert Keys
+                    SSLContext sslContext = SSLContext.getInstance("TLS");
+         			sslContext.init(null, new TrustManager[] { new AllowAllTrustManager() }, null);
+                    connection.setSSLSocketFactory(sslContext.getSocketFactory());
+                }
+                
                 BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 newestVersion = new Version(in.readLine());
                 
@@ -83,6 +98,34 @@ public class CommandSignsUpdater {
                 Messaging.sendMessage(sender, "update.fetch_error", "e", e.getMessage());
             }
         }
+    }
+    
+    public class AllowAllTrustManager extends X509ExtendedTrustManager {
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+				throws CertificateException {
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+				throws CertificateException {
+		}
+
+		@Override
+		public X509Certificate[] getAcceptedIssuers() {
+			return null;
+		}
+
+		@Override
+		public void checkClientTrusted(X509Certificate[] arg0, String arg1,
+				String arg2, String arg3) throws CertificateException {
+		}
+
+		@Override
+		public void checkServerTrusted(X509Certificate[] arg0, String arg1,
+				String arg2, String arg3) throws CertificateException {
+		}
     }
     
     public class Version implements Comparable<Version> {

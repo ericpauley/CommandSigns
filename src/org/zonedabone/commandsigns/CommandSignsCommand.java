@@ -255,42 +255,45 @@ class CommandSignsCommand implements CommandExecutor {
                 plugin.playerStates.put(player, cs);
             } else if (args[0].equalsIgnoreCase("update")) {
                 if (sender.hasPermission("commandsigns.update")) {
-                    if (args.length == 2) {
-                        if (args[1].equalsIgnoreCase("force")) {
-                            Messaging.sendMessage(sender, "update.force");
-                            plugin.updateHandler.new Updater(sender).start();
-                        } else if (args[1].equalsIgnoreCase("check")) {
-                            Messaging.sendMessage(sender, "update.check");
-                            new Thread() {
-                                
-                                @Override
-                                public void run() {
-                                    plugin.updateHandler.new Checker().run();
-                                    if (plugin.updateHandler.newAvailable) {
-                                        Messaging.sendMessage(player, "update.notify", "v", plugin.updateHandler.newestVersion.toString());
-                                    } else {
-                                        Messaging.sendMessage(player, "update.confirm_up_to_date", "v", plugin.updateHandler.currentVersion.toString());
-                                    }
-                                }
-                            }.start();
-                        }
-                    } else if (plugin.updateHandler.newAvailable) {
-                        if (!plugin.getUpdateFile().exists()) {
-                            Messaging.sendMessage(sender, "update.start", "v", plugin.updateHandler.newestVersion.toString());
-                            plugin.updateHandler.new Updater(sender).start();
-                        } else {
-                            Messaging.sendMessage(sender, "update.already_downloaded");
-                        }
+                    if (args.length == 2 && args[1].equalsIgnoreCase("force")) {
+                    	// Force-only. Does no check.
+                        Messaging.sendMessage(sender, "update.force");
+                        plugin.updateHandler.new Updater(sender).start();
                     } else {
-                        Messaging.sendMessage(sender, "update.up_to_date", "v", plugin.updateHandler.currentVersion.toString());
-                    }
+                    	// Preliminary check
+                        Messaging.sendMessage(sender, "update.check");
+                        new Thread() {
+                            
+                            @Override
+                            public void run() {
+                                plugin.updateHandler.new Checker().run();
+                                if (plugin.updateHandler.newAvailable) {
+                                    Messaging.sendMessage(sender, "update.notify", "v", plugin.updateHandler.newestVersion.toString());
+                                } else {
+                                    Messaging.sendMessage(sender, "update.confirm_up_to_date", "v", plugin.updateHandler.currentVersion.toString());
+                                }
+                            }
+                        }.start();
+                        
+                        // If command was 'update check', stop here. Enough has been done.
+                        if (!(args.length == 2 && args[1].equalsIgnoreCase("check"))) {
+		                    if (plugin.updateHandler.newAvailable) {
+		                        if (!plugin.getUpdateFile().exists()) {
+		                            Messaging.sendMessage(sender, "update.start", "v", plugin.updateHandler.newestVersion.toString());
+		                            plugin.updateHandler.new Updater(sender).start();
+		                        } else {
+		                            Messaging.sendMessage(sender, "update.already_downloaded");
+		                        }
+		                    }
+                        }
+	                }
                 }
-            } else {
-                Messaging.sendMessage(sender, "failure.wrong_syntax");
-            }
-            return true;
-        }
-        return false;
+	        } else {
+	            Messaging.sendMessage(sender, "failure.wrong_syntax");
+	        }
+	        return true;
+	    }
+	    return false;
     }
     
     public void finishEditing(Player player) {
