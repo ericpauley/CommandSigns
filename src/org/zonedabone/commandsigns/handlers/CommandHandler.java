@@ -2,32 +2,26 @@ package org.zonedabone.commandsigns.handlers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.PluginManager;
 import org.zonedabone.commandsigns.CommandSignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
 import org.zonedabone.commandsigns.CommandSignsConsoleProxy;
-import org.zonedabone.commandsigns.CommandSignsPlayerProxy;
+import org.zonedabone.commandsigns.CommandSignsMessagingProxy;
 import org.zonedabone.commandsigns.Messaging;
 
 public class CommandHandler extends Handler {
     
     private void run(CommandSigns plugin, Player p, String command, boolean silent) {
-        CommandSignsPlayerProxy csp = null;
-        if (silent) {
-            csp = new CommandSignsPlayerProxy(p);
-            p = csp;
-        }
+        p = (Player)CommandSignsMessagingProxy.newInstance(p, silent);
         PluginManager pm = Bukkit.getPluginManager();
         PlayerCommandPreprocessEvent e = new PlayerCommandPreprocessEvent(p, "/" + command);
         pm.callEvent(e);
         if (!e.isCancelled()) {
             Bukkit.dispatchCommand(p, command);
         }
-        if (csp != null)
-            csp.setSilent(false);
-        
     }
     
     @Override
@@ -75,7 +69,8 @@ public class CommandHandler extends Handler {
                         } else if (command.startsWith("#")) {
                             command = command.substring(1);
                             if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
-                                CommandSender cs = new CommandSignsConsoleProxy(plugin.getServer().getConsoleSender(), player, silent);
+                            	ConsoleCommandSender ccs = plugin.getServer().getConsoleSender();
+                            	CommandSender cs = new CommandSignsConsoleProxy(ccs, player, silent);
                                 plugin.getServer().dispatchCommand(cs, command);
                             } else {
                                 if (!silent)
@@ -95,7 +90,8 @@ public class CommandHandler extends Handler {
                     if (command.startsWith("*") || command.startsWith("^") || command.startsWith("#")) {
                         command = command.substring(1);
                     }
-                    CommandSender cs = new CommandSignsConsoleProxy(plugin.getServer().getConsoleSender(), plugin.getServer().getConsoleSender(), silent);
+                    ConsoleCommandSender ccs = plugin.getServer().getConsoleSender();
+                    CommandSender cs = new CommandSignsConsoleProxy(ccs, ccs, silent);
                     plugin.getServer().dispatchCommand(cs, command);
                 }
             }
