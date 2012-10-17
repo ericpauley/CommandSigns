@@ -8,14 +8,14 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.PluginManager;
 import org.zonedabone.commandsigns.CommandSignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
-import org.zonedabone.commandsigns.CommandSignsConsoleProxy;
-import org.zonedabone.commandsigns.CommandSignsMessagingProxy;
+import org.zonedabone.commandsigns.CommandSignsCommandSenderProxy;
+import org.zonedabone.commandsigns.CommandSignsPlayerProxy;
 import org.zonedabone.commandsigns.Messaging;
 
 public class CommandHandler extends Handler {
     
     private void run(CommandSigns plugin, Player p, String command, boolean silent) {
-        p = (Player)CommandSignsMessagingProxy.newInstance(p, silent);
+        p = new CommandSignsPlayerProxy(p, silent);
         PluginManager pm = Bukkit.getPluginManager();
         PlayerCommandPreprocessEvent e = new PlayerCommandPreprocessEvent(p, "/" + command);
         pm.callEvent(e);
@@ -70,7 +70,7 @@ public class CommandHandler extends Handler {
                             command = command.substring(1);
                             if (plugin.hasPermission(player, "commandsigns.use.super", false)) {
                             	ConsoleCommandSender ccs = plugin.getServer().getConsoleSender();
-                            	CommandSender cs = new CommandSignsConsoleProxy(ccs, player, silent);
+                            	CommandSender cs = new CommandSignsCommandSenderProxy(ccs, player, silent);
                                 plugin.getServer().dispatchCommand(cs, command);
                             } else {
                                 if (!silent)
@@ -91,7 +91,7 @@ public class CommandHandler extends Handler {
                         command = command.substring(1);
                     }
                     ConsoleCommandSender ccs = plugin.getServer().getConsoleSender();
-                    CommandSender cs = new CommandSignsConsoleProxy(ccs, ccs, silent);
+                    CommandSender cs = new CommandSignsCommandSenderProxy(ccs, silent);
                     plugin.getServer().dispatchCommand(cs, command);
                 }
             }
