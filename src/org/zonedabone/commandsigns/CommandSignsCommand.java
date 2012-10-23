@@ -18,57 +18,6 @@ class CommandSignsCommand implements CommandExecutor {
 		this.plugin = plugin;
 	}
 
-	@Override
-	public boolean onCommand(final CommandSender sender, Command cmd,
-			String commandLabel, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("commandsigns")) {
-			if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
-				// Messaging.sendMessage(sender, "usage");
-				return false;
-			}
-			Player tp = null;
-			if (sender instanceof Player) {
-				tp = (Player) sender;
-			}
-			final Player player = tp;
-			String command = args[0].toLowerCase();
-			Pattern pattern = Pattern.compile("(line|l|)(\\d+)");
-			Matcher matcher = pattern.matcher(command);
-			if (matcher.matches()) {
-				return add(sender, player, Integer.parseInt(matcher.group(2)),
-						args);
-			} else if (command.equals("batch")) {
-				return batch(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("clear")) {
-				return clear(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("copy")) {
-				return copy(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("edit")) {
-				return edit(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("read")) {
-				return read(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("redstone")) {
-				return redstone(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("reload")) {
-				return reload(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("remove")) {
-				return remove(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("save")) {
-				return save(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("toggle")) {
-				return toggle(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("update")) {
-				return update(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("view")) {
-				return view(sender, player, args);
-			} else {
-				Messaging.sendMessage(sender, "failure.wrong_syntax");
-				return true;
-			}
-		}
-		return false;
-	}
-
 	protected boolean add(final CommandSender sender, Player player,
 			int lineNumber, String[] args) {
 		if (player == null) {
@@ -218,6 +167,63 @@ class CommandSignsCommand implements CommandExecutor {
 			}
 		}
 		return true;
+	}
+
+	public void finishEditing(Player player) {
+		plugin.playerStates.remove(player);
+		plugin.playerText.remove(player);
+		Messaging.sendMessage(player, "success.done_editing");
+	}
+
+	@Override
+	public boolean onCommand(final CommandSender sender, Command cmd,
+			String commandLabel, String[] args) {
+		if (cmd.getName().equalsIgnoreCase("commandsigns")) {
+			if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
+				// Messaging.sendMessage(sender, "usage");
+				return false;
+			}
+			Player tp = null;
+			if (sender instanceof Player) {
+				tp = (Player) sender;
+			}
+			final Player player = tp;
+			String command = args[0].toLowerCase();
+			Pattern pattern = Pattern.compile("(line|l|)(\\d+)");
+			Matcher matcher = pattern.matcher(command);
+			if (matcher.matches()) {
+				return add(sender, player, Integer.parseInt(matcher.group(2)),
+						args);
+			} else if (command.equals("batch")) {
+				return batch(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("clear")) {
+				return clear(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("copy")) {
+				return copy(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("edit")) {
+				return edit(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("read")) {
+				return read(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("redstone")) {
+				return redstone(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("reload")) {
+				return reload(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("remove")) {
+				return remove(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("save")) {
+				return save(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("toggle")) {
+				return toggle(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("update")) {
+				return update(sender, player, args);
+			} else if (args[0].equalsIgnoreCase("view")) {
+				return view(sender, player, args);
+			} else {
+				Messaging.sendMessage(sender, "failure.wrong_syntax");
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected boolean read(final CommandSender sender, Player player,
@@ -390,11 +396,5 @@ class CommandSignsCommand implements CommandExecutor {
 			Messaging.sendMessage(player, "failure.no_perms");
 		}
 		return true;
-	}
-
-	public void finishEditing(Player player) {
-		plugin.playerStates.remove(player);
-		plugin.playerText.remove(player);
-		Messaging.sendMessage(player, "success.done_editing");
 	}
 }
