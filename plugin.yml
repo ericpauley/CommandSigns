@@ -12,11 +12,36 @@ commands:
     aliases: [cs, cmds, cmdsigns]
     description: CommandSigns commands.
     usage: |
-        /commandsigns line<number> - Add a line to your CommandSign clipboard. Right click a sign to activate.
-        /commandsigns read - Right click a sign to read the CommandSign text.
-        /commandsigns copy - Copy a CommandSigns to your clipboard.
-        /commandsigns remove - Right click a sign to remove a CommandSign.
-        /commandsigns clear - Clear your CommandSign clipboard.
+        /commandsigns line<number> <text>
+        /commandsigns <number> <text>
+        -       Add a line with one command or a line of text.
+        /commandsigns batch
+        -       Changes your state into batch mode for doing bigger tasks quicker.
+        /commandsigns clear
+		-       Clear your CommandSigns clipboard.
+        /commandsigns copy
+        -       Copy a CommandSign to clipboard (the command lines associated with it).
+        -       Note: You need permission to create a sign in order to read.
+        /commandsigns edit
+        -       Edit a CommandSign in live mode.
+        /commandsigns read
+        -       Read a CommandSign (the command lines associated with it).
+        -       Note: You need permission to create a sign in order to read.
+        /commandsigns redstone
+		-       Toggle whether the CommandSign can be triggered by redstone
+		-       Off by default
+        /commandsigns reload
+		-       Reload CommandSigns.
+        /commandsigns remove
+        -       Remove a CommandSign.
+        /commandsigns update
+		-       Update CommandSigns to latest version.
+		-       /commandsigns update check
+		-               Check for updates only.
+		-       /commandsigns update force
+		-               Force an update.
+		/commandsigns view
+        -       View the contents of your clipboard.
 permissions:
     commandsigns.*:
         description: Gives access to all CommandSigns commands
