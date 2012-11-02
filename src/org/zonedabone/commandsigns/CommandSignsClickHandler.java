@@ -62,12 +62,37 @@ public class CommandSignsClickHandler {
 
 	public void enableSign(boolean batch) {
 		if (plugin.activeSigns.containsKey(location)) {
-			player.sendMessage("Sign is already enabled!");
+			Messaging.sendMessage(player, "failure.already_enabled");
 			return;
 		}
 		CommandSignsText text = plugin.playerText.get(player);
 		plugin.activeSigns.put(location, text.clone(player.getName()));
 		Messaging.sendMessage(player, "success.enabled");
+		if (!batch) {
+			plugin.playerStates.remove(player);
+			plugin.playerText.remove(player);
+		}
+	}
+
+	public void insert(boolean batch) {
+		CommandSignsText currentText = plugin.activeSigns.get(location);
+		if (currentText == null) {
+			Messaging.sendMessage(player, "failure.not_a_sign");
+			return;
+		}
+		CommandSignsText newText = plugin.playerText.get(player);
+		
+		// Insert lines from last to first - that way you don't overwrite stuff
+		for (int i = newText.count(); i >= 1; i--) {
+			// Move all lines after the current position up one place
+			for (int j = currentText.count(); j >= i; j--) {
+				currentText.setLine(j + 1, currentText.getLine(j));
+			}
+			currentText.setLine(i, newText.getLine(i));
+			System.out.println("i : " + i + " =" + currentText.getLine(i));
+		}
+
+		Messaging.sendMessage(player, "success.done_editing");
 		if (!batch) {
 			plugin.playerStates.remove(player);
 			plugin.playerText.remove(player);
@@ -83,6 +108,12 @@ public class CommandSignsClickHandler {
 				break;
 			case BATCH_ENABLE:
 				enableSign(true);
+				break;
+			case INSERT:
+				insert(false);
+				break;
+			case BATCH_INSERT:
+				insert(true);
 				break;
 			case REMOVE:
 				disableSign(false);
@@ -132,10 +163,12 @@ public class CommandSignsClickHandler {
 			Messaging.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
-		int i = 0;
-		for (String s : text.getText()) {
-			if (!s.equals("")) {
-				player.sendMessage(i + ": " + s);
+		int i = 1;
+		for (String line : text) {
+			if (!line.equals("")) {
+				String display = line.replace("$", "\\$").replace("\\", "\\\\");
+				Messaging.sendRaw(player, "success.line_print", "n", "" + i,
+						"l", display);
 			}
 			i++;
 		}

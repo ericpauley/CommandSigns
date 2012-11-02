@@ -24,33 +24,7 @@ class CommandSignsCommand implements CommandExecutor {
 			Messaging.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
-			if (lineNumber <= 0) {
-				Messaging.sendMessage(player, "failure.invalid_line");
-			}
-			if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
-				Messaging.sendMessage(player, "failure.must_select");
-			}
-			CommandSignsText text = plugin.playerText.get(player);
-			if (text == null) {
-				text = new CommandSignsText(player.getName(), false);
-				plugin.playerText.put(player, text);
-			}
-			String line = StringUtils.join(args, " ", 1, args.length);
-			if (line.startsWith("/*")
-					&& !plugin.hasPermission(player,
-							"commandsigns.create.super", false)) {
-				Messaging.sendMessage(player, "failure.no_super");
-			}
-			if ((line.startsWith("/^") || line.startsWith("/#"))
-					&& !plugin.hasPermission(player, "commandsigns.create.op",
-							false)) {
-				Messaging.sendMessage(player, "failure.no_op");
-			}
-			text.setLine(lineNumber, line);
-			text.trim();
-			String display = line.replace("$", "\\$");
-			Messaging.sendRaw(player, "success.line_print", "n", ""
-					+ lineNumber, "l", display);
+			clipboard(sender, player, lineNumber, 1, args);
 			if (plugin.playerStates.get(player) != CommandSignsPlayerState.EDIT) {
 				plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 				Messaging.sendMessage(player, "progress.add");
@@ -133,6 +107,37 @@ class CommandSignsCommand implements CommandExecutor {
 		return true;
 	}
 
+	private void clipboard(final CommandSender sender, Player player,
+			int lineNumber, int textStart, String[] args) {
+		if (lineNumber < 1) {
+			Messaging.sendMessage(player, "failure.invalid_line");
+		} else {
+			if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
+				Messaging.sendMessage(player, "failure.must_select");
+			}
+			CommandSignsText text = plugin.playerText.get(player);
+			if (text == null) {
+				text = new CommandSignsText(player.getName(), false);
+				plugin.playerText.put(player, text);
+			}
+			String line = StringUtils.join(args, " ", textStart, args.length);
+			if (line.startsWith("/*")
+					&& !plugin.hasPermission(player, "commandsigns.create.super",
+							false)) {
+				Messaging.sendMessage(player, "failure.no_super");
+			}
+			if ((line.startsWith("/^") || line.startsWith("/#"))
+					&& !plugin.hasPermission(player, "commandsigns.create.op",
+							false)) {
+				Messaging.sendMessage(player, "failure.no_op");
+			}
+			text.setLine(lineNumber, line);
+			String display = line.replace("$", "\\$").replace("\\", "\\\\");
+			Messaging.sendRaw(player, "success.line_print", "n", "" + lineNumber,
+					"l", display);
+		}
+	}
+
 	protected boolean copy(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
@@ -175,6 +180,23 @@ class CommandSignsCommand implements CommandExecutor {
 		Messaging.sendMessage(player, "success.done_editing");
 	}
 
+	protected boolean insert(final CommandSender sender, Player player,
+			int lineNumber, String[] args) {
+		if (player == null) {
+			Messaging.sendMessage(sender, "failure.player_only");
+		}
+		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
+			clipboard(sender, player, lineNumber, 2, args);
+			if (plugin.playerStates.get(player) != CommandSignsPlayerState.EDIT) {
+				plugin.playerStates.put(player, CommandSignsPlayerState.INSERT);
+				Messaging.sendMessage(player, "progress.add");
+			}
+		} else {
+			Messaging.sendMessage(player, "failure.no_perms");
+		}
+		return true;
+	}
+
 	@Override
 	public boolean onCommand(final CommandSender sender, Command cmd,
 			String commandLabel, String[] args) {
@@ -189,34 +211,40 @@ class CommandSignsCommand implements CommandExecutor {
 			}
 			final Player player = tp;
 			String command = args[0].toLowerCase();
-			Pattern pattern = Pattern.compile("(line|l|)(\\d+)");
+			Pattern pattern = Pattern.compile("(line|l)?(\\d+)");
 			Matcher matcher = pattern.matcher(command);
 			if (matcher.matches()) {
 				return add(sender, player, Integer.parseInt(matcher.group(2)),
 						args);
 			} else if (command.equals("batch")) {
 				return batch(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("clear")) {
+			} else if (command.equals("clear")) {
 				return clear(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("copy")) {
+			} else if (command.equals("copy")) {
 				return copy(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("edit")) {
+			} else if (command.equals("edit")) {
 				return edit(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("read")) {
+			} else if (command.equals("insert") && args.length > 1) {
+				pattern = Pattern.compile("(line|l)?(\\d+)");
+				matcher = pattern.matcher(args[1].toLowerCase());
+				if (matcher.matches())
+					return insert(sender, player,
+							Integer.parseInt(matcher.group(2)), args);
+			} else if (command.equals("read")) {
 				return read(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("redstone")) {
+			} else if (command.equals("redstone")) {
 				return redstone(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("reload")) {
+			} else if (command.equals("reload")) {
 				return reload(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("remove")) {
+			} else if (command.equals("remove")) {
 				return remove(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("save")) {
+			} else if (command.equals("save")) {
 				return save(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("toggle")) {
+			} else if (command.equals("toggle")) {
 				return toggle(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("update")) {
+			} else if (command.equals("update")) {
 				return update(sender, player, args);
-			} else if (args[0].equalsIgnoreCase("view")) {
+			} else if (command.equals("view")) {
 				return view(sender, player, args);
 			} else {
 				Messaging.sendMessage(sender, "failure.wrong_syntax");
@@ -385,7 +413,7 @@ class CommandSignsCommand implements CommandExecutor {
 				player.sendMessage("No text in clipboard");
 			}
 			int i = 0;
-			for (String s : text.getText()) {
+			for (String s : text) {
 				if (!s.equals("")) {
 					player.sendMessage(i + ": " + s);
 				}
