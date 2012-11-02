@@ -126,15 +126,19 @@ public class CommandSignExecutor {
 			line = line.replaceAll("(?iu)<blocky>", "" + loc.getY());
 			line = line.replaceAll("(?iu)<blockz>", "" + loc.getZ());
 			line = line.replaceAll("(?iu)<world>", loc.getWorld().getName());
-			Player clp = null;
-			int dist = Integer.MAX_VALUE;
-			for (Player p : loc.getWorld().getPlayers()) {
-				if (p.getLocation().distanceSquared(loc) < dist) {
-					clp = p;
+			if (line.toLowerCase().contains(("<near>"))) {
+				Player clp = null;
+				double dist = Double.MAX_VALUE;
+				for (Player p : loc.getWorld().getPlayers()) {
+					if (p.getWorld().equals(loc.getWorld())) {
+						if (p.getLocation().distanceSquared(loc) < dist) {
+							clp = p;
+						}
+					}
 				}
-			}
-			if (clp != null) {
-				line = line.replaceAll("(?iu)<near>", clp.getName());
+				if (clp != null) {
+					line = line.replaceAll("(?iu)<near>", clp.getName());
+				}
 			}
 			if (player != null) {
 				line = line.replaceAll("(?iu)<x>", ""
