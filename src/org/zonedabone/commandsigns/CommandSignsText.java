@@ -88,7 +88,7 @@ public class CommandSignsText implements Iterable<String> {
 
 	public void trim() {
 		int blank;
-		while ((blank = text.lastIndexOf("")) > 0)
+		while ((blank = text.lastIndexOf("")) >= 0)
 			text.remove(blank);
 		for (String line : text) {
 			line.trim();

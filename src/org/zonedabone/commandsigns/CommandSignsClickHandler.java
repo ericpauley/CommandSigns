@@ -66,7 +66,9 @@ public class CommandSignsClickHandler {
 			return;
 		}
 		CommandSignsText text = plugin.playerText.get(player);
+		text.trim();
 		plugin.activeSigns.put(location, text.clone(player.getName()));
+		
 		Messaging.sendMessage(player, "success.enabled");
 		if (!batch) {
 			plugin.playerStates.remove(player);
@@ -89,9 +91,9 @@ public class CommandSignsClickHandler {
 				currentText.setLine(j + 1, currentText.getLine(j));
 			}
 			currentText.setLine(i, newText.getLine(i));
-			System.out.println("i : " + i + " =" + currentText.getLine(i));
 		}
-
+		currentText.trim();
+		
 		Messaging.sendMessage(player, "success.done_editing");
 		if (!batch) {
 			plugin.playerStates.remove(player);
