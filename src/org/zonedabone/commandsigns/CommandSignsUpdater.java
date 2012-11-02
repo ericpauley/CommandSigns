@@ -50,6 +50,7 @@ public class CommandSignsUpdater {
 			return null;
 		}
 	}
+
 	public class Checker implements Runnable {
 
 		@Override
@@ -85,6 +86,7 @@ public class CommandSignsUpdater {
 			}
 		}
 	}
+
 	public class Updater extends Thread {
 
 		private CommandSender sender;
@@ -128,6 +130,7 @@ public class CommandSignsUpdater {
 			}
 		}
 	}
+
 	public class Version implements Comparable<Version> {
 
 		private List<Integer> parts = new ArrayList<Integer>();
@@ -207,6 +210,7 @@ public class CommandSignsUpdater {
 			return versionString;
 		}
 	}
+
 	public Version currentVersion, newestVersion;
 
 	private String downloadRoot = "http://cloud.github.com/downloads/zonedabone/CommandSigns/";

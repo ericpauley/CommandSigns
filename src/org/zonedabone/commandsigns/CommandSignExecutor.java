@@ -35,18 +35,23 @@ public class CommandSignExecutor {
 		registerHandler(new RandomHandler());
 		registerHandler(new ChatHandler());
 	}
+
 	public static Set<Handler> getHandlers() {
 		return handlers;
 	}
+
 	public static void registerHandler(Handler handler) {
 		handlers.add(handler);
 	}
+
 	public static void setHandlers(Set<Handler> handlers) {
 		CommandSignExecutor.handlers = handlers;
 	}
+
 	public static void unregisterAll() {
 		handlers.clear();
 	}
+
 	private final Action action;
 	boolean isValid = false;
 	private LinkedList<String> lines;
@@ -116,7 +121,7 @@ public class CommandSignExecutor {
 	private LinkedList<String> parseCommandSign(Player player, Location loc) {
 		LinkedList<String> commandList = new LinkedList<String>();
 		CommandSignsText commandSign = plugin.activeSigns.get(location);
-		for (String line : commandSign.getText()) {
+		for (String line : commandSign) {
 			line = line.replaceAll("(?iu)<blockx>", "" + loc.getX());
 			line = line.replaceAll("(?iu)<blocky>", "" + loc.getY());
 			line = line.replaceAll("(?iu)<blockz>", "" + loc.getZ());

@@ -12,36 +12,37 @@ commands:
     aliases: [cs, cmds, cmdsigns]
     description: CommandSigns commands.
     usage: |
-        /commandsigns line<number> <text>
-        /commandsigns <number> <text>
-        -       Add a line with one command or a line of text.
+        /commandsigns <linenumber> <text>
+               Add a line with one command or a line of text.
         /commandsigns batch
-        -       Changes your state into batch mode for doing bigger tasks quicker.
+               Changes your state into batch mode for doing bigger tasks quicker.
         /commandsigns clear
-		-       Clear your CommandSigns clipboard.
+               Clear your CommandSigns clipboard.
         /commandsigns copy
-        -       Copy a CommandSign to clipboard (the command lines associated with it).
-        -       Note: You need permission to create a sign in order to read.
+               Copy a CommandSign to clipboard (the command lines associated with it).
+               Note: You need permission to create a sign in order to read.
         /commandsigns edit
-        -       Edit a CommandSign in live mode.
+               Edit a CommandSign in live mode.
+        /commandsigns insert <linenumber> <text>
+               Insert a line into an existing CommandSign.
         /commandsigns read
-        -       Read a CommandSign (the command lines associated with it).
-        -       Note: You need permission to create a sign in order to read.
+               Read a CommandSign (the command lines associated with it).
+               Note: You need permission to create a sign in order to read.
         /commandsigns redstone
-		-       Toggle whether the CommandSign can be triggered by redstone
-		-       Off by default
+               Toggle whether the CommandSign can be triggered by redstone
+               Off by default
         /commandsigns reload
-		-       Reload CommandSigns.
+               Reload CommandSigns.
         /commandsigns remove
-        -       Remove a CommandSign.
+               Remove a CommandSign.
         /commandsigns update
-		-       Update CommandSigns to latest version.
-		-       /commandsigns update check
-		-               Check for updates only.
-		-       /commandsigns update force
-		-               Force an update.
-		/commandsigns view
-        -       View the contents of your clipboard.
+               Update CommandSigns to latest version.
+               /commandsigns update check
+                       Check for updates only.
+               /commandsigns update force
+                       Force an update.
+        /commandsigns view
+               View the contents of your clipboard.
 permissions:
     commandsigns.*:
         description: Gives access to all CommandSigns commands

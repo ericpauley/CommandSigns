@@ -1,4 +1,4 @@
-version: 2.3
+version: 2.3.1
 prefix: "&4[CommandSigns]&f "
 success:
     cleared: "CommandSign text and status cleared."
@@ -34,6 +34,7 @@ failure:
     no_op: "You may not make signs with '/^' or '/#'."
     invalid_line: "Line number invalid!"
     remove_first: "CommandSign text must be removed first."
+    already_enabled: "CommandSign is already enabled!"
     not_a_sign: "Selected block is not a CommandSign."
     cannot_use: "You may not use this type of sign."
     player_only: "This command can only be run as a player."

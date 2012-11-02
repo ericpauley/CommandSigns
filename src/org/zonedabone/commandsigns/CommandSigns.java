@@ -109,10 +109,9 @@ public class CommandSigns extends JavaPlugin {
 				boolean redstone = data.getBoolean(key + ".redstone", false);
 				String owner = data.getString(key + ".owner", null);
 				CommandSignsText cst = new CommandSignsText(owner, redstone);
-				cst.getText().add("");
 				for (Object o : data.getList(key + ".text",
 						new ArrayList<String>())) {
-					cst.getText().add(o.toString());
+					cst.addLine(o.toString());
 				}
 				cst.setEnabled(data.getBoolean(key + ".active", true));
 				Map<String, Long> timeouts = cst.getTimeouts();
@@ -189,7 +188,7 @@ public class CommandSigns extends JavaPlugin {
 						CommandSignsText cst = new CommandSignsText(owner,
 								redstone);
 						for (String command : raw[5].split("[\u00B6\u001E]")) {
-							cst.getText().add(command);
+							cst.addLine(command);
 						}
 						activeSigns.put(csl, cst);
 					} catch (Exception ex) {
@@ -235,7 +234,6 @@ public class CommandSigns extends JavaPlugin {
 			Location loc = sign.getKey();
 			CommandSignsText cst = sign.getValue();
 			cst.trim();
-			cst.getText().remove(0);
 			String key = loc.getWorld().getName() + "," + loc.getBlockX() + ","
 					+ loc.getBlockY() + "," + loc.getBlockZ();
 			ConfigurationSection signData = data.createSection(key);
@@ -284,7 +282,7 @@ public class CommandSigns extends JavaPlugin {
 					signNumber++;
 					entry.getValue().trim();
 					commands = "";
-					for (String command : entry.getValue().getText()) {
+					for (String command : entry.getValue()) {
 						if (!first)
 							commands += "\u001E";
 						commands += command;
@@ -371,7 +369,7 @@ public class CommandSigns extends JavaPlugin {
 			public int getValue() {
 				int number = 0;
 				for (CommandSignsText cst : activeSigns.values()) {
-					for (String s : cst.getText()) {
+					for (String s : cst) {
 						if (s.startsWith("/*") || s.startsWith("!/*")) {
 							number++;
 						}
@@ -386,7 +384,7 @@ public class CommandSigns extends JavaPlugin {
 			public int getValue() {
 				int number = 0;
 				for (CommandSignsText cst : activeSigns.values()) {
-					for (String s : cst.getText()) {
+					for (String s : cst) {
 						if (s.startsWith("/^") || s.startsWith("!/^")) {
 							number++;
 						}
@@ -401,7 +399,7 @@ public class CommandSigns extends JavaPlugin {
 			public int getValue() {
 				int number = 0;
 				for (CommandSignsText cst : activeSigns.values()) {
-					for (String s : cst.getText()) {
+					for (String s : cst) {
 						if (s.startsWith("/#") || s.startsWith("!/#")) {
 							number++;
 						}
