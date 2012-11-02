@@ -51,7 +51,8 @@ public class CommandSignsEventListener implements Listener {
 			if (block != null) {
 				final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(
 						plugin, event.getPlayer(), block);
-				if (signClickEvent.onInteract(action) && action != Action.PHYSICAL) {
+				if (signClickEvent.onInteract(action)
+						&& action != Action.PHYSICAL) {
 					event.setCancelled(true);
 				}
 			}

@@ -22,17 +22,18 @@ public class CommandSignsText implements Iterable<String> {
 
 	public CommandSignsText clone(String owner) {
 		CommandSignsText cst = new CommandSignsText(owner, redstone);
-        for (String s : text) {
-            cst.getText().add(s);
-        }
-        return cst;
+		for (String s : text) {
+			cst.getText().add(s);
+		}
+		return cst;
 	}
 
 	public int count() {
 		int size = text.size();
 		// Count from last to first, stop whenever a non-blank
 		// is found, or if the size hits 'zero'
-		while (size > 0 && getLine(size) == "") size--;
+		while (size > 0 && getLine(size) == "")
+			size--;
 		return size;
 	}
 
@@ -40,11 +41,11 @@ public class CommandSignsText implements Iterable<String> {
 	public String getLine(int index) {
 		return text.get(index - 1);
 	}
-	
+
 	public void addLine(String string) {
 		text.add(string);
 	}
-	
+
 	public void removeLine(int index) {
 		if (index >= 1 && index <= text.size()) {
 			text.remove(index - 1);
@@ -54,7 +55,7 @@ public class CommandSignsText implements Iterable<String> {
 	public List<String> getText() {
 		return this.text;
 	}
-	
+
 	public String getOwner() {
 		return owner;
 	}
@@ -94,11 +95,11 @@ public class CommandSignsText implements Iterable<String> {
 			line.trim();
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		String string = "";
-		
+
 		return string;
 	}
 

@@ -68,7 +68,7 @@ public class CommandSignsClickHandler {
 		CommandSignsText text = plugin.playerText.get(player);
 		text.trim();
 		plugin.activeSigns.put(location, text.clone(player.getName()));
-		
+
 		Messaging.sendMessage(player, "success.enabled");
 		if (!batch) {
 			plugin.playerStates.remove(player);
@@ -83,7 +83,7 @@ public class CommandSignsClickHandler {
 			return;
 		}
 		CommandSignsText newText = plugin.playerText.get(player);
-		
+
 		// Insert lines from last to first - that way you don't overwrite stuff
 		for (int i = newText.count(); i >= 1; i--) {
 			// Move all lines after the current position up one place
@@ -93,7 +93,7 @@ public class CommandSignsClickHandler {
 			currentText.setLine(i, newText.getLine(i));
 		}
 		currentText.trim();
-		
+
 		Messaging.sendMessage(player, "success.done_editing");
 		if (!batch) {
 			plugin.playerStates.remove(player);

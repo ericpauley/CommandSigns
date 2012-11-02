@@ -122,8 +122,8 @@ class CommandSignsCommand implements CommandExecutor {
 			}
 			String line = StringUtils.join(args, " ", textStart, args.length);
 			if (line.startsWith("/*")
-					&& !plugin.hasPermission(player, "commandsigns.create.super",
-							false)) {
+					&& !plugin.hasPermission(player,
+							"commandsigns.create.super", false)) {
 				Messaging.sendMessage(player, "failure.no_super");
 			}
 			if ((line.startsWith("/^") || line.startsWith("/#"))
@@ -133,8 +133,8 @@ class CommandSignsCommand implements CommandExecutor {
 			}
 			text.setLine(lineNumber, line);
 			String display = line.replace("$", "\\$").replace("\\", "\\\\");
-			Messaging.sendRaw(player, "success.line_print", "n", "" + lineNumber,
-					"l", display);
+			Messaging.sendRaw(player, "success.line_print", "n", ""
+					+ lineNumber, "l", display);
 		}
 	}
 
