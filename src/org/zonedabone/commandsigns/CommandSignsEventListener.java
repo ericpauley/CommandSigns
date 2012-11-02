@@ -45,12 +45,13 @@ public class CommandSignsEventListener implements Listener {
 		Block block = null;
 		Action action = event.getAction();
 		if (action == Action.RIGHT_CLICK_BLOCK
-				|| action == Action.LEFT_CLICK_BLOCK) {
+				|| action == Action.LEFT_CLICK_BLOCK
+				|| action == Action.PHYSICAL) {
 			block = event.getClickedBlock();
 			if (block != null) {
 				final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(
 						plugin, event.getPlayer(), block);
-				if (signClickEvent.onInteract(action)) {
+				if (signClickEvent.onInteract(action) && action != Action.PHYSICAL) {
 					event.setCancelled(true);
 				}
 			}
