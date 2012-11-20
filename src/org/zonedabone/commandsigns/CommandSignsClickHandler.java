@@ -168,9 +168,9 @@ public class CommandSignsClickHandler {
 		int i = 1;
 		for (String line : text) {
 			if (!line.equals("")) {
-				String display = line.replace("$", "\\$").replace("\\", "\\\\");
-				Messaging.sendRaw(player, "success.line_print", "n", "" + i,
-						"l", display);
+				Messaging.sendRaw(player, "success.line_print",
+						new String[] {"NUMBER", "LINE"},
+						new String[] {"" + i, line});
 			}
 			i++;
 		}

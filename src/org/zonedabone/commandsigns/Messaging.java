@@ -45,8 +45,11 @@ public class Messaging {
 		plugin.getLogger().info("Loaded " + messages.size() + " messages.");
 	}
 
-	public static String parseMessage(String message, String... replacements) {
-		String raw = parseRaw(message, replacements);
+	public static String parseMessage(String messageName) {
+		return parseMessage(messageName, null, null);
+	}
+	public static String parseMessage(String message, String[] variables, String[] replacements) {
+		String raw = parseRaw(message, variables, replacements);
 		String prefix = messages.get("prefix");
 		if (prefix != null) {
 			return ChatColor.translateAlternateColorCodes('&', prefix + raw);
@@ -55,35 +58,50 @@ public class Messaging {
 		}
 	}
 
-	public static String parseRaw(String message, String... replacements) {
-		message = message.toLowerCase();
-		String prefix = messages.get(message.split("\\.")[0] + ".prefix");
-		String raw = messages.get(message);
+	public static String parseRaw(String messageName) {
+		return parseRaw(messageName, null, null);
+	}
+	public static String parseRaw(String messageName, String[] variables, String[] replacements) {
+		messageName = messageName.toLowerCase();
+		String prefix = messages.get(messageName.split("\\.")[0] + ".prefix");
+		String raw = messages.get(messageName);
 		if (raw != null) {
-			for (int i = 0; i < replacements.length - 1; i++) {
-				raw = raw.replaceAll("(?iu)\\{" + replacements[i]
-						+ "[a-zA-Z0-9]*\\}", replacements[i + 1]);
+			if (variables != null && replacements != null) {
+				if (variables.length != replacements.length) {
+					return "The variables and replacements don't match in size! Please alert a developer.";
+				}
+				for (int i = 0; i < variables.length; i++) {
+					// Sanitise replacements
+					String replacement = replacements[i].replace("\\", "\\\\").replace("$", "\\$");
+					raw = raw.replaceAll("(?iu)\\{" + variables[i] + "\\}", replacement);
+				}
 			}
 			raw = raw.replaceAll("(?iu)\\{PREFIX\\}",
 					((prefix != null) ? prefix : ""));
 			return ChatColor.translateAlternateColorCodes('&',
 					((prefix != null) ? prefix : "") + raw);
 		} else {
-			return "Could not find message " + message + ".";
+			return "Could not find message " + messageName + ".";
 		}
 	}
 
-	public static void sendMessage(CommandSender cs, String message,
-			String... replacements) {
+	public static void sendMessage(CommandSender cs, String messageName) {
+		sendMessage(cs, messageName, null, null);
+	}
+	public static void sendMessage(CommandSender cs, String messageName,
+			String[] variables, String[] replacements) {
 		if (cs != null) {
-			cs.sendMessage(parseMessage(message, replacements));
+			cs.sendMessage(parseMessage(messageName, variables, replacements));
 		}
 	}
 
-	public static void sendRaw(CommandSender cs, String message,
-			String... replacements) {
+	public static void sendRaw(CommandSender cs, String messageName) {
+		sendRaw(cs, messageName, null, null);
+	}
+	public static void sendRaw(CommandSender cs, String messageName,
+			String[] variables, String[] replacements) {
 		if (cs != null) {
-			cs.sendMessage(parseRaw(message, replacements));
+			cs.sendMessage(parseRaw(messageName, variables, replacements));
 		}
 	}
 }
