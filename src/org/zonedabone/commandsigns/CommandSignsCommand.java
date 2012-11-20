@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,6 +37,10 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean batch(final CommandSender sender, Player player,
 			String[] args) {
 		CommandSignsPlayerState ps = plugin.playerStates.get(player);
+		if (ps == null) {
+			Messaging.sendMessage(player, "failure.not_in_mode");
+			return false;
+		}
 		switch (ps) {
 		case REMOVE:
 			player.sendMessage("Switched to batch remove mode.");
@@ -80,8 +83,7 @@ class CommandSignsCommand implements CommandExecutor {
 			ps = CommandSignsPlayerState.REDSTONE;
 			break;
 		default:
-			player.sendMessage(ChatColor.RED
-					+ "The mode you are in doesn't support batch processing.");
+			Messaging.sendMessage(player, "failure.no_batch");
 		}
 		plugin.playerStates.put(player, ps);
 		return true;
@@ -412,7 +414,7 @@ class CommandSignsCommand implements CommandExecutor {
 			if (text == null) {
 				player.sendMessage("No text in clipboard");
 			}
-			int i = 0;
+			int i = 1;
 			for (String s : text) {
 				if (!s.equals("")) {
 					player.sendMessage(i + ": " + s);

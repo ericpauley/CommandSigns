@@ -1,4 +1,4 @@
-version: 2.3.1
+version: 2.3.2
 prefix: "&4[CommandSigns]&f "
 success:
     cleared: "CommandSign text and status cleared."
@@ -39,6 +39,8 @@ failure:
     cannot_use: "You may not use this type of sign."
     player_only: "This command can only be run as a player."
     must_select: "You must select a sign to edit or leave edit mode with /commandsigns clear."
+    no_batch: "The mode you are in doesn't support batch processing."
+    not_in_mode: "You must type a command before toggling batch mode."
     
 update:
     prefix: "&e"
