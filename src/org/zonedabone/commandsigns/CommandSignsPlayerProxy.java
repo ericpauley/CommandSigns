@@ -847,4 +847,14 @@ public class CommandSignsPlayerProxy implements Player {
 		originator.updateInventory();
 	}
 
+	@Override
+	public void giveExpLevels(int arg0) {
+		originator.giveExpLevels(arg0);
+	}
+
+	@Override
+	public void setBedSpawnLocation(Location arg0, boolean arg1) {
+		originator.setBedSpawnLocation(arg0, arg1);
+	}
+
 }
