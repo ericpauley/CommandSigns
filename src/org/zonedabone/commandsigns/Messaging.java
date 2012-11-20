@@ -48,7 +48,9 @@ public class Messaging {
 	public static String parseMessage(String messageName) {
 		return parseMessage(messageName, null, null);
 	}
-	public static String parseMessage(String message, String[] variables, String[] replacements) {
+
+	public static String parseMessage(String message, String[] variables,
+			String[] replacements) {
 		String raw = parseRaw(message, variables, replacements);
 		String prefix = messages.get("prefix");
 		if (prefix != null) {
@@ -61,7 +63,9 @@ public class Messaging {
 	public static String parseRaw(String messageName) {
 		return parseRaw(messageName, null, null);
 	}
-	public static String parseRaw(String messageName, String[] variables, String[] replacements) {
+
+	public static String parseRaw(String messageName, String[] variables,
+			String[] replacements) {
 		messageName = messageName.toLowerCase();
 		String prefix = messages.get(messageName.split("\\.")[0] + ".prefix");
 		String raw = messages.get(messageName);
@@ -72,8 +76,10 @@ public class Messaging {
 				}
 				for (int i = 0; i < variables.length; i++) {
 					// Sanitise replacements
-					String replacement = replacements[i].replace("\\", "\\\\").replace("$", "\\$");
-					raw = raw.replaceAll("(?iu)\\{" + variables[i] + "\\}", replacement);
+					String replacement = replacements[i].replace("\\", "\\\\")
+							.replace("$", "\\$");
+					raw = raw.replaceAll("(?iu)\\{" + variables[i] + "\\}",
+							replacement);
 				}
 			}
 			raw = raw.replaceAll("(?iu)\\{PREFIX\\}",
@@ -88,6 +94,7 @@ public class Messaging {
 	public static void sendMessage(CommandSender cs, String messageName) {
 		sendMessage(cs, messageName, null, null);
 	}
+
 	public static void sendMessage(CommandSender cs, String messageName,
 			String[] variables, String[] replacements) {
 		if (cs != null) {
@@ -98,6 +105,7 @@ public class Messaging {
 	public static void sendRaw(CommandSender cs, String messageName) {
 		sendRaw(cs, messageName, null, null);
 	}
+
 	public static void sendRaw(CommandSender cs, String messageName,
 			String[] variables, String[] replacements) {
 		if (cs != null) {

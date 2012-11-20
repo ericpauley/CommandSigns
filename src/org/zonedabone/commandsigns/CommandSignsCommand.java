@@ -134,9 +134,8 @@ class CommandSignsCommand implements CommandExecutor {
 				Messaging.sendMessage(player, "failure.no_op");
 			}
 			text.setLine(lineNumber, line);
-			Messaging.sendRaw(player, "success.line_print",
-					new String[] {"NUMBER", "LINE"},
-					new String[] {"" + lineNumber, line});
+			Messaging.sendRaw(player, "success.line_print", new String[] {
+					"NUMBER", "LINE" }, new String[] { "" + lineNumber, line });
 		}
 	}
 
@@ -372,17 +371,25 @@ class CommandSignsCommand implements CommandExecutor {
 					public void run() {
 						plugin.updateHandler.new Checker().run();
 						if (plugin.updateHandler.newAvailable) {
-							Messaging.sendMessage(sender, "update.notify",
-									new String[] {"VERSION"},
-									new String[] {plugin.updateHandler.newestVersion.toString()});
-							
+							Messaging
+									.sendMessage(
+											sender,
+											"update.notify",
+											new String[] { "VERSION" },
+											new String[] { plugin.updateHandler.newestVersion
+													.toString() });
+
 						} else {
-							Messaging.sendMessage(sender, "update.confirm_up_to_date",
-									new String[] {"VERSION"},
-									new String[] {plugin.updateHandler.currentVersion.toString()});
+							Messaging
+									.sendMessage(
+											sender,
+											"update.confirm_up_to_date",
+											new String[] { "VERSION" },
+											new String[] { plugin.updateHandler.currentVersion
+													.toString() });
 						}
 					}
-				
+
 				}.start();
 
 				// If command was 'update check', stop here. Enough has been
@@ -390,9 +397,13 @@ class CommandSignsCommand implements CommandExecutor {
 				if (!(args.length == 2 && args[1].equalsIgnoreCase("check"))) {
 					if (plugin.updateHandler.newAvailable) {
 						if (!plugin.getUpdateFile().exists()) {
-							Messaging.sendMessage(sender, "update.start",
-									new String[] {"VERSION"},
-									new String[] {plugin.updateHandler.newestVersion.toString()});
+							Messaging
+									.sendMessage(
+											sender,
+											"update.start",
+											new String[] { "VERSION" },
+											new String[] { plugin.updateHandler.newestVersion
+													.toString() });
 							plugin.updateHandler.new Updater(sender).start();
 						} else {
 							Messaging.sendMessage(sender,

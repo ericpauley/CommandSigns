@@ -65,8 +65,9 @@ public class CommandSignsEventListener implements Listener {
 			if (plugin.updateHandler.newAvailable) {
 				if (!plugin.getUpdateFile().exists()) {
 					Messaging.sendMessage(event.getPlayer(), "update.notify",
-							new String[] {"VERSION"},
-							new String[] {plugin.updateHandler.newestVersion.toString()});
+							new String[] { "VERSION" },
+							new String[] { plugin.updateHandler.newestVersion
+									.toString() });
 				}
 			}
 		}

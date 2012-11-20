@@ -36,7 +36,7 @@ public class CommandSignsUpdater {
 	public CommandSignsUpdater(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	public class AllowAllTrustManager extends X509ExtendedTrustManager {
 
 		@Override
@@ -130,21 +130,26 @@ public class CommandSignsUpdater {
 					totalBytesRead += bytesRead;
 				}
 				long endTime = System.currentTimeMillis();
-				Messaging.sendMessage(sender, "update.finish",
-						new String[] {"SIZE"},
-						new String[] {""
-								+ (((totalBytesRead)) / 1000), "t", ""
-								+ (((double) (endTime - startTime)) / 1000)});
+				Messaging
+						.sendMessage(
+								sender,
+								"update.finish",
+								new String[] { "SIZE" },
+								new String[] {
+										"" + (((totalBytesRead)) / 1000),
+										"t",
+										""
+												+ (((double) (endTime - startTime)) / 1000) });
 				writer.close();
 				reader.close();
 			} catch (MalformedURLException e) {
 				Messaging.sendMessage(sender, "update.fetch_error",
-						new String[] {"ERROR"},
-						new String[] {e.getMessage()});
+						new String[] { "ERROR" },
+						new String[] { e.getMessage() });
 			} catch (IOException e) {
 				Messaging.sendMessage(sender, "update.fetch_error",
-						new String[] {"ERROR"},
-						new String[] {e.getMessage()});
+						new String[] { "ERROR" },
+						new String[] { e.getMessage() });
 			}
 		}
 	}

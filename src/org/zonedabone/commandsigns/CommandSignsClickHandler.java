@@ -168,9 +168,8 @@ public class CommandSignsClickHandler {
 		int i = 1;
 		for (String line : text) {
 			if (!line.equals("")) {
-				Messaging.sendRaw(player, "success.line_print",
-						new String[] {"NUMBER", "LINE"},
-						new String[] {"" + i, line});
+				Messaging.sendRaw(player, "success.line_print", new String[] {
+						"NUMBER", "LINE" }, new String[] { "" + i, line });
 			}
 			i++;
 		}
