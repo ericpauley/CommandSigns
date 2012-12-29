@@ -32,6 +32,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.InventoryView.Property;
@@ -855,6 +856,51 @@ public class CommandSignsPlayerProxy implements Player {
 	@Override
 	public void setBedSpawnLocation(Location arg0, boolean arg1) {
 		originator.setBedSpawnLocation(arg0, arg1);
+	}
+
+	@Override
+	public boolean getCanPickupItems() {
+		return originator.getCanPickupItems();
+	}
+
+	@Override
+	public EntityEquipment getEquipment() {
+		return originator.getEquipment();
+	}
+
+	@Override
+	public boolean getRemoveWhenFarAway() {
+		return originator.getRemoveWhenFarAway();
+	}
+
+	@Override
+	public void setCanPickupItems(boolean arg0) {
+		originator.setCanPickupItems(arg0);
+	}
+
+	@Override
+	public void setRemoveWhenFarAway(boolean arg0) {
+		originator.setRemoveWhenFarAway(arg0);
+	}
+
+	@Override
+	public Location getLocation(Location arg0) {
+		return originator.getLocation(arg0);
+	}
+
+	@Override
+	public void resetMaxHealth() {
+		originator.resetMaxHealth();
+	}
+
+	@Override
+	public void setMaxHealth(int arg0) {
+		originator.setMaxHealth(arg0);
+	}
+
+	@Override
+	public void setTexturePack(String arg0) {
+		originator.setTexturePack(arg0);
 	}
 
 }

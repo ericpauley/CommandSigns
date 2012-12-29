@@ -24,6 +24,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.zonedabone.commandsigns.Metrics.Graph;
 import org.zonedabone.commandsigns.Metrics.Plotter;
 
@@ -41,7 +42,7 @@ public class CommandSigns extends JavaPlugin {
 	public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
 	public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
 	public CommandSignsUpdater updateHandler = new CommandSignsUpdater(this);
-	private int updateTask;
+	private BukkitTask updateTask;
 
 	public File getUpdateFile() {
 		return new File(getServer().getUpdateFolderFile().getAbsoluteFile(),
@@ -209,7 +210,7 @@ public class CommandSigns extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		getServer().getScheduler().cancelTask(updateTask);
+		updateTask.cancel();
 		saveFile();
 	}
 
@@ -417,7 +418,7 @@ public class CommandSigns extends JavaPlugin {
 
 	public void startUpdateCheck() {
 		Runnable checker = updateHandler.new Checker();
-		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(
+		updateTask = getServer().getScheduler().runTaskTimer(
 				this, checker, 0, 1728000L);
 	}
 }
