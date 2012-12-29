@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -25,13 +28,13 @@ public class CommandSignsUpdater {
 
 	public Version currentVersion, newestVersion;
 
-	private String downloadRoot = "http://cloud.github.com/downloads/zonedabone/CommandSigns/";
-
 	public boolean newAvailable = false;
+	
+	public String downloadLocation;
 
 	private CommandSigns plugin;
 
-	private String upstream = "https://raw.github.com/zonedabone/CommandSigns/master/";
+	private final String upstream = "https://raw.github.com/zonedabone/CommandSigns/master/";
 
 	public CommandSignsUpdater(CommandSigns plugin) {
 		this.plugin = plugin;
@@ -63,6 +66,35 @@ public class CommandSignsUpdater {
 		public X509Certificate[] getAcceptedIssuers() {
 			return null;
 		}
+		
+		/**
+		 * Returns a URL connection stream for HTTPS. This method removes TrustManager intervention.
+		 * 
+		 * @param url
+		 * @return
+		 * @throws IOException
+		 * @throws NoSuchAlgorithmException
+		 * @throws KeyManagementException
+		 */
+		public HttpsURLConnection getHTTPSConnection(URL url) throws IOException {
+			HttpsURLConnection connection;
+			connection = (HttpsURLConnection) url.openConnection();
+
+			// Set the AllowAll trust manager 
+			try {
+				SSLContext sslContext = SSLContext.getInstance("TLS");
+				sslContext.init(null,
+						new TrustManager[] { this },
+						null);
+				connection.setSSLSocketFactory(sslContext
+						.getSocketFactory());
+			} catch (Exception e) {
+				plugin.getLogger().warning(
+						"HTTPS connection error in updater - " + e.getMessage());
+			}
+			
+			return connection;
+		}
 	}
 
 	public class Checker implements Runnable {
@@ -74,23 +106,22 @@ public class CommandSignsUpdater {
 						.getVersion());
 
 				URL url = new URL(upstream + "VERSION");
-				HttpsURLConnection connection;
-				connection = (HttpsURLConnection) url.openConnection();
 
-				if (upstream.startsWith("https")) {
-					// Special handling for HTTPS URLs if the user has
-					// insufficient Cert Keys
-					SSLContext sslContext = SSLContext.getInstance("TLS");
-					sslContext.init(null,
-							new TrustManager[] { new AllowAllTrustManager() },
-							null);
-					connection.setSSLSocketFactory(sslContext
-							.getSocketFactory());
+				URLConnection connection;
+				if (url.getProtocol() == "HTTPS") {
+					connection = new AllowAllTrustManager().getHTTPSConnection(url);
+				} else {
+					connection = url.openConnection();
 				}
 
+				/*
+				 * Line 1: Version
+				 * Line 2: Download URL
+				 */
 				BufferedReader in = new BufferedReader(new InputStreamReader(
 						connection.getInputStream()));
 				newestVersion = new Version(in.readLine());
+				downloadLocation = in.readLine();
 
 				if (currentVersion.compareTo(newestVersion) < 0)
 					newAvailable = true;
@@ -113,10 +144,16 @@ public class CommandSignsUpdater {
 		public void run() {
 			try {
 				long startTime = System.currentTimeMillis();
-				URL url = new URL(downloadRoot + "CommandSigns-"
-						+ newestVersion + ".jar");
-				url.openConnection();
-				InputStream reader = url.openStream();
+				URL url = new URL(downloadLocation);
+				
+				URLConnection connection;
+				if (url.getProtocol() == "HTTPS") {
+					connection = new AllowAllTrustManager().getHTTPSConnection(url);
+				} else {
+					connection = url.openConnection();
+				}
+				
+				InputStream reader = connection.getInputStream();
 				File f = plugin.getUpdateFile();
 				f.getParentFile().mkdirs();
 				FileOutputStream writer = new FileOutputStream(f);
@@ -136,10 +173,10 @@ public class CommandSignsUpdater {
 								"update.finish",
 								new String[] { "SIZE" },
 								new String[] {
-										"" + (((totalBytesRead)) / 1000),
+										"" + totalBytesRead / 1000,
 										"t",
 										""
-												+ (((double) (endTime - startTime)) / 1000) });
+												+ ((double) (endTime - startTime)) / 1000 });
 				writer.close();
 				reader.close();
 			} catch (MalformedURLException e) {
