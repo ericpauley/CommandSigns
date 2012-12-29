@@ -425,13 +425,14 @@ class CommandSignsCommand implements CommandExecutor {
 			CommandSignsText text = plugin.playerText.get(player);
 			if (text == null) {
 				player.sendMessage("No text in clipboard");
-			}
-			int i = 1;
-			for (String s : text) {
-				if (!s.equals("")) {
-					player.sendMessage(i + ": " + s);
+			} else {
+				int i = 1;
+				for (String s : text) {
+					if (!s.equals("")) {
+						player.sendMessage(i + ": " + s);
+					}
+					i++;
 				}
-				i++;
 			}
 			plugin.playerStates.remove(player);
 		} else {
