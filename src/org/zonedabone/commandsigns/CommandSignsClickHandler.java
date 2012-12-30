@@ -32,20 +32,24 @@ public class CommandSignsClickHandler {
 		plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
 	}
 
-	public void disableSign(boolean batch) {
-		if (!plugin.activeSigns.containsKey(location)) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+	public void createSign(boolean batch) {
+		if (plugin.activeSigns.containsKey(location)) {
+			Messaging.sendMessage(player, "failure.already_enabled");
 			return;
 		}
-		plugin.activeSigns.remove(location);
-		Messaging.sendMessage(player, "success.removed");
+		CommandSignsText text = plugin.playerText.get(player);
+
+		try {
+			text.trim();
+			plugin.activeSigns.put(location, text.clone(player.getName()));
+			Messaging.sendMessage(player, "success.enabled");
+		} catch (Exception e) {
+			Messaging.sendMessage(player, "failure.wrong_syntax");
+		}
+
 		if (!batch) {
-			if (plugin.playerText.containsKey(player)) {
-				plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
-				Messaging.sendMessage(player, "information.text_in_clipboard");
-			} else {
-				plugin.playerStates.remove(player);
-			}
+			plugin.playerStates.remove(player);
+			plugin.playerText.remove(player);
 		}
 	}
 
@@ -58,22 +62,6 @@ public class CommandSignsClickHandler {
 		Messaging.sendMessage(player, "progress.edit_started");
 		plugin.playerText.put(player, cst);
 		plugin.playerStates.put(player, CommandSignsPlayerState.EDIT);
-	}
-
-	public void enableSign(boolean batch) {
-		if (plugin.activeSigns.containsKey(location)) {
-			Messaging.sendMessage(player, "failure.already_enabled");
-			return;
-		}
-		CommandSignsText text = plugin.playerText.get(player);
-		text.trim();
-		plugin.activeSigns.put(location, text.clone(player.getName()));
-
-		Messaging.sendMessage(player, "success.enabled");
-		if (!batch) {
-			plugin.playerStates.remove(player);
-			plugin.playerText.remove(player);
-		}
 	}
 
 	public void insert(boolean batch) {
@@ -106,10 +94,10 @@ public class CommandSignsClickHandler {
 		if (state != null) {
 			switch (state) {
 			case ENABLE:
-				enableSign(false);
+				createSign(false);
 				break;
 			case BATCH_ENABLE:
-				enableSign(true);
+				createSign(true);
 				break;
 			case INSERT:
 				insert(false);
@@ -118,10 +106,10 @@ public class CommandSignsClickHandler {
 				insert(true);
 				break;
 			case REMOVE:
-				disableSign(false);
+				removeSign(false);
 				break;
 			case BATCH_REMOVE:
-				disableSign(true);
+				removeSign(true);
 				break;
 			case READ:
 				readSign(false);
@@ -196,6 +184,23 @@ public class CommandSignsClickHandler {
 		}
 		if (!batch)
 			plugin.playerStates.remove(player);
+	}
+
+	public void removeSign(boolean batch) {
+		if (!plugin.activeSigns.containsKey(location)) {
+			Messaging.sendMessage(player, "failure.not_a_sign");
+			return;
+		}
+		plugin.activeSigns.remove(location);
+		Messaging.sendMessage(player, "success.removed");
+		if (!batch) {
+			if (plugin.playerText.containsKey(player)) {
+				plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
+				Messaging.sendMessage(player, "information.text_in_clipboard");
+			} else {
+				plugin.playerStates.remove(player);
+			}
+		}
 	}
 
 	public void toggleSign(boolean batch) {
