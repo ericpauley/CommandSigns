@@ -171,12 +171,10 @@ public class CommandSignsUpdater {
 						.sendMessage(
 								sender,
 								"update.finish",
-								new String[] { "SIZE" },
+								new String[] { "SIZE", "TIME" },
 								new String[] {
 										"" + totalBytesRead / 1000,
-										"t",
-										""
-												+ ((double) (endTime - startTime)) / 1000 });
+										"" + ((double) (endTime - startTime)) / 1000 });
 				writer.close();
 				reader.close();
 			} catch (MalformedURLException e) {
