@@ -140,6 +140,11 @@ public class CommandSignExecutor {
 					line = line.replaceAll("(?iu)<near>", clp.getName());
 				}
 			}
+			while (line.toLowerCase().contains("<randomname>")) {
+				Player[] randoms = plugin.getServer().getOnlinePlayers();
+				int rand = (int) Math.round(Math.random() * (randoms.length - 1));
+				line = line.replaceFirst("(?iu)<randomname>", randoms[rand].getName());
+			}
 			if (player != null) {
 				line = line.replaceAll("(?iu)<x>", ""
 						+ player.getLocation().getBlockX());
