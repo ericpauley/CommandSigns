@@ -11,16 +11,16 @@ public abstract class ConfigStore implements Map<String, String> {
 
 	private Map<String, String> config = new ConcurrentHashMap<String, String>();
 	protected CommandSigns plugin;
-	
+
 	public ConfigStore(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	/**
 	 * Loads the configuration file into memory
 	 */
 	public abstract void load();
-	
+
 	@Override
 	public void clear() {
 		config.clear();
@@ -45,7 +45,7 @@ public abstract class ConfigStore implements Map<String, String> {
 	public String get(Object key) {
 		return config.get(key);
 	}
-	
+
 	/**
 	 * Gets the boolean value mapped to the given key.
 	 * 
@@ -59,7 +59,7 @@ public abstract class ConfigStore implements Map<String, String> {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Gets the integer value mapped to the given key.
 	 * 
@@ -108,5 +108,5 @@ public abstract class ConfigStore implements Map<String, String> {
 	public Collection<String> values() {
 		return config.values();
 	}
-	
+
 }

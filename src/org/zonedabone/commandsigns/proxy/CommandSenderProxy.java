@@ -24,13 +24,11 @@ public class CommandSenderProxy implements CommandSender {
 		this(originator, originator, false);
 	}
 
-	public CommandSenderProxy(CommandSender originator,
-			boolean silent) {
+	public CommandSenderProxy(CommandSender originator, boolean silent) {
 		this(originator, originator, silent);
 	}
 
-	public CommandSenderProxy(CommandSender originator,
-			CommandSender recipient) {
+	public CommandSenderProxy(CommandSender originator, CommandSender recipient) {
 		this(originator, recipient, false);
 	}
 

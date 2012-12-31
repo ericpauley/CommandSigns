@@ -8,7 +8,7 @@ public class Config extends ConfigStore {
 	public Config(CommandSigns plugin) {
 		super(plugin);
 	}
-	
+
 	public void load() {
 		Configuration config = YamlLoader.loadResource(plugin, "config.yml");
 
@@ -19,5 +19,5 @@ public class Config extends ConfigStore {
 		}
 		plugin.getLogger().info("Config file loaded.");
 	}
-	
+
 }

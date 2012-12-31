@@ -39,7 +39,8 @@ public class EventListener implements Listener {
 		}
 		Location location = event.getBlock().getLocation();
 		if (plugin.activeSigns.containsKey(location)) {
-			plugin.messenger.sendMessage(event.getPlayer(), "failure.remove_first");
+			plugin.messenger.sendMessage(event.getPlayer(),
+					"failure.remove_first");
 			event.setCancelled(true);
 		}
 	}
@@ -53,8 +54,8 @@ public class EventListener implements Listener {
 				|| action == Action.PHYSICAL) {
 			block = event.getClickedBlock();
 			if (block != null) {
-				final ClickHandler signClickEvent = new ClickHandler(
-						plugin, event.getPlayer(), block);
+				final ClickHandler signClickEvent = new ClickHandler(plugin,
+						event.getPlayer(), block);
 				if (signClickEvent.onInteract(action)
 						&& action != Action.PHYSICAL) {
 					event.setCancelled(true);
@@ -68,8 +69,8 @@ public class EventListener implements Listener {
 		if (plugin.hasPermission(event.getPlayer(), "commandsigns.update")) {
 			if (plugin.updateHandler.newAvailable) {
 				if (!plugin.getUpdateFile().exists()) {
-					plugin.messenger.sendMessage(event.getPlayer(), "update.notify",
-							new String[] { "VERSION" },
+					plugin.messenger.sendMessage(event.getPlayer(),
+							"update.notify", new String[] { "VERSION" },
 							new String[] { plugin.updateHandler.newestVersion
 									.toString() });
 				}

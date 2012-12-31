@@ -43,7 +43,8 @@ public class CommandHandler extends Handler {
 								run(plugin, player, command, silent);
 							} else {
 								if (!silent)
-									plugin.messenger.sendMessage(player, "cannot_use");
+									plugin.messenger.sendMessage(player,
+											"cannot_use");
 								return;
 							}
 						} else if (command.startsWith("^")) {
@@ -57,7 +58,8 @@ public class CommandHandler extends Handler {
 								run(plugin, player, command, silent);
 							} else {
 								if (!silent)
-									plugin.messenger.sendMessage(player, "cannot_use");
+									plugin.messenger.sendMessage(player,
+											"cannot_use");
 								return;
 							}
 						} else if (command.startsWith("#")) {
@@ -66,12 +68,13 @@ public class CommandHandler extends Handler {
 									"commandsigns.use.super", false)) {
 								ConsoleCommandSender ccs = plugin.getServer()
 										.getConsoleSender();
-								CommandSender cs = new CommandSenderProxy(
-										ccs, player, silent);
+								CommandSender cs = new CommandSenderProxy(ccs,
+										player, silent);
 								plugin.getServer().dispatchCommand(cs, command);
 							} else {
 								if (!silent)
-									plugin.messenger.sendMessage(player, "cannot_use");
+									plugin.messenger.sendMessage(player,
+											"cannot_use");
 								return;
 							}
 						} else {
@@ -91,8 +94,7 @@ public class CommandHandler extends Handler {
 					}
 					ConsoleCommandSender ccs = plugin.getServer()
 							.getConsoleSender();
-					CommandSender cs = new CommandSenderProxy(ccs,
-							silent);
+					CommandSender cs = new CommandSenderProxy(ccs, silent);
 					plugin.getServer().dispatchCommand(cs, command);
 				}
 			}

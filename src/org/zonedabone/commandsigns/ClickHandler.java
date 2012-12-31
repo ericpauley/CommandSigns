@@ -13,8 +13,7 @@ public class ClickHandler {
 	private Player player;
 	private CommandSigns plugin;
 
-	public ClickHandler(CommandSigns plugin, Player player,
-			Block block) {
+	public ClickHandler(CommandSigns plugin, Player player, Block block) {
 		this.plugin = plugin;
 		this.player = player;
 		location = block.getLocation();
@@ -158,8 +157,9 @@ public class ClickHandler {
 		int i = 1;
 		for (String line : text) {
 			if (!line.equals("")) {
-				plugin.messenger.sendRaw(player, "success.line_print", new String[] {
-						"NUMBER", "LINE" }, new String[] { "" + i, line });
+				plugin.messenger.sendRaw(player, "success.line_print",
+						new String[] { "NUMBER", "LINE" }, new String[] {
+								"" + i, line });
 			}
 			i++;
 		}
@@ -198,7 +198,8 @@ public class ClickHandler {
 		if (!batch) {
 			if (plugin.playerText.containsKey(player)) {
 				plugin.playerStates.put(player, PlayerState.ENABLE);
-				plugin.messenger.sendMessage(player, "information.text_in_clipboard");
+				plugin.messenger.sendMessage(player,
+						"information.text_in_clipboard");
 			} else {
 				plugin.playerStates.remove(player);
 			}

@@ -29,6 +29,8 @@ public class Updater {
 
 	public volatile boolean newAvailable = false;
 	
+	public volatile boolean awaitingRestart = false;
+
 	public String downloadLocation;
 
 	private CommandSigns plugin;
@@ -65,31 +67,32 @@ public class Updater {
 		public X509Certificate[] getAcceptedIssuers() {
 			return null;
 		}
-		
+
 		/**
-		 * Returns a URL connection stream for HTTPS. This method removes TrustManager intervention.
+		 * Returns a URL connection stream for HTTPS. This method removes
+		 * TrustManager intervention.
 		 * 
 		 * @param url
 		 * @return
 		 * @throws IOException
 		 */
-		public HttpsURLConnection getHTTPSConnection(URL url) throws IOException {
+		public HttpsURLConnection getHTTPSConnection(URL url)
+				throws IOException {
 			HttpsURLConnection connection;
 			connection = (HttpsURLConnection) url.openConnection();
 
-			// Set the AllowAll trust manager 
+			// Set the AllowAll trust manager
 			try {
 				SSLContext sslContext = SSLContext.getInstance("TLS");
-				sslContext.init(null,
-						new TrustManager[] { this },
-						null);
-				connection.setSSLSocketFactory(sslContext
-						.getSocketFactory());
+				sslContext.init(null, new TrustManager[] { this }, null);
+				connection.setSSLSocketFactory(sslContext.getSocketFactory());
 			} catch (Exception e) {
-				plugin.getLogger().warning(
-						"HTTPS connection error in updater - " + e.getMessage());
+				plugin.getLogger()
+						.warning(
+								"HTTPS connection error in updater - "
+										+ e.getMessage());
 			}
-			
+
 			return connection;
 		}
 	}
@@ -106,14 +109,14 @@ public class Updater {
 
 				URLConnection connection;
 				if (url.getProtocol() == "HTTPS") {
-					connection = new AllowAllTrustManager().getHTTPSConnection(url);
+					connection = new AllowAllTrustManager()
+							.getHTTPSConnection(url);
 				} else {
 					connection = url.openConnection();
 				}
 
 				/*
-				 * Line 1: Version
-				 * Line 2: Download URL
+				 * Line 1: Version Line 2: Download URL
 				 */
 				BufferedReader in = new BufferedReader(new InputStreamReader(
 						connection.getInputStream()));
@@ -122,10 +125,11 @@ public class Updater {
 
 				if (currentVersion.compareTo(newestVersion) < 0) {
 					newAvailable = true;
-					
+
 					// Auto update if set
 					if (plugin.config.getBoolean("updater.auto-install") == true)
-						new UpdaterThread(plugin.getServer().getConsoleSender()).start();
+						new UpdaterThread(plugin.getServer().getConsoleSender())
+								.start();
 				}
 			} catch (Exception e) {
 				plugin.getLogger().warning(
@@ -144,51 +148,55 @@ public class Updater {
 
 		@Override
 		public void run() {
-			try {
-				long startTime = System.currentTimeMillis();
-				URL url = new URL(downloadLocation);
-				
-				URLConnection connection;
-				if (url.getProtocol() == "HTTPS") {
-					connection = new AllowAllTrustManager().getHTTPSConnection(url);
-				} else {
-					connection = url.openConnection();
+			if (newAvailable && !awaitingRestart) {
+				try {
+					long startTime = System.currentTimeMillis();
+					URL url = new URL(downloadLocation);
+	
+					URLConnection connection;
+					if (url.getProtocol() == "HTTPS") {
+						connection = new AllowAllTrustManager()
+								.getHTTPSConnection(url);
+					} else {
+						connection = url.openConnection();
+					}
+	
+					InputStream reader = connection.getInputStream();
+					File f = plugin.getUpdateFile();
+					f.getParentFile().mkdirs();
+					FileOutputStream writer = new FileOutputStream(f);
+					byte[] buffer = new byte[153600];
+					int totalBytesRead = 0;
+					int bytesRead = 0;
+	
+					while ((bytesRead = reader.read(buffer)) > 0) {
+						writer.write(buffer, 0, bytesRead);
+						buffer = new byte[153600];
+						totalBytesRead += bytesRead;
+					}
+					long endTime = System.currentTimeMillis();
+					plugin.messenger.sendMessage(sender, "update.finish",
+							new String[] { "SIZE", "TIME" }, new String[] {
+									"" + totalBytesRead / 1000,
+									"" + ((double) (endTime - startTime)) / 1000 });
+					writer.close();
+					reader.close();
+	
+					newAvailable = false;
+					awaitingRestart = true;
+				} catch (MalformedURLException e) {
+					plugin.messenger.sendMessage(sender, "update.fetch_error",
+							new String[] { "ERROR" },
+							new String[] { e.getMessage() });
+				} catch (IOException e) {
+					plugin.messenger.sendMessage(sender, "update.fetch_error",
+							new String[] { "ERROR" },
+							new String[] { e.getMessage() });
 				}
-				
-				InputStream reader = connection.getInputStream();
-				File f = plugin.getUpdateFile();
-				f.getParentFile().mkdirs();
-				FileOutputStream writer = new FileOutputStream(f);
-				byte[] buffer = new byte[153600];
-				int totalBytesRead = 0;
-				int bytesRead = 0;
-
-				while ((bytesRead = reader.read(buffer)) > 0) {
-					writer.write(buffer, 0, bytesRead);
-					buffer = new byte[153600];
-					totalBytesRead += bytesRead;
-				}
-				long endTime = System.currentTimeMillis();
-				plugin.messenger
-						.sendMessage(
-								sender,
-								"update.finish",
-								new String[] { "SIZE", "TIME" },
-								new String[] {
-										"" + totalBytesRead / 1000,
-										"" + ((double) (endTime - startTime)) / 1000 });
-				writer.close();
-				reader.close();
-				
-				newAvailable = false;
-			} catch (MalformedURLException e) {
-				plugin.messenger.sendMessage(sender, "update.fetch_error",
-						new String[] { "ERROR" },
-						new String[] { e.getMessage() });
-			} catch (IOException e) {
-				plugin.messenger.sendMessage(sender, "update.fetch_error",
-						new String[] { "ERROR" },
-						new String[] { e.getMessage() });
+			} else if (awaitingRestart) {
+				plugin.messenger.sendMessage(sender, "update.already_downloaded");
+			} else {
+				plugin.messenger.sendMessage(sender, "update.up_to_date");
 			}
 		}
 	}

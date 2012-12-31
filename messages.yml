@@ -1,4 +1,4 @@
-config-version: 2.3.2
+config-version: 2.3.3
 prefix: "&4[CommandSigns]&f "
 success:
     cleared: "CommandSign text and status cleared."
@@ -49,7 +49,7 @@ update:
     already_downloaded: "An update to CommandSigns is already waiting to be installed on reload/restart."
     up_to_date: "CommandSigns is already up to date. (&5{VERSION}{PREFIX})"
     confirm_up_to_date: "CommandSigns is up to date. (&5{VERSION}{PREFIX})"
-    notify: "CommandSigns is updated to &5{VERSION}{PREFIX}. You can update your install with &5/cmds update{PREFIX}."
+    notify: "CommandSigns &5{VERSION}{PREFIX} is available. You can update your install with &5/cmds update{PREFIX}."
     fetch_error: "Error fetching update - {ERROR}"
     check: "Checking for latest version..."
     force: "Force updating CommandSigns to latest version..."

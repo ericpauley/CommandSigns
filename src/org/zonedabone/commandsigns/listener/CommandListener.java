@@ -99,8 +99,7 @@ public class CommandListener implements CommandExecutor {
 		}
 		if (plugin.hasPermission(player, "commandsigns.remove")) {
 			PlayerState ps = plugin.playerStates.get(player);
-			if (ps == PlayerState.EDIT
-					|| ps == PlayerState.EDIT_SELECT) {
+			if (ps == PlayerState.EDIT || ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
 			plugin.playerStates.remove(player);
@@ -137,8 +136,9 @@ public class CommandListener implements CommandExecutor {
 				plugin.messenger.sendMessage(player, "failure.no_op");
 			}
 			text.setLine(lineNumber, line);
-			plugin.messenger.sendRaw(player, "success.line_print", new String[] {
-					"NUMBER", "LINE" }, new String[] { "" + lineNumber, line });
+			plugin.messenger.sendRaw(player, "success.line_print",
+					new String[] { "NUMBER", "LINE" }, new String[] {
+							"" + lineNumber, line });
 		}
 	}
 
@@ -149,8 +149,7 @@ public class CommandListener implements CommandExecutor {
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 			PlayerState ps = plugin.playerStates.get(player);
-			if (ps == PlayerState.EDIT
-					|| ps == PlayerState.EDIT_SELECT) {
+			if (ps == PlayerState.EDIT || ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
 			plugin.playerStates.put(player, PlayerState.COPY);
@@ -165,12 +164,10 @@ public class CommandListener implements CommandExecutor {
 			String[] args) {
 		if (plugin.hasPermission(sender, "commandsigns.edit", false)) {
 			PlayerState ps = plugin.playerStates.get(player);
-			if (ps == PlayerState.EDIT_SELECT
-					|| ps == PlayerState.EDIT) {
+			if (ps == PlayerState.EDIT_SELECT || ps == PlayerState.EDIT) {
 				finishEditing(player);
 			} else {
-				plugin.playerStates.put(player,
-						PlayerState.EDIT_SELECT);
+				plugin.playerStates.put(player, PlayerState.EDIT_SELECT);
 				plugin.playerText.remove(player);
 				plugin.messenger.sendMessage(player, "progress.select_sign");
 			}
@@ -265,8 +262,7 @@ public class CommandListener implements CommandExecutor {
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 			PlayerState ps = plugin.playerStates.get(player);
-			if (ps == PlayerState.EDIT
-					|| ps == PlayerState.EDIT_SELECT) {
+			if (ps == PlayerState.EDIT || ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
 			plugin.playerStates.put(player, PlayerState.READ);
@@ -284,8 +280,7 @@ public class CommandListener implements CommandExecutor {
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.redstone")) {
 			PlayerState ps = plugin.playerStates.get(player);
-			if (ps == PlayerState.EDIT
-					|| ps == PlayerState.EDIT_SELECT) {
+			if (ps == PlayerState.EDIT || ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
 			plugin.playerStates.put(player, PlayerState.REDSTONE);
@@ -299,11 +294,7 @@ public class CommandListener implements CommandExecutor {
 	protected boolean reload(final CommandSender sender, Player player,
 			String[] args) {
 		if (plugin.hasPermission(sender, "commandsigns.reload", false)) {
-			plugin.messenger.load();
-			plugin.loadFile();
-			plugin.startMetrics();
-			plugin.setupPermissions();
-			plugin.setupEconomy();
+			plugin.load();
 			plugin.messenger.sendMessage(sender, "success.reloaded");
 		} else {
 			plugin.messenger.sendMessage(player, "failure.no_perms");
@@ -318,8 +309,7 @@ public class CommandListener implements CommandExecutor {
 		}
 		if (plugin.hasPermission(player, "commandsigns.remove")) {
 			PlayerState ps = plugin.playerStates.get(player);
-			if (ps == PlayerState.EDIT
-					|| ps == PlayerState.EDIT_SELECT) {
+			if (ps == PlayerState.EDIT || ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
 			plugin.playerStates.put(player, PlayerState.REMOVE);
@@ -346,8 +336,7 @@ public class CommandListener implements CommandExecutor {
 		}
 		if (plugin.hasPermission(player, "commandsigns.toggle")) {
 			PlayerState ps = plugin.playerStates.get(player);
-			if (ps == PlayerState.EDIT
-					|| ps == PlayerState.EDIT_SELECT) {
+			if (ps == PlayerState.EDIT || ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
 			plugin.playerStates.put(player, PlayerState.TOGGLE);
@@ -364,6 +353,7 @@ public class CommandListener implements CommandExecutor {
 			if (args.length == 2 && args[1].equalsIgnoreCase("force")) {
 				// Force-only. Does no check.
 				plugin.messenger.sendMessage(sender, "update.force");
+				plugin.updateHandler.newAvailable = true;
 				plugin.updateHandler.new UpdaterThread(sender).start();
 			} else {
 				// Preliminary check
@@ -397,8 +387,8 @@ public class CommandListener implements CommandExecutor {
 
 				// If command was 'update check', stop here. Enough has been
 				// done. Same applies for if auto-update is set.
-				if (!((args.length == 2 && args[1].equalsIgnoreCase("check"))
-						|| plugin.config.getBoolean("updater.auto-install") == true)) {
+				if (!((args.length == 2 && args[1].equalsIgnoreCase("check")) || plugin.config
+						.getBoolean("updater.auto-install") == true)) {
 					if (plugin.updateHandler.newAvailable) {
 						if (!plugin.getUpdateFile().exists()) {
 							plugin.messenger
@@ -408,7 +398,8 @@ public class CommandListener implements CommandExecutor {
 											new String[] { "VERSION" },
 											new String[] { plugin.updateHandler.newestVersion
 													.toString() });
-							plugin.updateHandler.new UpdaterThread(sender).start();
+							plugin.updateHandler.new UpdaterThread(sender)
+									.start();
 						} else {
 							plugin.messenger.sendMessage(sender,
 									"update.already_downloaded");

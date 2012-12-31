@@ -71,8 +71,7 @@ public class PlayerProxy implements Player {
 		this(originator, recipient, false);
 	}
 
-	public PlayerProxy(Player originator, Player recipient,
-			boolean silent) {
+	public PlayerProxy(Player originator, Player recipient, boolean silent) {
 		this.originator = originator;
 		this.recipient = recipient;
 		this.silent = silent;

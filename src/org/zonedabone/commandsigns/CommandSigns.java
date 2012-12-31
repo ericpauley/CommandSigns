@@ -39,25 +39,24 @@ import org.zonedabone.commandsigns.util.Updater;
 public class CommandSigns extends JavaPlugin {
 
 	// Listeners
-	private final EventListener listener = new EventListener(
-			this);
+	private final EventListener listener = new EventListener(this);
 	public CommandListener commandExecutor = new CommandListener(this);
-	
+
 	// Third-party
 	private Metrics metrics;
-	
+
 	public static Economy economy = null;
 	public static Permission permission = null;
-	
+
 	// Plugin variables
 	public final Map<Location, SignText> activeSigns = new HashMap<Location, SignText>();
 	public final Map<OfflinePlayer, PlayerState> playerStates = new HashMap<OfflinePlayer, PlayerState>();
 	public final Map<OfflinePlayer, SignText> playerText = new HashMap<OfflinePlayer, SignText>();
-	
+
 	public Config config = new Config(this);
 	public Messaging messenger = new Messaging(this);
 	public Updater updateHandler = new Updater(this);
-	
+
 	// Class variables
 	private BukkitTask updateTask;
 
@@ -203,8 +202,7 @@ public class CommandSigns extends JavaPlugin {
 									"Location not valid.");
 
 						String owner = raw[4];
-						SignText cst = new SignText(owner,
-								redstone);
+						SignText cst = new SignText(owner, redstone);
 						for (String command : raw[5].split("[\u00B6\u001E]")) {
 							cst.addLine(command);
 						}
@@ -233,26 +231,32 @@ public class CommandSigns extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		messenger.load();
-		loadFile();
+		load();
 		PluginManager pm = getServer().getPluginManager();
 		getCommand("commandsigns").setExecutor(commandExecutor);
 		pm.registerEvents(listener, this);
+	}
+	
+	public void load() {
+		config.load();
+		messenger.load();
+		loadFile();
+		setupPermissions();
+		setupEconomy();
+		
 		if (config.getBoolean("updater.auto-check") == true)
 			startUpdateCheck();
+		
 		if (config.getBoolean("metrics.enable") == true)
 			startMetrics();
 		else
 			getLogger().info(messenger.parseRaw("metrics.opt_out"));
-		setupPermissions();
-		setupEconomy();
 	}
 
 	public void saveFile() {
 		FileConfiguration config = new YamlConfiguration();
 		ConfigurationSection data = config.createSection("signs");
-		for (Map.Entry<Location, SignText> sign : activeSigns
-				.entrySet()) {
+		for (Map.Entry<Location, SignText> sign : activeSigns.entrySet()) {
 			Location loc = sign.getKey();
 			SignText cst = sign.getValue();
 			cst.trim();
@@ -298,8 +302,7 @@ public class CommandSigns extends JavaPlugin {
 			int signNumber = 0;
 
 			writer.write("");
-			for (Map.Entry<Location, SignText> entry : activeSigns
-					.entrySet()) {
+			for (Map.Entry<Location, SignText> entry : activeSigns.entrySet()) {
 				try {
 					signNumber++;
 					entry.getValue().trim();
@@ -439,7 +442,7 @@ public class CommandSigns extends JavaPlugin {
 
 	public void startUpdateCheck() {
 		Runnable checker = updateHandler.new Checker();
-		updateTask = getServer().getScheduler().runTaskTimer(
-				this, checker, 0, 1728000L);
+		updateTask = getServer().getScheduler().runTaskTimer(this, checker, 0,
+				1728000L);
 	}
 }
