@@ -65,7 +65,7 @@ public class EventListener implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (event.getPlayer().hasPermission("commandsigns.update")) {
+		if (plugin.hasPermission(event.getPlayer(), "commandsigns.update")) {
 			if (plugin.updateHandler.newAvailable) {
 				if (!plugin.getUpdateFile().exists()) {
 					plugin.messenger.sendMessage(event.getPlayer(), "update.notify",

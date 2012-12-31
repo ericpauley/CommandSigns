@@ -243,7 +243,7 @@ public class CommandSigns extends JavaPlugin {
 		if (config.getBoolean("metrics.enable") == true)
 			startMetrics();
 		else
-			getLogger().info(messenger.parseRaw("metrics.failure"));
+			getLogger().info(messenger.parseRaw("metrics.opt_out"));
 		setupPermissions();
 		setupEconomy();
 	}
