@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.utils;
+package org.zonedabone.commandsigns.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.zonedabone.commandsigns.CommandSigns;
-import org.zonedabone.commandsigns.utils.Updater.Version;
+import org.zonedabone.commandsigns.util.Updater.Version;
 
 public class YamlLoader {
 	

@@ -8,18 +8,18 @@ import java.util.Stack;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.zonedabone.commandsigns.handlers.ChatHandler;
-import org.zonedabone.commandsigns.handlers.ClickTypeHandler;
-import org.zonedabone.commandsigns.handlers.CommandHandler;
-import org.zonedabone.commandsigns.handlers.CooldownHandler;
-import org.zonedabone.commandsigns.handlers.GroupHandler;
-import org.zonedabone.commandsigns.handlers.Handler;
-import org.zonedabone.commandsigns.handlers.MoneyHandler;
-import org.zonedabone.commandsigns.handlers.PermissionHandler;
-import org.zonedabone.commandsigns.handlers.RandomHandler;
-import org.zonedabone.commandsigns.handlers.SendHandler;
-import org.zonedabone.commandsigns.handlers.WaitHandler;
-import org.zonedabone.commandsigns.utils.SignText;
+import org.zonedabone.commandsigns.handler.ChatHandler;
+import org.zonedabone.commandsigns.handler.ClickTypeHandler;
+import org.zonedabone.commandsigns.handler.CommandHandler;
+import org.zonedabone.commandsigns.handler.CooldownHandler;
+import org.zonedabone.commandsigns.handler.GroupHandler;
+import org.zonedabone.commandsigns.handler.Handler;
+import org.zonedabone.commandsigns.handler.MoneyHandler;
+import org.zonedabone.commandsigns.handler.PermissionHandler;
+import org.zonedabone.commandsigns.handler.RandomHandler;
+import org.zonedabone.commandsigns.handler.SendHandler;
+import org.zonedabone.commandsigns.handler.WaitHandler;
+import org.zonedabone.commandsigns.util.SignText;
 
 public class SignExecutor {
 

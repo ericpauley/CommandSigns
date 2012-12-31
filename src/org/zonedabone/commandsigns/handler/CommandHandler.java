@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.handlers;
+package org.zonedabone.commandsigns.handler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -8,8 +8,8 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.PluginManager;
 import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
-import org.zonedabone.commandsigns.proxies.CommandSenderProxy;
-import org.zonedabone.commandsigns.proxies.PlayerProxy;
+import org.zonedabone.commandsigns.proxy.CommandSenderProxy;
+import org.zonedabone.commandsigns.proxy.PlayerProxy;
 
 public class CommandHandler extends Handler {
 

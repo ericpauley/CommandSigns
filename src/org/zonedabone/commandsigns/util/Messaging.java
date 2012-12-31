@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.utils;
+package org.zonedabone.commandsigns.util;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

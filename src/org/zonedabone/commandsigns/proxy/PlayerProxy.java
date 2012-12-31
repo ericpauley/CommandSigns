@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.proxies;
+package org.zonedabone.commandsigns.proxy;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;

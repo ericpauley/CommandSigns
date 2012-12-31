@@ -25,16 +25,16 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.zonedabone.commandsigns.listeners.CommandListener;
-import org.zonedabone.commandsigns.listeners.EventListener;
+import org.zonedabone.commandsigns.listener.CommandListener;
+import org.zonedabone.commandsigns.listener.EventListener;
 import org.zonedabone.commandsigns.thirdparty.Metrics;
 import org.zonedabone.commandsigns.thirdparty.Metrics.Graph;
 import org.zonedabone.commandsigns.thirdparty.Metrics.Plotter;
-import org.zonedabone.commandsigns.utils.Config;
-import org.zonedabone.commandsigns.utils.PlayerState;
-import org.zonedabone.commandsigns.utils.SignText;
-import org.zonedabone.commandsigns.utils.Messaging;
-import org.zonedabone.commandsigns.utils.Updater;
+import org.zonedabone.commandsigns.util.Config;
+import org.zonedabone.commandsigns.util.Messaging;
+import org.zonedabone.commandsigns.util.PlayerState;
+import org.zonedabone.commandsigns.util.SignText;
+import org.zonedabone.commandsigns.util.Updater;
 
 public class CommandSigns extends JavaPlugin {
 

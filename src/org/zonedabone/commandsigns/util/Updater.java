@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.utils;
+package org.zonedabone.commandsigns.util;
 
 import java.io.BufferedReader;
 import java.io.File;

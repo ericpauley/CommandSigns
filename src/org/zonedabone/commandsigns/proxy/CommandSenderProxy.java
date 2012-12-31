@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.proxies;
+package org.zonedabone.commandsigns.proxy;
 
 import java.util.Set;
 

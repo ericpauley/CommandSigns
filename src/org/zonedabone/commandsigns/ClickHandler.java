@@ -4,8 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.zonedabone.commandsigns.utils.PlayerState;
-import org.zonedabone.commandsigns.utils.SignText;
+import org.zonedabone.commandsigns.util.PlayerState;
+import org.zonedabone.commandsigns.util.SignText;
 
 public class ClickHandler {
 

@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.utils;
+package org.zonedabone.commandsigns.util;
 
 import org.bukkit.configuration.Configuration;
 import org.zonedabone.commandsigns.CommandSigns;

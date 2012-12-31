@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.handlers;
+package org.zonedabone.commandsigns.handler;
 
 import org.bukkit.event.block.Action;
 import org.zonedabone.commandsigns.SignExecutor;

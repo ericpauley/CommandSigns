@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.listeners;
+package org.zonedabone.commandsigns.listener;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,8 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.zonedabone.commandsigns.CommandSigns;
-import org.zonedabone.commandsigns.utils.PlayerState;
-import org.zonedabone.commandsigns.utils.SignText;
+import org.zonedabone.commandsigns.util.PlayerState;
+import org.zonedabone.commandsigns.util.SignText;
 
 public class CommandListener implements CommandExecutor {
 
