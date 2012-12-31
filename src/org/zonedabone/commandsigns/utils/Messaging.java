@@ -1,55 +1,40 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.utils;
 
-import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.zonedabone.commandsigns.CommandSignsUpdater.Version;
+import org.zonedabone.commandsigns.CommandSigns;
 
-public class Messaging {
+public class Messaging extends ConfigStore {
 
 	private static Map<String, String> messages = new ConcurrentHashMap<String, String>();
 
-	public static void loadMessages(CommandSigns plugin) {
-		File f = new File(plugin.getDataFolder(), "messages.yml");
-		Configuration included = YamlConfiguration.loadConfiguration(plugin
-				.getResource("messages.yml"));
-		if (!f.exists()) {
-			plugin.getLogger().info("Creating default messages.yml.");
-			plugin.saveResource("messages.yml", true);
-		}
+	public Messaging(CommandSigns plugin) {
+		super(plugin);
+	}
 
-		Configuration config = YamlConfiguration.loadConfiguration(f);
-		CommandSignsUpdater updaterClass = new CommandSignsUpdater(plugin);
+	/**
+	 * {@inheritDoc}
+	 */
+	public void load() {
+		Configuration config = YamlLoader.loadResource(plugin, "messages.yml");
 
-		Version curVersion = updaterClass.new Version(
-				config.getString("version"));
-		Version incVersion = updaterClass.new Version(
-				included.getString("version"));
-
-		if (incVersion.compareTo(curVersion) > 0) {
-			plugin.getLogger().info("Updating messages.yml.");
-			plugin.saveResource("messages.yml", true);
-		}
-
-		config = YamlConfiguration.loadConfiguration(f);
 		for (String k : config.getKeys(true)) {
 			if (config.isString(k)) {
 				messages.put(k, config.getString(k));
 			}
 		}
-		plugin.getLogger().info("Loaded " + messages.size() + " messages.");
+		plugin.getLogger().info("Messages file loaded.");
 	}
 
-	public static String parseMessage(String messageName) {
+	public String parseMessage(String messageName) {
 		return parseMessage(messageName, null, null);
 	}
 
-	public static String parseMessage(String message, String[] variables,
+	public String parseMessage(String message, String[] variables,
 			String[] replacements) {
 		String raw = parseRaw(message, variables, replacements);
 		String prefix = messages.get("prefix");
@@ -60,11 +45,11 @@ public class Messaging {
 		}
 	}
 
-	public static String parseRaw(String messageName) {
+	public String parseRaw(String messageName) {
 		return parseRaw(messageName, null, null);
 	}
 
-	public static String parseRaw(String messageName, String[] variables,
+	public String parseRaw(String messageName, String[] variables,
 			String[] replacements) {
 		messageName = messageName.toLowerCase();
 		String prefix = messages.get(messageName.split("\\.")[0] + ".prefix");
@@ -91,22 +76,22 @@ public class Messaging {
 		}
 	}
 
-	public static void sendMessage(CommandSender cs, String messageName) {
+	public void sendMessage(CommandSender cs, String messageName) {
 		sendMessage(cs, messageName, null, null);
 	}
 
-	public static void sendMessage(CommandSender cs, String messageName,
+	public void sendMessage(CommandSender cs, String messageName,
 			String[] variables, String[] replacements) {
 		if (cs != null) {
 			cs.sendMessage(parseMessage(messageName, variables, replacements));
 		}
 	}
 
-	public static void sendRaw(CommandSender cs, String messageName) {
+	public void sendRaw(CommandSender cs, String messageName) {
 		sendRaw(cs, messageName, null, null);
 	}
 
-	public static void sendRaw(CommandSender cs, String messageName,
+	public void sendRaw(CommandSender cs, String messageName,
 			String[] variables, String[] replacements) {
 		if (cs != null) {
 			cs.sendMessage(parseRaw(messageName, variables, replacements));

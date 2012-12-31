@@ -1,12 +1,12 @@
 package org.zonedabone.commandsigns.handlers;
 
 import org.bukkit.event.block.Action;
-import org.zonedabone.commandsigns.CommandSignExecutor;
+import org.zonedabone.commandsigns.SignExecutor;
 
 public class ClickTypeHandler extends Handler {
 
 	@Override
-	public void handle(CommandSignExecutor e, String command, boolean silent,
+	public void handle(SignExecutor e, String command, boolean silent,
 			boolean negate) {
 		if (e.getPlayer() != null) {
 			if (command.startsWith(">>")) {

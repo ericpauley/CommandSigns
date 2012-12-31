@@ -25,23 +25,40 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.zonedabone.commandsigns.Metrics.Graph;
-import org.zonedabone.commandsigns.Metrics.Plotter;
+import org.zonedabone.commandsigns.listeners.CommandListener;
+import org.zonedabone.commandsigns.listeners.EventListener;
+import org.zonedabone.commandsigns.thirdparty.Metrics;
+import org.zonedabone.commandsigns.thirdparty.Metrics.Graph;
+import org.zonedabone.commandsigns.thirdparty.Metrics.Plotter;
+import org.zonedabone.commandsigns.utils.Config;
+import org.zonedabone.commandsigns.utils.PlayerState;
+import org.zonedabone.commandsigns.utils.SignText;
+import org.zonedabone.commandsigns.utils.Messaging;
+import org.zonedabone.commandsigns.utils.Updater;
 
 public class CommandSigns extends JavaPlugin {
 
+	// Listeners
+	private final EventListener listener = new EventListener(
+			this);
+	public CommandListener commandExecutor = new CommandListener(this);
+	
+	// Third-party
+	private Metrics metrics;
+	
 	public static Economy economy = null;
 	public static Permission permission = null;
-	public final Map<Location, CommandSignsText> activeSigns = new HashMap<Location, CommandSignsText>();
-	public CommandSignsCommand commandExecutor = new CommandSignsCommand(this);
-	// listeners
-	private final CommandSignsEventListener listener = new CommandSignsEventListener(
-			this);
-	private Metrics metrics;
-	// plugin variables
-	public final Map<OfflinePlayer, CommandSignsPlayerState> playerStates = new HashMap<OfflinePlayer, CommandSignsPlayerState>();
-	public final Map<OfflinePlayer, CommandSignsText> playerText = new HashMap<OfflinePlayer, CommandSignsText>();
-	public CommandSignsUpdater updateHandler = new CommandSignsUpdater(this);
+	
+	// Plugin variables
+	public final Map<Location, SignText> activeSigns = new HashMap<Location, SignText>();
+	public final Map<OfflinePlayer, PlayerState> playerStates = new HashMap<OfflinePlayer, PlayerState>();
+	public final Map<OfflinePlayer, SignText> playerText = new HashMap<OfflinePlayer, SignText>();
+	
+	public Config config = new Config(this);
+	public Messaging messenger = new Messaging(this);
+	public Updater updateHandler = new Updater(this);
+	
+	// Class variables
 	private BukkitTask updateTask;
 
 	public File getUpdateFile() {
@@ -62,7 +79,7 @@ public class CommandSigns extends JavaPlugin {
 			perm = permission.has(player, string);
 		}
 		if (perm == false && notify) {
-			Messaging.sendMessage(player, "failure.no_perms");
+			messenger.sendMessage(player, "failure.no_perms");
 		}
 		return perm;
 	}
@@ -109,7 +126,7 @@ public class CommandSigns extends JavaPlugin {
 
 				boolean redstone = data.getBoolean(key + ".redstone", false);
 				String owner = data.getString(key + ".owner", null);
-				CommandSignsText cst = new CommandSignsText(owner, redstone);
+				SignText cst = new SignText(owner, redstone);
 				for (Object o : data.getList(key + ".text",
 						new ArrayList<String>())) {
 					cst.addLine(o.toString());
@@ -186,7 +203,7 @@ public class CommandSigns extends JavaPlugin {
 									"Location not valid.");
 
 						String owner = raw[4];
-						CommandSignsText cst = new CommandSignsText(owner,
+						SignText cst = new SignText(owner,
 								redstone);
 						for (String command : raw[5].split("[\u00B6\u001E]")) {
 							cst.addLine(command);
@@ -216,13 +233,17 @@ public class CommandSigns extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		Messaging.loadMessages(this);
+		messenger.load();
 		loadFile();
 		PluginManager pm = getServer().getPluginManager();
 		getCommand("commandsigns").setExecutor(commandExecutor);
 		pm.registerEvents(listener, this);
-		startUpdateCheck();
-		startMetrics();
+		if (config.getBoolean("updater.auto-check") == true)
+			startUpdateCheck();
+		if (config.getBoolean("metrics.enable") == true)
+			startMetrics();
+		else
+			getLogger().info(messenger.parseRaw("metrics.failure"));
 		setupPermissions();
 		setupEconomy();
 	}
@@ -230,10 +251,10 @@ public class CommandSigns extends JavaPlugin {
 	public void saveFile() {
 		FileConfiguration config = new YamlConfiguration();
 		ConfigurationSection data = config.createSection("signs");
-		for (Map.Entry<Location, CommandSignsText> sign : activeSigns
+		for (Map.Entry<Location, SignText> sign : activeSigns
 				.entrySet()) {
 			Location loc = sign.getKey();
-			CommandSignsText cst = sign.getValue();
+			SignText cst = sign.getValue();
 			cst.trim();
 			String key = loc.getWorld().getName() + "," + loc.getBlockX() + ","
 					+ loc.getBlockY() + "," + loc.getBlockZ();
@@ -277,7 +298,7 @@ public class CommandSigns extends JavaPlugin {
 			int signNumber = 0;
 
 			writer.write("");
-			for (Map.Entry<Location, CommandSignsText> entry : activeSigns
+			for (Map.Entry<Location, SignText> entry : activeSigns
 					.entrySet()) {
 				try {
 					signNumber++;
@@ -321,7 +342,7 @@ public class CommandSigns extends JavaPlugin {
 		}
 	}
 
-	protected boolean setupEconomy() {
+	public boolean setupEconomy() {
 		RegisteredServiceProvider<Economy> economyProvider = getServer()
 				.getServicesManager().getRegistration(
 						net.milkbowl.vault.economy.Economy.class);
@@ -331,7 +352,7 @@ public class CommandSigns extends JavaPlugin {
 		return economy != null;
 	}
 
-	protected boolean setupPermissions() {
+	public boolean setupPermissions() {
 		RegisteredServiceProvider<Permission> permissionProvider = getServer()
 				.getServicesManager().getRegistration(
 						net.milkbowl.vault.permission.Permission.class);
@@ -345,7 +366,7 @@ public class CommandSigns extends JavaPlugin {
 		try {
 			metrics = new Metrics(this);
 		} catch (IOException e) {
-			getLogger().warning(Messaging.parseRaw("metrics.failure"));
+			getLogger().warning(messenger.parseRaw("metrics.failure"));
 		}
 		Graph g = metrics.createGraph("Number of CommandSigns");
 		g.addPlotter(new Plotter() {
@@ -369,7 +390,7 @@ public class CommandSigns extends JavaPlugin {
 			@Override
 			public int getValue() {
 				int number = 0;
-				for (CommandSignsText cst : activeSigns.values()) {
+				for (SignText cst : activeSigns.values()) {
 					for (String s : cst) {
 						if (s.startsWith("/*") || s.startsWith("!/*")) {
 							number++;
@@ -384,7 +405,7 @@ public class CommandSigns extends JavaPlugin {
 			@Override
 			public int getValue() {
 				int number = 0;
-				for (CommandSignsText cst : activeSigns.values()) {
+				for (SignText cst : activeSigns.values()) {
 					for (String s : cst) {
 						if (s.startsWith("/^") || s.startsWith("!/^")) {
 							number++;
@@ -399,7 +420,7 @@ public class CommandSigns extends JavaPlugin {
 			@Override
 			public int getValue() {
 				int number = 0;
-				for (CommandSignsText cst : activeSigns.values()) {
+				for (SignText cst : activeSigns.values()) {
 					for (String s : cst) {
 						if (s.startsWith("/#") || s.startsWith("!/#")) {
 							number++;
@@ -410,9 +431,9 @@ public class CommandSigns extends JavaPlugin {
 			}
 		});
 		if (metrics.start()) {
-			getLogger().info(Messaging.parseRaw("metrics.success"));
+			getLogger().info(messenger.parseRaw("metrics.success"));
 		} else {
-			getLogger().info(Messaging.parseRaw("metrics.optout"));
+			getLogger().info(messenger.parseRaw("metrics.failure"));
 		}
 	}
 

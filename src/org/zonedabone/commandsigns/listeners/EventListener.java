@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.listeners;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -11,20 +11,24 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.zonedabone.commandsigns.ClickHandler;
+import org.zonedabone.commandsigns.SignExecutor;
+import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.utils.SignText;
 
-public class CommandSignsEventListener implements Listener {
+public class EventListener implements Listener {
 
 	private CommandSigns plugin;
 
-	public CommandSignsEventListener(CommandSigns plugin) {
+	public EventListener(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
 
 	public void handleRedstone(Block b) {
 		Location csl = b.getLocation();
-		CommandSignsText text = plugin.activeSigns.get(csl);
+		SignText text = plugin.activeSigns.get(csl);
 		if (text != null && text.isRedstone()) {
-			new CommandSignExecutor(plugin, null, csl, null).runLines();
+			new SignExecutor(plugin, null, csl, null).runLines();
 		}
 	}
 
@@ -35,7 +39,7 @@ public class CommandSignsEventListener implements Listener {
 		}
 		Location location = event.getBlock().getLocation();
 		if (plugin.activeSigns.containsKey(location)) {
-			Messaging.sendMessage(event.getPlayer(), "failure.remove_first");
+			plugin.messenger.sendMessage(event.getPlayer(), "failure.remove_first");
 			event.setCancelled(true);
 		}
 	}
@@ -49,7 +53,7 @@ public class CommandSignsEventListener implements Listener {
 				|| action == Action.PHYSICAL) {
 			block = event.getClickedBlock();
 			if (block != null) {
-				final CommandSignsClickHandler signClickEvent = new CommandSignsClickHandler(
+				final ClickHandler signClickEvent = new ClickHandler(
 						plugin, event.getPlayer(), block);
 				if (signClickEvent.onInteract(action)
 						&& action != Action.PHYSICAL) {
@@ -64,7 +68,7 @@ public class CommandSignsEventListener implements Listener {
 		if (event.getPlayer().hasPermission("commandsigns.update")) {
 			if (plugin.updateHandler.newAvailable) {
 				if (!plugin.getUpdateFile().exists()) {
-					Messaging.sendMessage(event.getPlayer(), "update.notify",
+					plugin.messenger.sendMessage(event.getPlayer(), "update.notify",
 							new String[] { "VERSION" },
 							new String[] { plugin.updateHandler.newestVersion
 									.toString() });

@@ -19,8 +19,9 @@ import org.zonedabone.commandsigns.handlers.PermissionHandler;
 import org.zonedabone.commandsigns.handlers.RandomHandler;
 import org.zonedabone.commandsigns.handlers.SendHandler;
 import org.zonedabone.commandsigns.handlers.WaitHandler;
+import org.zonedabone.commandsigns.utils.SignText;
 
-public class CommandSignExecutor {
+public class SignExecutor {
 
 	private static Set<Handler> handlers = new HashSet<Handler>();
 	static {
@@ -45,7 +46,7 @@ public class CommandSignExecutor {
 	}
 
 	public static void setHandlers(Set<Handler> handlers) {
-		CommandSignExecutor.handlers = handlers;
+		SignExecutor.handlers = handlers;
 	}
 
 	public static void unregisterAll() {
@@ -64,11 +65,11 @@ public class CommandSignExecutor {
 
 	private final Stack<Boolean> restrictions = new Stack<Boolean>();
 
-	private final CommandSignsText text;
+	private final SignText text;
 
 	private double wait;
 
-	public CommandSignExecutor(CommandSigns plugin, Player player,
+	public SignExecutor(CommandSigns plugin, Player player,
 			Location location, Action action) {
 		this.plugin = plugin;
 		this.player = player;
@@ -110,7 +111,7 @@ public class CommandSignExecutor {
 		return restrictions;
 	}
 
-	public CommandSignsText getText() {
+	public SignText getText() {
 		return text;
 	}
 
@@ -120,7 +121,7 @@ public class CommandSignExecutor {
 
 	private LinkedList<String> parseCommandSign(Player player, Location loc) {
 		LinkedList<String> commandList = new LinkedList<String>();
-		CommandSignsText commandSign = plugin.activeSigns.get(location);
+		SignText commandSign = plugin.activeSigns.get(location);
 		for (String line : commandSign) {
 			line = line.replaceAll("(?iu)<blockx>", "" + loc.getX());
 			line = line.replaceAll("(?iu)<blocky>", "" + loc.getY());

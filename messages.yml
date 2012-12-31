@@ -1,4 +1,4 @@
-version: 2.3.2
+config-version: 2.3.2
 prefix: "&4[CommandSigns]&f "
 success:
     cleared: "CommandSign text and status cleared."

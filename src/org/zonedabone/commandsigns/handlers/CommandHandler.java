@@ -6,16 +6,15 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.PluginManager;
-import org.zonedabone.commandsigns.CommandSignExecutor;
+import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
-import org.zonedabone.commandsigns.CommandSignsCommandSenderProxy;
-import org.zonedabone.commandsigns.CommandSignsPlayerProxy;
-import org.zonedabone.commandsigns.Messaging;
+import org.zonedabone.commandsigns.proxies.CommandSenderProxy;
+import org.zonedabone.commandsigns.proxies.PlayerProxy;
 
 public class CommandHandler extends Handler {
 
 	@Override
-	public void handle(CommandSignExecutor e, String command, boolean silent,
+	public void handle(SignExecutor e, String command, boolean silent,
 			boolean negate) {
 		if (command.startsWith("/") || command.startsWith("\\")) {
 			boolean op = false;
@@ -44,7 +43,7 @@ public class CommandHandler extends Handler {
 								run(plugin, player, command, silent);
 							} else {
 								if (!silent)
-									Messaging.sendMessage(player, "cannot_use");
+									plugin.messenger.sendMessage(player, "cannot_use");
 								return;
 							}
 						} else if (command.startsWith("^")) {
@@ -58,7 +57,7 @@ public class CommandHandler extends Handler {
 								run(plugin, player, command, silent);
 							} else {
 								if (!silent)
-									Messaging.sendMessage(player, "cannot_use");
+									plugin.messenger.sendMessage(player, "cannot_use");
 								return;
 							}
 						} else if (command.startsWith("#")) {
@@ -67,12 +66,12 @@ public class CommandHandler extends Handler {
 									"commandsigns.use.super", false)) {
 								ConsoleCommandSender ccs = plugin.getServer()
 										.getConsoleSender();
-								CommandSender cs = new CommandSignsCommandSenderProxy(
+								CommandSender cs = new CommandSenderProxy(
 										ccs, player, silent);
 								plugin.getServer().dispatchCommand(cs, command);
 							} else {
 								if (!silent)
-									Messaging.sendMessage(player, "cannot_use");
+									plugin.messenger.sendMessage(player, "cannot_use");
 								return;
 							}
 						} else {
@@ -92,7 +91,7 @@ public class CommandHandler extends Handler {
 					}
 					ConsoleCommandSender ccs = plugin.getServer()
 							.getConsoleSender();
-					CommandSender cs = new CommandSignsCommandSenderProxy(ccs,
+					CommandSender cs = new CommandSenderProxy(ccs,
 							silent);
 					plugin.getServer().dispatchCommand(cs, command);
 				}
@@ -102,7 +101,7 @@ public class CommandHandler extends Handler {
 
 	private void run(CommandSigns plugin, Player p, String command,
 			boolean silent) {
-		p = new CommandSignsPlayerProxy(p, silent);
+		p = new PlayerProxy(p, silent);
 		PluginManager pm = Bukkit.getPluginManager();
 		PlayerCommandPreprocessEvent e = new PlayerCommandPreprocessEvent(p,
 				"/" + command);

@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class CommandSignsText implements Iterable<String> {
+public class SignText implements Iterable<String> {
 
 	private boolean enabled = true;
 	private String owner;
@@ -14,14 +14,14 @@ public class CommandSignsText implements Iterable<String> {
 	private List<String> text;
 	private final Map<String, Long> timeouts = new HashMap<String, Long>();
 
-	public CommandSignsText(String owner, boolean redstone) {
+	public SignText(String owner, boolean redstone) {
 		this.owner = owner;
 		text = new ArrayList<String>();
 		this.redstone = redstone;
 	}
 
-	public CommandSignsText clone(String owner) {
-		CommandSignsText cst = new CommandSignsText(owner, redstone);
+	public SignText clone(String owner) {
+		SignText cst = new SignText(owner, redstone);
 		for (String s : text) {
 			cst.getText().add(s);
 		}

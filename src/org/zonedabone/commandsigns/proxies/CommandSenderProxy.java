@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.proxies;
 
 import java.util.Set;
 
@@ -14,27 +14,27 @@ import org.bukkit.plugin.Plugin;
  * CommandSender originator and recipient can be the same CommandSender Allows
  * sendMessage() methods to be intercepted if the silent flag is set
  */
-public class CommandSignsCommandSenderProxy implements CommandSender {
+public class CommandSenderProxy implements CommandSender {
 
 	private CommandSender originator;
 	private CommandSender recipient;
 	boolean silent;
 
-	public CommandSignsCommandSenderProxy(CommandSender originator) {
+	public CommandSenderProxy(CommandSender originator) {
 		this(originator, originator, false);
 	}
 
-	public CommandSignsCommandSenderProxy(CommandSender originator,
+	public CommandSenderProxy(CommandSender originator,
 			boolean silent) {
 		this(originator, originator, silent);
 	}
 
-	public CommandSignsCommandSenderProxy(CommandSender originator,
+	public CommandSenderProxy(CommandSender originator,
 			CommandSender recipient) {
 		this(originator, recipient, false);
 	}
 
-	public CommandSignsCommandSenderProxy(CommandSender originator,
+	public CommandSenderProxy(CommandSender originator,
 			CommandSender recipient, boolean silent) {
 		this.originator = originator;
 		this.recipient = recipient;

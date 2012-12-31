@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.listeners;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,82 +8,85 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.utils.PlayerState;
+import org.zonedabone.commandsigns.utils.SignText;
 
-class CommandSignsCommand implements CommandExecutor {
+public class CommandListener implements CommandExecutor {
 
 	private CommandSigns plugin;
 
-	public CommandSignsCommand(CommandSigns plugin) {
+	public CommandListener(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
 
 	protected boolean add(final CommandSender sender, Player player,
 			int lineNumber, String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 			clipboard(sender, player, lineNumber, 1, args);
-			if (plugin.playerStates.get(player) != CommandSignsPlayerState.EDIT) {
-				plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
-				Messaging.sendMessage(player, "progress.add");
+			if (plugin.playerStates.get(player) != PlayerState.EDIT) {
+				plugin.playerStates.put(player, PlayerState.ENABLE);
+				plugin.messenger.sendMessage(player, "progress.add");
 			}
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
 
 	protected boolean batch(final CommandSender sender, Player player,
 			String[] args) {
-		CommandSignsPlayerState ps = plugin.playerStates.get(player);
+		PlayerState ps = plugin.playerStates.get(player);
 		if (ps == null) {
-			Messaging.sendMessage(player, "failure.not_in_mode");
+			plugin.messenger.sendMessage(player, "failure.not_in_mode");
 			return false;
 		}
 		switch (ps) {
 		case REMOVE:
 			player.sendMessage("Switched to batch remove mode.");
-			ps = CommandSignsPlayerState.BATCH_REMOVE;
+			ps = PlayerState.BATCH_REMOVE;
 			break;
 		case BATCH_REMOVE:
 			player.sendMessage("Switched to single remove mode.");
-			ps = CommandSignsPlayerState.REMOVE;
+			ps = PlayerState.REMOVE;
 			break;
 		case ENABLE:
 			player.sendMessage("Switched to batch enable mode.");
-			ps = CommandSignsPlayerState.BATCH_ENABLE;
+			ps = PlayerState.BATCH_ENABLE;
 			break;
 		case BATCH_ENABLE:
 			player.sendMessage("Switched to single enable mode.");
-			ps = CommandSignsPlayerState.ENABLE;
+			ps = PlayerState.ENABLE;
 			break;
 		case READ:
 			player.sendMessage("Switched to batch read mode.");
-			ps = CommandSignsPlayerState.BATCH_READ;
+			ps = PlayerState.BATCH_READ;
 			break;
 		case BATCH_READ:
 			player.sendMessage("Switched to single read mode.");
-			ps = CommandSignsPlayerState.READ;
+			ps = PlayerState.READ;
 			break;
 		case TOGGLE:
 			player.sendMessage("Switched to batch toggle mode.");
-			ps = CommandSignsPlayerState.BATCH_TOGGLE;
+			ps = PlayerState.BATCH_TOGGLE;
 			break;
 		case BATCH_TOGGLE:
 			player.sendMessage("Switched to single toggle mode.");
-			ps = CommandSignsPlayerState.TOGGLE;
+			ps = PlayerState.TOGGLE;
 			break;
 		case REDSTONE:
 			player.sendMessage("Switched to batch redstone mode.");
-			ps = CommandSignsPlayerState.BATCH_REDSTONE;
+			ps = PlayerState.BATCH_REDSTONE;
 			break;
 		case BATCH_REDSTONE:
 			player.sendMessage("Switched to single redstone mode.");
-			ps = CommandSignsPlayerState.REDSTONE;
+			ps = PlayerState.REDSTONE;
 			break;
 		default:
-			Messaging.sendMessage(player, "failure.no_batch");
+			plugin.messenger.sendMessage(player, "failure.no_batch");
 		}
 		plugin.playerStates.put(player, ps);
 		return true;
@@ -92,19 +95,19 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean clear(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.remove")) {
-			CommandSignsPlayerState ps = plugin.playerStates.get(player);
-			if (ps == CommandSignsPlayerState.EDIT
-					|| ps == CommandSignsPlayerState.EDIT_SELECT) {
+			PlayerState ps = plugin.playerStates.get(player);
+			if (ps == PlayerState.EDIT
+					|| ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
 			plugin.playerStates.remove(player);
 			plugin.playerText.remove(player);
-			Messaging.sendMessage(player, "success.cleared");
+			plugin.messenger.sendMessage(player, "success.cleared");
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -112,29 +115,29 @@ class CommandSignsCommand implements CommandExecutor {
 	private void clipboard(final CommandSender sender, Player player,
 			int lineNumber, int textStart, String[] args) {
 		if (lineNumber < 1) {
-			Messaging.sendMessage(player, "failure.invalid_line");
+			plugin.messenger.sendMessage(player, "failure.invalid_line");
 		} else {
-			if (plugin.playerStates.get(player) == CommandSignsPlayerState.EDIT_SELECT) {
-				Messaging.sendMessage(player, "failure.must_select");
+			if (plugin.playerStates.get(player) == PlayerState.EDIT_SELECT) {
+				plugin.messenger.sendMessage(player, "failure.must_select");
 			}
-			CommandSignsText text = plugin.playerText.get(player);
+			SignText text = plugin.playerText.get(player);
 			if (text == null) {
-				text = new CommandSignsText(player.getName(), false);
+				text = new SignText(player.getName(), false);
 				plugin.playerText.put(player, text);
 			}
 			String line = StringUtils.join(args, " ", textStart, args.length);
 			if (line.startsWith("/*")
 					&& !plugin.hasPermission(player,
 							"commandsigns.create.super", false)) {
-				Messaging.sendMessage(player, "failure.no_super");
+				plugin.messenger.sendMessage(player, "failure.no_super");
 			}
 			if ((line.startsWith("/^") || line.startsWith("/#"))
 					&& !plugin.hasPermission(player, "commandsigns.create.op",
 							false)) {
-				Messaging.sendMessage(player, "failure.no_op");
+				plugin.messenger.sendMessage(player, "failure.no_op");
 			}
 			text.setLine(lineNumber, line);
-			Messaging.sendRaw(player, "success.line_print", new String[] {
+			plugin.messenger.sendRaw(player, "success.line_print", new String[] {
 					"NUMBER", "LINE" }, new String[] { "" + lineNumber, line });
 		}
 	}
@@ -142,18 +145,18 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean copy(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
-			CommandSignsPlayerState ps = plugin.playerStates.get(player);
-			if (ps == CommandSignsPlayerState.EDIT
-					|| ps == CommandSignsPlayerState.EDIT_SELECT) {
+			PlayerState ps = plugin.playerStates.get(player);
+			if (ps == PlayerState.EDIT
+					|| ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
-			plugin.playerStates.put(player, CommandSignsPlayerState.COPY);
-			Messaging.sendMessage(player, "progress.copy");
+			plugin.playerStates.put(player, PlayerState.COPY);
+			plugin.messenger.sendMessage(player, "progress.copy");
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -161,15 +164,15 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean edit(final CommandSender sender, Player player,
 			String[] args) {
 		if (plugin.hasPermission(sender, "commandsigns.edit", false)) {
-			CommandSignsPlayerState ps = plugin.playerStates.get(player);
-			if (ps == CommandSignsPlayerState.EDIT_SELECT
-					|| ps == CommandSignsPlayerState.EDIT) {
+			PlayerState ps = plugin.playerStates.get(player);
+			if (ps == PlayerState.EDIT_SELECT
+					|| ps == PlayerState.EDIT) {
 				finishEditing(player);
 			} else {
 				plugin.playerStates.put(player,
-						CommandSignsPlayerState.EDIT_SELECT);
+						PlayerState.EDIT_SELECT);
 				plugin.playerText.remove(player);
-				Messaging.sendMessage(player, "progress.select_sign");
+				plugin.messenger.sendMessage(player, "progress.select_sign");
 			}
 		}
 		return true;
@@ -178,22 +181,22 @@ class CommandSignsCommand implements CommandExecutor {
 	public void finishEditing(Player player) {
 		plugin.playerStates.remove(player);
 		plugin.playerText.remove(player);
-		Messaging.sendMessage(player, "success.done_editing");
+		plugin.messenger.sendMessage(player, "success.done_editing");
 	}
 
 	protected boolean insert(final CommandSender sender, Player player,
 			int lineNumber, String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
 			clipboard(sender, player, lineNumber, 2, args);
-			if (plugin.playerStates.get(player) != CommandSignsPlayerState.EDIT) {
-				plugin.playerStates.put(player, CommandSignsPlayerState.INSERT);
-				Messaging.sendMessage(player, "progress.add");
+			if (plugin.playerStates.get(player) != PlayerState.EDIT) {
+				plugin.playerStates.put(player, PlayerState.INSERT);
+				plugin.messenger.sendMessage(player, "progress.add");
 			}
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -248,7 +251,7 @@ class CommandSignsCommand implements CommandExecutor {
 			} else if (command.equals("view")) {
 				return view(sender, player, args);
 			} else {
-				Messaging.sendMessage(sender, "failure.wrong_syntax");
+				plugin.messenger.sendMessage(sender, "failure.wrong_syntax");
 				return true;
 			}
 		}
@@ -258,18 +261,18 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean read(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
-			CommandSignsPlayerState ps = plugin.playerStates.get(player);
-			if (ps == CommandSignsPlayerState.EDIT
-					|| ps == CommandSignsPlayerState.EDIT_SELECT) {
+			PlayerState ps = plugin.playerStates.get(player);
+			if (ps == PlayerState.EDIT
+					|| ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
-			plugin.playerStates.put(player, CommandSignsPlayerState.READ);
-			Messaging.sendMessage(player, "progress.read");
+			plugin.playerStates.put(player, PlayerState.READ);
+			plugin.messenger.sendMessage(player, "progress.read");
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -277,18 +280,18 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean redstone(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.redstone")) {
-			CommandSignsPlayerState ps = plugin.playerStates.get(player);
-			if (ps == CommandSignsPlayerState.EDIT
-					|| ps == CommandSignsPlayerState.EDIT_SELECT) {
+			PlayerState ps = plugin.playerStates.get(player);
+			if (ps == PlayerState.EDIT
+					|| ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
-			plugin.playerStates.put(player, CommandSignsPlayerState.REDSTONE);
-			Messaging.sendMessage(player, "progress.redstone");
+			plugin.playerStates.put(player, PlayerState.REDSTONE);
+			plugin.messenger.sendMessage(player, "progress.redstone");
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -296,14 +299,14 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean reload(final CommandSender sender, Player player,
 			String[] args) {
 		if (plugin.hasPermission(sender, "commandsigns.reload", false)) {
-			Messaging.loadMessages(plugin);
+			plugin.messenger.load();
 			plugin.loadFile();
 			plugin.startMetrics();
 			plugin.setupPermissions();
 			plugin.setupEconomy();
-			Messaging.sendMessage(sender, "success.reloaded");
+			plugin.messenger.sendMessage(sender, "success.reloaded");
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -311,18 +314,18 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean remove(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.remove")) {
-			CommandSignsPlayerState ps = plugin.playerStates.get(player);
-			if (ps == CommandSignsPlayerState.EDIT
-					|| ps == CommandSignsPlayerState.EDIT_SELECT) {
+			PlayerState ps = plugin.playerStates.get(player);
+			if (ps == PlayerState.EDIT
+					|| ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
-			plugin.playerStates.put(player, CommandSignsPlayerState.REMOVE);
-			Messaging.sendMessage(player, "progress.remove");
+			plugin.playerStates.put(player, PlayerState.REMOVE);
+			plugin.messenger.sendMessage(player, "progress.remove");
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -331,7 +334,7 @@ class CommandSignsCommand implements CommandExecutor {
 			String[] args) {
 		if (plugin.hasPermission(sender, "commandsigns.save", false)) {
 			plugin.saveFile();
-			Messaging.sendMessage(sender, "success.saved");
+			plugin.messenger.sendMessage(sender, "success.saved");
 		}
 		return true;
 	}
@@ -339,18 +342,18 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean toggle(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.toggle")) {
-			CommandSignsPlayerState ps = plugin.playerStates.get(player);
-			if (ps == CommandSignsPlayerState.EDIT
-					|| ps == CommandSignsPlayerState.EDIT_SELECT) {
+			PlayerState ps = plugin.playerStates.get(player);
+			if (ps == PlayerState.EDIT
+					|| ps == PlayerState.EDIT_SELECT) {
 				finishEditing(player);
 			}
-			plugin.playerStates.put(player, CommandSignsPlayerState.TOGGLE);
-			Messaging.sendMessage(player, "progress.toggle");
+			plugin.playerStates.put(player, PlayerState.TOGGLE);
+			plugin.messenger.sendMessage(player, "progress.toggle");
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
@@ -360,18 +363,18 @@ class CommandSignsCommand implements CommandExecutor {
 		if (sender.hasPermission("commandsigns.update")) {
 			if (args.length == 2 && args[1].equalsIgnoreCase("force")) {
 				// Force-only. Does no check.
-				Messaging.sendMessage(sender, "update.force");
-				plugin.updateHandler.new Updater(sender).start();
+				plugin.messenger.sendMessage(sender, "update.force");
+				plugin.updateHandler.new UpdaterThread(sender).start();
 			} else {
 				// Preliminary check
-				Messaging.sendMessage(sender, "update.check");
+				plugin.messenger.sendMessage(sender, "update.check");
 				new Thread() {
 
 					@Override
 					public void run() {
 						plugin.updateHandler.new Checker().run();
 						if (plugin.updateHandler.newAvailable) {
-							Messaging
+							plugin.messenger
 									.sendMessage(
 											sender,
 											"update.notify",
@@ -380,7 +383,7 @@ class CommandSignsCommand implements CommandExecutor {
 													.toString() });
 
 						} else {
-							Messaging
+							plugin.messenger
 									.sendMessage(
 											sender,
 											"update.confirm_up_to_date",
@@ -393,20 +396,21 @@ class CommandSignsCommand implements CommandExecutor {
 				}.start();
 
 				// If command was 'update check', stop here. Enough has been
-				// done.
-				if (!(args.length == 2 && args[1].equalsIgnoreCase("check"))) {
+				// done. Same applies for if auto-update is set.
+				if (!((args.length == 2 && args[1].equalsIgnoreCase("check"))
+						|| plugin.config.getBoolean("updater.auto-install") == true)) {
 					if (plugin.updateHandler.newAvailable) {
 						if (!plugin.getUpdateFile().exists()) {
-							Messaging
+							plugin.messenger
 									.sendMessage(
 											sender,
 											"update.start",
 											new String[] { "VERSION" },
 											new String[] { plugin.updateHandler.newestVersion
 													.toString() });
-							plugin.updateHandler.new Updater(sender).start();
+							plugin.updateHandler.new UpdaterThread(sender).start();
 						} else {
-							Messaging.sendMessage(sender,
+							plugin.messenger.sendMessage(sender,
 									"update.already_downloaded");
 						}
 					}
@@ -419,10 +423,10 @@ class CommandSignsCommand implements CommandExecutor {
 	protected boolean view(final CommandSender sender, Player player,
 			String[] args) {
 		if (player == null) {
-			Messaging.sendMessage(sender, "failure.player_only");
+			plugin.messenger.sendMessage(sender, "failure.player_only");
 		}
 		if (plugin.hasPermission(player, "commandsigns.create.regular")) {
-			CommandSignsText text = plugin.playerText.get(player);
+			SignText text = plugin.playerText.get(player);
 			if (text == null) {
 				player.sendMessage("No text in clipboard");
 			} else {
@@ -436,8 +440,9 @@ class CommandSignsCommand implements CommandExecutor {
 			}
 			plugin.playerStates.remove(player);
 		} else {
-			Messaging.sendMessage(player, "failure.no_perms");
+			plugin.messenger.sendMessage(player, "failure.no_perms");
 		}
 		return true;
 	}
+
 }

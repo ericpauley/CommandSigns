@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -21,14 +19,15 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
 import org.bukkit.command.CommandSender;
+import org.zonedabone.commandsigns.CommandSigns;
 
 import com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager;
 
-public class CommandSignsUpdater {
+public class Updater {
 
-	public Version currentVersion, newestVersion;
+	public volatile Version currentVersion, newestVersion;
 
-	public boolean newAvailable = false;
+	public volatile boolean newAvailable = false;
 	
 	public String downloadLocation;
 
@@ -36,11 +35,11 @@ public class CommandSignsUpdater {
 
 	private final String upstream = "https://raw.github.com/zonedabone/CommandSigns/master/";
 
-	public CommandSignsUpdater(CommandSigns plugin) {
+	public Updater(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
 
-	public class AllowAllTrustManager extends X509ExtendedTrustManager {
+	private class AllowAllTrustManager extends X509ExtendedTrustManager {
 
 		@Override
 		public void checkClientTrusted(X509Certificate[] arg0, String arg1)
@@ -73,8 +72,6 @@ public class CommandSignsUpdater {
 		 * @param url
 		 * @return
 		 * @throws IOException
-		 * @throws NoSuchAlgorithmException
-		 * @throws KeyManagementException
 		 */
 		public HttpsURLConnection getHTTPSConnection(URL url) throws IOException {
 			HttpsURLConnection connection;
@@ -123,8 +120,13 @@ public class CommandSignsUpdater {
 				newestVersion = new Version(in.readLine());
 				downloadLocation = in.readLine();
 
-				if (currentVersion.compareTo(newestVersion) < 0)
+				if (currentVersion.compareTo(newestVersion) < 0) {
 					newAvailable = true;
+					
+					// Auto update if set
+					if (plugin.config.getBoolean("updater.auto-install") == true)
+						new UpdaterThread(plugin.getServer().getConsoleSender()).start();
+				}
 			} catch (Exception e) {
 				plugin.getLogger().warning(
 						"Unable to check for updates - " + e.getMessage());
@@ -132,11 +134,11 @@ public class CommandSignsUpdater {
 		}
 	}
 
-	public class Updater extends Thread {
+	public class UpdaterThread extends Thread {
 
 		private CommandSender sender;
 
-		public Updater(CommandSender sender) {
+		public UpdaterThread(CommandSender sender) {
 			this.sender = sender;
 		}
 
@@ -167,7 +169,7 @@ public class CommandSignsUpdater {
 					totalBytesRead += bytesRead;
 				}
 				long endTime = System.currentTimeMillis();
-				Messaging
+				plugin.messenger
 						.sendMessage(
 								sender,
 								"update.finish",
@@ -177,12 +179,14 @@ public class CommandSignsUpdater {
 										"" + ((double) (endTime - startTime)) / 1000 });
 				writer.close();
 				reader.close();
+				
+				newAvailable = false;
 			} catch (MalformedURLException e) {
-				Messaging.sendMessage(sender, "update.fetch_error",
+				plugin.messenger.sendMessage(sender, "update.fetch_error",
 						new String[] { "ERROR" },
 						new String[] { e.getMessage() });
 			} catch (IOException e) {
-				Messaging.sendMessage(sender, "update.fetch_error",
+				plugin.messenger.sendMessage(sender, "update.fetch_error",
 						new String[] { "ERROR" },
 						new String[] { e.getMessage() });
 			}

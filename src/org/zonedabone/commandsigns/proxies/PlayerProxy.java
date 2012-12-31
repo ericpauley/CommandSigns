@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.proxies;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
@@ -53,25 +53,25 @@ import org.bukkit.util.Vector;
  * originator and recipient can be the same player Allows sendMessage() methods
  * to be intercepted if the silent flag is set
  */
-public class CommandSignsPlayerProxy implements Player {
+public class PlayerProxy implements Player {
 
 	private Player originator;
 	private Player recipient;
 	boolean silent;
 
-	public CommandSignsPlayerProxy(Player originator) {
+	public PlayerProxy(Player originator) {
 		this(originator, originator, false);
 	}
 
-	public CommandSignsPlayerProxy(Player originator, boolean silent) {
+	public PlayerProxy(Player originator, boolean silent) {
 		this(originator, originator, silent);
 	}
 
-	public CommandSignsPlayerProxy(Player originator, Player recipient) {
+	public PlayerProxy(Player originator, Player recipient) {
 		this(originator, recipient, false);
 	}
 
-	public CommandSignsPlayerProxy(Player originator, Player recipient,
+	public PlayerProxy(Player originator, Player recipient,
 			boolean silent) {
 		this.originator = originator;
 		this.recipient = recipient;

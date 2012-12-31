@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns;
+package org.zonedabone.commandsigns.thirdparty;
 
 /*
  * Copyright 2011 Tyler Blair. All rights reserved.

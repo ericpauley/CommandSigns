@@ -4,14 +4,16 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.zonedabone.commandsigns.utils.PlayerState;
+import org.zonedabone.commandsigns.utils.SignText;
 
-public class CommandSignsClickHandler {
+public class ClickHandler {
 
 	private Location location;
 	private Player player;
 	private CommandSigns plugin;
 
-	public CommandSignsClickHandler(CommandSigns plugin, Player player,
+	public ClickHandler(CommandSigns plugin, Player player,
 			Block block) {
 		this.plugin = plugin;
 		this.player = player;
@@ -19,32 +21,32 @@ public class CommandSignsClickHandler {
 	}
 
 	public void copySign() {
-		CommandSignsText text = plugin.activeSigns.get(location);
+		SignText text = plugin.activeSigns.get(location);
 		if (text == null) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+			plugin.messenger.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
-		CommandSignsText clone = plugin.activeSigns.get(location).clone(
+		SignText clone = plugin.activeSigns.get(location).clone(
 				player.getName());
 		plugin.playerText.put(player, clone);
 		readSign(true);
-		Messaging.sendMessage(player, "success.copied");
-		plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
+		plugin.messenger.sendMessage(player, "success.copied");
+		plugin.playerStates.put(player, PlayerState.ENABLE);
 	}
 
 	public void createSign(boolean batch) {
 		if (plugin.activeSigns.containsKey(location)) {
-			Messaging.sendMessage(player, "failure.already_enabled");
+			plugin.messenger.sendMessage(player, "failure.already_enabled");
 			return;
 		}
-		CommandSignsText text = plugin.playerText.get(player);
+		SignText text = plugin.playerText.get(player);
 
 		try {
 			text.trim();
 			plugin.activeSigns.put(location, text.clone(player.getName()));
-			Messaging.sendMessage(player, "success.enabled");
+			plugin.messenger.sendMessage(player, "success.enabled");
 		} catch (Exception e) {
-			Messaging.sendMessage(player, "failure.wrong_syntax");
+			plugin.messenger.sendMessage(player, "failure.wrong_syntax");
 		}
 
 		if (!batch) {
@@ -54,23 +56,23 @@ public class CommandSignsClickHandler {
 	}
 
 	public void editSign() {
-		CommandSignsText cst = plugin.activeSigns.get(location);
+		SignText cst = plugin.activeSigns.get(location);
 		if (cst == null) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+			plugin.messenger.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
-		Messaging.sendMessage(player, "progress.edit_started");
+		plugin.messenger.sendMessage(player, "progress.edit_started");
 		plugin.playerText.put(player, cst);
-		plugin.playerStates.put(player, CommandSignsPlayerState.EDIT);
+		plugin.playerStates.put(player, PlayerState.EDIT);
 	}
 
 	public void insert(boolean batch) {
-		CommandSignsText currentText = plugin.activeSigns.get(location);
+		SignText currentText = plugin.activeSigns.get(location);
 		if (currentText == null) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+			plugin.messenger.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
-		CommandSignsText newText = plugin.playerText.get(player);
+		SignText newText = plugin.playerText.get(player);
 
 		// Insert lines from last to first - that way you don't overwrite stuff
 		for (int i = newText.count(); i >= 1; i--) {
@@ -82,7 +84,7 @@ public class CommandSignsClickHandler {
 		}
 		currentText.trim();
 
-		Messaging.sendMessage(player, "success.done_editing");
+		plugin.messenger.sendMessage(player, "success.done_editing");
 		if (!batch) {
 			plugin.playerStates.remove(player);
 			plugin.playerText.remove(player);
@@ -90,7 +92,7 @@ public class CommandSignsClickHandler {
 	}
 
 	public boolean onInteract(Action action) {
-		CommandSignsPlayerState state = plugin.playerStates.get(player);
+		PlayerState state = plugin.playerStates.get(player);
 		if (state != null) {
 			switch (state) {
 			case ENABLE:
@@ -137,26 +139,26 @@ public class CommandSignsClickHandler {
 				redstoneToggle(true);
 				break;
 			default:
-				return new CommandSignExecutor(plugin, player, location, action)
+				return new SignExecutor(plugin, player, location, action)
 						.runLines();
 			}
 			return true;
 		} else {
-			return new CommandSignExecutor(plugin, player, location, action)
+			return new SignExecutor(plugin, player, location, action)
 					.runLines();
 		}
 	}
 
 	public void readSign(boolean batch) {
-		CommandSignsText text = plugin.activeSigns.get(location);
+		SignText text = plugin.activeSigns.get(location);
 		if (text == null) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+			plugin.messenger.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
 		int i = 1;
 		for (String line : text) {
 			if (!line.equals("")) {
-				Messaging.sendRaw(player, "success.line_print", new String[] {
+				plugin.messenger.sendRaw(player, "success.line_print", new String[] {
 						"NUMBER", "LINE" }, new String[] { "" + i, line });
 			}
 			i++;
@@ -167,20 +169,20 @@ public class CommandSignsClickHandler {
 
 	public void redstoneToggle(boolean batch) {
 		if (!plugin.activeSigns.containsKey(location)) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+			plugin.messenger.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
-		CommandSignsText text = plugin.activeSigns.get(location);
+		SignText text = plugin.activeSigns.get(location);
 		plugin.activeSigns.remove(location);
 		boolean enabled = text.isRedstone();
 		if (enabled) {
 			text.setRedstone(false);
 			plugin.activeSigns.put(location, text);
-			Messaging.sendMessage(player, "success.redstone_disabled");
+			plugin.messenger.sendMessage(player, "success.redstone_disabled");
 		} else {
 			text.setRedstone(true);
 			plugin.activeSigns.put(location, text);
-			Messaging.sendMessage(player, "success.redstone_enabled");
+			plugin.messenger.sendMessage(player, "success.redstone_enabled");
 		}
 		if (!batch)
 			plugin.playerStates.remove(player);
@@ -188,15 +190,15 @@ public class CommandSignsClickHandler {
 
 	public void removeSign(boolean batch) {
 		if (!plugin.activeSigns.containsKey(location)) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+			plugin.messenger.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
 		plugin.activeSigns.remove(location);
-		Messaging.sendMessage(player, "success.removed");
+		plugin.messenger.sendMessage(player, "success.removed");
 		if (!batch) {
 			if (plugin.playerText.containsKey(player)) {
-				plugin.playerStates.put(player, CommandSignsPlayerState.ENABLE);
-				Messaging.sendMessage(player, "information.text_in_clipboard");
+				plugin.playerStates.put(player, PlayerState.ENABLE);
+				plugin.messenger.sendMessage(player, "information.text_in_clipboard");
 			} else {
 				plugin.playerStates.remove(player);
 			}
@@ -205,20 +207,20 @@ public class CommandSignsClickHandler {
 
 	public void toggleSign(boolean batch) {
 		if (!plugin.activeSigns.containsKey(location)) {
-			Messaging.sendMessage(player, "failure.not_a_sign");
+			plugin.messenger.sendMessage(player, "failure.not_a_sign");
 			return;
 		}
-		CommandSignsText text = plugin.activeSigns.get(location);
+		SignText text = plugin.activeSigns.get(location);
 		plugin.activeSigns.remove(location);
 		boolean enabled = text.isEnabled();
 		if (enabled) {
 			text.setEnabled(false);
 			plugin.activeSigns.put(location, text);
-			Messaging.sendMessage(player, "success.disabled");
+			plugin.messenger.sendMessage(player, "success.disabled");
 		} else {
 			text.setEnabled(true);
 			plugin.activeSigns.put(location, text);
-			Messaging.sendMessage(player, "success.enabled");
+			plugin.messenger.sendMessage(player, "success.enabled");
 		}
 		if (!batch)
 			plugin.playerStates.remove(player);

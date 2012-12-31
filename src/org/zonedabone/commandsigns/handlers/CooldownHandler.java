@@ -3,12 +3,12 @@ package org.zonedabone.commandsigns.handlers;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
-import org.zonedabone.commandsigns.CommandSignExecutor;
+import org.zonedabone.commandsigns.SignExecutor;
 
 public class CooldownHandler extends Handler {
 
 	@Override
-	public void handle(CommandSignExecutor e, String command, boolean silent,
+	public void handle(SignExecutor e, String command, boolean silent,
 			boolean negate) {
 		if (e.getPlayer() != null && command.startsWith("~")) {
 			int amount = 0;
