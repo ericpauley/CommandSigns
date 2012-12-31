@@ -53,7 +53,11 @@ public abstract class ConfigStore implements Map<String, String> {
 	 * @return
 	 */
 	public boolean getBoolean(Object key) {
-		return Boolean.parseBoolean(this.get(key));
+		try {
+			return Boolean.parseBoolean(this.get(key));
+		} catch (Exception ex) {
+			return false;
+		}
 	}
 	
 	/**
@@ -65,7 +69,7 @@ public abstract class ConfigStore implements Map<String, String> {
 	public int getInt(Object key) {
 		try {
 			return Integer.parseInt(this.get(key));
-		} catch (NumberFormatException ex) {
+		} catch (Exception ex) {
 			return 0;
 		}
 	}
