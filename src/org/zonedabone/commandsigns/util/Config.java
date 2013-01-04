@@ -13,7 +13,7 @@ public class Config extends ConfigStore {
 		Configuration config = YamlLoader.loadResource(plugin, "config.yml");
 
 		for (String k : config.getKeys(true)) {
-			if (config.isString(k)) {
+			if (!config.isConfigurationSection(k)) {
 				this.put(k, config.getString(k));
 			}
 		}

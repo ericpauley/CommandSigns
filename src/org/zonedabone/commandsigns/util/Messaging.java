@@ -23,7 +23,7 @@ public class Messaging extends ConfigStore {
 		Configuration config = YamlLoader.loadResource(plugin, "messages.yml");
 
 		for (String k : config.getKeys(true)) {
-			if (config.isString(k)) {
+			if (!config.isConfigurationSection(k)) {
 				messages.put(k, config.getString(k));
 			}
 		}
