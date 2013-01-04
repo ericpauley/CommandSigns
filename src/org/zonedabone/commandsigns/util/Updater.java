@@ -35,7 +35,7 @@ public class Updater {
 
 	private CommandSigns plugin;
 
-	private final String upstream = "https://raw.github.com/zonedabone/CommandSigns/master/";
+	private final String version = "https://raw.github.com/zonedabone/CommandSigns/master/VERSION";
 
 	public Updater(CommandSigns plugin) {
 		this.plugin = plugin;
@@ -105,7 +105,7 @@ public class Updater {
 				currentVersion = new Version(plugin.getDescription()
 						.getVersion());
 
-				URL url = new URL(upstream + "VERSION");
+				URL url = new URL(version);
 
 				URLConnection connection;
 				if (url.getProtocol() == "HTTPS") {

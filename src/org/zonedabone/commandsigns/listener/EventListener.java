@@ -66,14 +66,13 @@ public class EventListener implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (plugin.hasPermission(event.getPlayer(), "commandsigns.update")) {
-			if (plugin.updateHandler.newAvailable) {
-				if (!plugin.getUpdateFile().exists()) {
-					plugin.messenger.sendMessage(event.getPlayer(),
-							"update.notify", new String[] { "VERSION" },
-							new String[] { plugin.updateHandler.newestVersion
-									.toString() });
-				}
+		if (plugin.hasPermission(event.getPlayer(), "commandsigns.update", false)) {
+			if (plugin.updateHandler.newAvailable
+					&& !plugin.updateHandler.awaitingRestart) {
+				plugin.messenger.sendMessage(event.getPlayer(),
+						"update.notify", new String[] { "VERSION" },
+						new String[] { plugin.updateHandler.newestVersion
+								.toString() });
 			}
 		}
 	}

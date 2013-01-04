@@ -358,39 +358,12 @@ public class CommandListener implements CommandExecutor {
 			} else {
 				// Preliminary check
 				plugin.messenger.sendMessage(sender, "update.check");
-				new Thread() {
+				plugin.updateHandler.new Checker().run();
 
-					@Override
-					public void run() {
-						plugin.updateHandler.new Checker().run();
-						if (plugin.updateHandler.newAvailable) {
-							plugin.messenger
-									.sendMessage(
-											sender,
-											"update.notify",
-											new String[] { "VERSION" },
-											new String[] { plugin.updateHandler.newestVersion
-													.toString() });
-
-						} else {
-							plugin.messenger
-									.sendMessage(
-											sender,
-											"update.confirm_up_to_date",
-											new String[] { "VERSION" },
-											new String[] { plugin.updateHandler.currentVersion
-													.toString() });
-						}
-					}
-
-				}.start();
-
-				// If command was 'update check', stop here. Enough has been
-				// done. Same applies for if auto-update is set.
-				if (!((args.length == 2 && args[1].equalsIgnoreCase("check")) || plugin.config
-						.getBoolean("updater.auto-install") == true)) {
+				// If command wasn't 'update check', proceed and install the update
+				if (!(args.length == 2 && args[1].equalsIgnoreCase("check"))) {
 					if (plugin.updateHandler.newAvailable) {
-						if (!plugin.getUpdateFile().exists()) {
+						if (!plugin.updateHandler.awaitingRestart) {
 							plugin.messenger
 									.sendMessage(
 											sender,
@@ -404,6 +377,21 @@ public class CommandListener implements CommandExecutor {
 							plugin.messenger.sendMessage(sender,
 									"update.already_downloaded");
 						}
+					}
+				} else {
+					// Otherwise, report the newest version
+					if (plugin.updateHandler.newAvailable) {
+						plugin.messenger.sendMessage(sender, "update.notify",
+								new String[] { "VERSION" },
+								new String[] { plugin.updateHandler.newestVersion
+										.toString() });
+
+					} else {
+						plugin.messenger.sendMessage(sender,
+								"update.confirm_up_to_date",
+								new String[] { "VERSION" },
+								new String[] { plugin.updateHandler.currentVersion
+										.toString() });
 					}
 				}
 			}
