@@ -225,7 +225,7 @@ public class CommandSigns extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		updateTask.cancel();
+		if (updateTask != null) updateTask.cancel();
 		saveFile();
 	}
 
