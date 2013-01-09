@@ -27,7 +27,6 @@ public class Messaging extends ConfigStore {
 				messages.put(k, config.getString(k));
 			}
 		}
-		plugin.getLogger().info("Messages file loaded.");
 	}
 
 	public String parseMessage(String messageName) {

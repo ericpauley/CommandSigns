@@ -2,7 +2,6 @@ package org.zonedabone.commandsigns.handler;
 
 import java.util.Map;
 
-import org.bukkit.ChatColor;
 import org.zonedabone.commandsigns.SignExecutor;
 
 public class CooldownHandler extends Handler {
@@ -10,6 +9,7 @@ public class CooldownHandler extends Handler {
 	@Override
 	public void handle(SignExecutor e, String command, boolean silent,
 			boolean negate) {
+		plugin = e.getPlugin();
 		if (e.getPlayer() != null && command.startsWith("~")) {
 			int amount = 0;
 			if (command.length() > 1) {
@@ -39,20 +39,15 @@ public class CooldownHandler extends Handler {
 					// Show error if not silent
 					if (!silent) {
 						if (negate)
-							e.getPlayer().sendMessage(
-									ChatColor.RED
-											+ "You must click again within "
-											+ amount / 1000
-											+ " seconds to use this sign.");
+							plugin.messenger.sendMessage(e.getPlayer(), "restriction.inverse_cooldown", 
+									new String[] { "COOLDOWN" },
+									new String[] { "" + amount / 1000 }
+									);
 						else
-							e.getPlayer()
-									.sendMessage(
-											ChatColor.RED
-													+ "You must wait another "
-													+ Math.round((amount
-															+ latest - System
-															.currentTimeMillis()) / 1000 + 1)
-													+ " seconds before using this sign again.");
+							plugin.messenger.sendMessage(e.getPlayer(), "restriction.inverse_cooldown", 
+									new String[] { "COOLDOWN" },
+									new String[] { "" + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) }
+									);
 					}
 					if (negate) {
 						lastUse.put(e.getPlayer().getName(),
@@ -72,15 +67,9 @@ public class CooldownHandler extends Handler {
 					// Show error if not silent
 					if (!silent) {
 						if (negate)
-							e.getPlayer()
-									.sendMessage(
-											ChatColor.RED
-													+ "You must use this sign before you can use this sign... I'm confused.");
+							plugin.messenger.sendMessage(e.getPlayer(), "restriction.inverse_use_once");
 						else
-							e.getPlayer()
-									.sendMessage(
-											ChatColor.RED
-													+ "You can only use this sign once.");
+							plugin.messenger.sendMessage(e.getPlayer(), "restriction.use_once");
 					}
 					if (negate) {
 						lastUse.put(e.getPlayer().getName(),

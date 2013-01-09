@@ -1,6 +1,5 @@
 package org.zonedabone.commandsigns.handler;
 
-import org.bukkit.ChatColor;
 import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
 
@@ -9,6 +8,7 @@ public class GroupHandler extends Handler {
 	@Override
 	public void handle(SignExecutor e, String command, boolean silent,
 			boolean negate) {
+		plugin = e.getPlugin();
 		if (e.getPlayer() != null && CommandSigns.permission != null
 				&& CommandSigns.permission.isEnabled()
 				&& command.startsWith("@")) {
@@ -23,10 +23,7 @@ public class GroupHandler extends Handler {
 			} else {
 				e.getRestrictions().push(false);
 				if (!silent)
-					e.getPlayer()
-							.sendMessage(
-									ChatColor.RED
-											+ "You are not in the required group to run this command.");
+					plugin.messenger.sendMessage(e.getPlayer(), "restriction.not_permitted");
 			}
 		}
 	}

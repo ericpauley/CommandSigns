@@ -1,14 +1,14 @@
 package org.zonedabone.commandsigns.handler;
 
-import org.bukkit.ChatColor;
-import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.SignExecutor;
 
 public class MoneyHandler extends Handler {
 
 	@Override
 	public void handle(SignExecutor e, String command, boolean silent,
 			boolean negate) {
+		plugin = e.getPlugin();
 		if (e.getPlayer() != null && CommandSigns.economy != null
 				&& CommandSigns.economy.isEnabled() && command.startsWith("$")) {
 			double amount = 0;
@@ -24,12 +24,10 @@ public class MoneyHandler extends Handler {
 			} else {
 				e.getRestrictions().push(false);
 				if (!silent)
-					e.getPlayer()
-							.sendMessage(
-									ChatColor.RED
-											+ "You cannot afford to use this CommandSign. ("
-											+ CommandSigns.economy
-													.format(amount) + ")");
+					plugin.messenger.sendMessage(e.getPlayer(), "restriction.not_enough_money", 
+						new String[] { "MONEY" },
+						new String[] { "" + CommandSigns.economy.format(amount) }
+						);
 			}
 		}
 	}

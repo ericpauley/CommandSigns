@@ -1,4 +1,4 @@
-config-version: 2.3.3
+config-version: 2.3.4
 prefix: "&4[CommandSigns]&f "
 success:
   cleared: "CommandSign text and status cleared."
@@ -42,6 +42,16 @@ failure:
   no_batch: "The mode you are in doesn't support batch processing."
   not_in_mode: "You must type a command before toggling batch mode."
     
+restriction:
+  not_permitted: "This sign isn't allowed to socialise with people like you."
+  bad_random: "You try to hit the sign, but you miss this time. The sign would laugh at you, but it can't laugh. Yet."
+  not_enough_money: "A magical force tries to take money from your pockets, but you don't have {MONEY}. It gives up."
+  cooldown: "The sign is tired! You must wait another {COOLDOWN} seconds before you start abusing it again."
+  inverse_cooldown: "The sign complains that it wasn't ready. Try again within {COOLDOWN} seconds, or it'll fall asleep again."
+  use_once: "The sign has already done its business with you. It doesn't want to do anything more."
+  inverse_use_once: "The sign wants you to use it before... you can use it? This is confusing. Game over: 0 points."
+  
+  
 update:
   prefix: "&e"
   start: "Updating CommandSigns to version &5{VERSION}{PREFIX}..."

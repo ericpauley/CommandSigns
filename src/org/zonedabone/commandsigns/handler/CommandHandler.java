@@ -20,7 +20,7 @@ public class CommandHandler extends Handler {
 			boolean op = false;
 			boolean all = false;
 			Player player = e.getPlayer();
-			CommandSigns plugin = e.getPlugin();
+			plugin = e.getPlugin();
 			if (command.startsWith("/")) {
 				command = command.substring(1);
 				if (command.length() == 0) {

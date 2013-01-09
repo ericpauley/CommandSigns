@@ -17,7 +17,6 @@ public class Config extends ConfigStore {
 				this.put(k, config.getString(k));
 			}
 		}
-		plugin.getLogger().info("Config file loaded.");
 	}
 
 }

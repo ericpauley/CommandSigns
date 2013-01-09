@@ -159,7 +159,7 @@ public class CommandSigns extends JavaPlugin {
 				ex.printStackTrace();
 			}
 		}
-		getLogger().info("Loaded " + activeSigns.size() + " signs.");
+		getLogger().info("Successfully loaded " + activeSigns.size() + " signs.");
 	}
 
 	public void loadOldFile() {
