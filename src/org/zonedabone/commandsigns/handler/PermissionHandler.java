@@ -22,7 +22,8 @@ public class PermissionHandler extends Handler {
 			} else {
 				e.getRestrictions().push(false);
 				if (!silent)
-					plugin.messenger.sendMessage(e.getPlayer(), "restriction.not_permitted");
+					plugin.messenger.sendMessage(e.getPlayer(),
+							"restriction.not_permitted");
 			}
 		}
 	}

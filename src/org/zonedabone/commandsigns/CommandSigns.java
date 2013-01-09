@@ -159,7 +159,8 @@ public class CommandSigns extends JavaPlugin {
 				ex.printStackTrace();
 			}
 		}
-		getLogger().info("Successfully loaded " + activeSigns.size() + " signs.");
+		getLogger().info(
+				"Successfully loaded " + activeSigns.size() + " signs.");
 	}
 
 	public void loadOldFile() {
@@ -225,7 +226,8 @@ public class CommandSigns extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		if (updateTask != null) updateTask.cancel();
+		if (updateTask != null)
+			updateTask.cancel();
 		saveFile();
 	}
 
@@ -236,17 +238,17 @@ public class CommandSigns extends JavaPlugin {
 		getCommand("commandsigns").setExecutor(commandExecutor);
 		pm.registerEvents(listener, this);
 	}
-	
+
 	public void load() {
 		config.load();
 		messenger.load();
 		loadFile();
 		setupPermissions();
 		setupEconomy();
-		
+
 		if (config.getBoolean("updater.auto-check") == true)
 			startUpdateCheck();
-		
+
 		if (config.getBoolean("metrics.enable") == true)
 			startMetrics();
 		else

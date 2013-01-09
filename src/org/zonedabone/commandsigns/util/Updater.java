@@ -28,7 +28,7 @@ public class Updater {
 	public volatile Version currentVersion, newestVersion;
 
 	public volatile boolean newAvailable = false;
-	
+
 	public volatile boolean awaitingRestart = false;
 
 	public String downloadLocation;
@@ -152,7 +152,7 @@ public class Updater {
 				try {
 					long startTime = System.currentTimeMillis();
 					URL url = new URL(downloadLocation);
-	
+
 					URLConnection connection;
 					if (url.getProtocol() == "HTTPS") {
 						connection = new AllowAllTrustManager()
@@ -160,7 +160,7 @@ public class Updater {
 					} else {
 						connection = url.openConnection();
 					}
-	
+
 					InputStream reader = connection.getInputStream();
 					File f = plugin.getUpdateFile();
 					f.getParentFile().mkdirs();
@@ -168,7 +168,7 @@ public class Updater {
 					byte[] buffer = new byte[153600];
 					int totalBytesRead = 0;
 					int bytesRead = 0;
-	
+
 					while ((bytesRead = reader.read(buffer)) > 0) {
 						writer.write(buffer, 0, bytesRead);
 						buffer = new byte[153600];
@@ -178,10 +178,11 @@ public class Updater {
 					plugin.messenger.sendMessage(sender, "update.finish",
 							new String[] { "SIZE", "TIME" }, new String[] {
 									"" + totalBytesRead / 1000,
-									"" + ((double) (endTime - startTime)) / 1000 });
+									"" + ((double) (endTime - startTime))
+											/ 1000 });
 					writer.close();
 					reader.close();
-	
+
 					newAvailable = false;
 					awaitingRestart = true;
 				} catch (MalformedURLException e) {
@@ -194,7 +195,8 @@ public class Updater {
 							new String[] { e.getMessage() });
 				}
 			} else if (awaitingRestart) {
-				plugin.messenger.sendMessage(sender, "update.already_downloaded");
+				plugin.messenger.sendMessage(sender,
+						"update.already_downloaded");
 			} else {
 				plugin.messenger.sendMessage(sender, "update.up_to_date");
 			}

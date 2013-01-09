@@ -360,7 +360,8 @@ public class CommandListener implements CommandExecutor {
 				plugin.messenger.sendMessage(sender, "update.check");
 				plugin.updateHandler.new Checker().run();
 
-				// If command wasn't 'update check', proceed and install the update
+				// If command wasn't 'update check', proceed and install the
+				// update
 				if (!(args.length == 2 && args[1].equalsIgnoreCase("check"))) {
 					if (plugin.updateHandler.newAvailable) {
 						if (!plugin.updateHandler.awaitingRestart) {
@@ -381,17 +382,22 @@ public class CommandListener implements CommandExecutor {
 				} else {
 					// Otherwise, report the newest version
 					if (plugin.updateHandler.newAvailable) {
-						plugin.messenger.sendMessage(sender, "update.notify",
-								new String[] { "VERSION" },
-								new String[] { plugin.updateHandler.newestVersion
-										.toString() });
+						plugin.messenger
+								.sendMessage(
+										sender,
+										"update.notify",
+										new String[] { "VERSION" },
+										new String[] { plugin.updateHandler.newestVersion
+												.toString() });
 
 					} else {
-						plugin.messenger.sendMessage(sender,
-								"update.confirm_up_to_date",
-								new String[] { "VERSION" },
-								new String[] { plugin.updateHandler.currentVersion
-										.toString() });
+						plugin.messenger
+								.sendMessage(
+										sender,
+										"update.confirm_up_to_date",
+										new String[] { "VERSION" },
+										new String[] { plugin.updateHandler.currentVersion
+												.toString() });
 					}
 				}
 			}

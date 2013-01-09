@@ -21,7 +21,8 @@ public class RandomHandler extends Handler {
 			} else {
 				e.getRestrictions().push(false);
 				if (!silent && e.getPlayer() != null)
-					plugin.messenger.sendMessage(e.getPlayer(), "restriction.bad_random");
+					plugin.messenger.sendMessage(e.getPlayer(),
+							"restriction.bad_random");
 			}
 		}
 

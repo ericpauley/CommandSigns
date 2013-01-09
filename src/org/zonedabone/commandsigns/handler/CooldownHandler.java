@@ -39,15 +39,20 @@ public class CooldownHandler extends Handler {
 					// Show error if not silent
 					if (!silent) {
 						if (negate)
-							plugin.messenger.sendMessage(e.getPlayer(), "restriction.inverse_cooldown", 
+							plugin.messenger.sendMessage(e.getPlayer(),
+									"restriction.inverse_cooldown",
 									new String[] { "COOLDOWN" },
-									new String[] { "" + amount / 1000 }
-									);
+									new String[] { "" + amount / 1000 });
 						else
-							plugin.messenger.sendMessage(e.getPlayer(), "restriction.inverse_cooldown", 
-									new String[] { "COOLDOWN" },
-									new String[] { "" + Math.round((amount + latest - System.currentTimeMillis()) / 1000 + 1) }
-									);
+							plugin.messenger
+									.sendMessage(
+											e.getPlayer(),
+											"restriction.inverse_cooldown",
+											new String[] { "COOLDOWN" },
+											new String[] { ""
+													+ Math.round((amount
+															+ latest - System
+															.currentTimeMillis()) / 1000 + 1) });
 					}
 					if (negate) {
 						lastUse.put(e.getPlayer().getName(),
@@ -67,9 +72,11 @@ public class CooldownHandler extends Handler {
 					// Show error if not silent
 					if (!silent) {
 						if (negate)
-							plugin.messenger.sendMessage(e.getPlayer(), "restriction.inverse_use_once");
+							plugin.messenger.sendMessage(e.getPlayer(),
+									"restriction.inverse_use_once");
 						else
-							plugin.messenger.sendMessage(e.getPlayer(), "restriction.use_once");
+							plugin.messenger.sendMessage(e.getPlayer(),
+									"restriction.use_once");
 					}
 					if (negate) {
 						lastUse.put(e.getPlayer().getName(),

@@ -24,10 +24,10 @@ public class MoneyHandler extends Handler {
 			} else {
 				e.getRestrictions().push(false);
 				if (!silent)
-					plugin.messenger.sendMessage(e.getPlayer(), "restriction.not_enough_money", 
-						new String[] { "MONEY" },
-						new String[] { "" + CommandSigns.economy.format(amount) }
-						);
+					plugin.messenger.sendMessage(e.getPlayer(),
+							"restriction.not_enough_money",
+							new String[] { "MONEY" }, new String[] { ""
+									+ CommandSigns.economy.format(amount) });
 			}
 		}
 	}

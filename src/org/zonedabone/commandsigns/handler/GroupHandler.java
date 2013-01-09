@@ -16,7 +16,8 @@ public class GroupHandler extends Handler {
 				&& CommandSigns.permission.isEnabled()
 				&& command.startsWith("@")) {
 			boolean allowed = false;
-			List<String> groups = Arrays.asList(CommandSigns.permission.getPlayerGroups(e.getPlayer()));
+			List<String> groups = Arrays.asList(CommandSigns.permission
+					.getPlayerGroups(e.getPlayer()));
 			for (String s : command.substring(1).split(",")) {
 				allowed = allowed || groups.contains(s);
 			}
@@ -25,7 +26,8 @@ public class GroupHandler extends Handler {
 			} else {
 				e.getRestrictions().push(false);
 				if (!silent)
-					plugin.messenger.sendMessage(e.getPlayer(), "restriction.not_permitted");
+					plugin.messenger.sendMessage(e.getPlayer(),
+							"restriction.not_permitted");
 			}
 		}
 	}
