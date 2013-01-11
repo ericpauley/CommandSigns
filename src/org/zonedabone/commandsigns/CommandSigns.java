@@ -121,7 +121,7 @@ public class CommandSigns extends JavaPlugin {
 				// location is air
 				block = loc.getBlock().getTypeId();
 				if (block == 0)
-					throw new IllegalArgumentException("Location not valid.");
+					throw new IllegalArgumentException("Location not valid: " + loc.toString() + ".");
 
 				boolean redstone = data.getBoolean(key + ".redstone", false);
 				String owner = data.getString(key + ".owner", null);
