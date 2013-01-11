@@ -31,10 +31,10 @@ public class Updater {
 
 	public volatile boolean awaitingRestart = false;
 
-	public String downloadLocation;
-
 	private CommandSigns plugin;
 
+	private String downloadLocation = "http://dev.bukkit.org/media/files/";
+	
 	private final String version = "https://raw.github.com/zonedabone/CommandSigns/master/VERSION";
 
 	public Updater(CommandSigns plugin) {
@@ -116,12 +116,13 @@ public class Updater {
 				}
 
 				/*
-				 * Line 1: Version Line 2: Download URL
+				 * Line 1: Version Line
+				 * Line 2: Random numbers for Bukkit download URL
 				 */
 				BufferedReader in = new BufferedReader(new InputStreamReader(
 						connection.getInputStream()));
 				newestVersion = new Version(in.readLine());
-				downloadLocation = in.readLine();
+				downloadLocation = downloadLocation + in.readLine() + "/CommandSigns.jar";
 
 				if (currentVersion.compareTo(newestVersion) < 0) {
 					newAvailable = true;
