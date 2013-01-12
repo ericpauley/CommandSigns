@@ -15,7 +15,7 @@ public class PermissionHandler extends Handler {
 			boolean allowed = false;
 			for (String s : command.substring(1).split(",")) {
 				allowed = allowed
-						|| e.getPlugin().hasPermission(e.getPlayer(), s);
+						|| e.getPlugin().hasPermission(e.getPlayer(), s, false);
 			}
 			if (allowed ^ negate) {
 				e.getRestrictions().push(true);
