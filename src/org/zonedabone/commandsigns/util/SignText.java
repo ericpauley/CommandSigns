@@ -20,6 +20,10 @@ public class SignText implements Iterable<String> {
 		this.redstone = redstone;
 	}
 
+	public void addLine(String string) {
+		text.add(string);
+	}
+
 	public SignText clone(String owner) {
 		SignText cst = new SignText(owner, redstone);
 		for (String s : text) {
@@ -42,22 +46,12 @@ public class SignText implements Iterable<String> {
 		return text.get(index - 1);
 	}
 
-	public void addLine(String string) {
-		text.add(string);
-	}
-
-	public void removeLine(int index) {
-		if (index >= 1 && index <= text.size()) {
-			text.remove(index - 1);
-		}
+	public String getOwner() {
+		return owner;
 	}
 
 	public List<String> getText() {
 		return this.text;
-	}
-
-	public String getOwner() {
-		return owner;
 	}
 
 	public Map<String, Long> getTimeouts() {
@@ -70,6 +64,17 @@ public class SignText implements Iterable<String> {
 
 	public boolean isRedstone() {
 		return redstone;
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		return text.iterator();
+	}
+
+	public void removeLine(int index) {
+		if (index >= 1 && index <= text.size()) {
+			text.remove(index - 1);
+		}
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -87,15 +92,6 @@ public class SignText implements Iterable<String> {
 		this.redstone = redstone;
 	}
 
-	public void trim() {
-		int blank;
-		while ((blank = text.lastIndexOf("")) >= 0)
-			text.remove(blank);
-		for (String line : text) {
-			line.trim();
-		}
-	}
-
 	@Override
 	public String toString() {
 		String string = "";
@@ -103,8 +99,12 @@ public class SignText implements Iterable<String> {
 		return string;
 	}
 
-	@Override
-	public Iterator<String> iterator() {
-		return text.iterator();
+	public void trim() {
+		int blank;
+		while ((blank = text.lastIndexOf("")) >= 0)
+			text.remove(blank);
+		for (String line : text) {
+			line.trim();
+		}
 	}
 }

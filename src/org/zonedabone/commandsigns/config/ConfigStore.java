@@ -16,11 +16,6 @@ public abstract class ConfigStore implements Map<String, String> {
 		this.plugin = plugin;
 	}
 
-	/**
-	 * Loads the configuration file into memory
-	 */
-	public abstract void load();
-
 	@Override
 	public void clear() {
 		config.clear();
@@ -83,6 +78,11 @@ public abstract class ConfigStore implements Map<String, String> {
 	public Set<String> keySet() {
 		return config.keySet();
 	}
+
+	/**
+	 * Loads the configuration file into memory
+	 */
+	public abstract void load();
 
 	@Override
 	public String put(String key, String value) {

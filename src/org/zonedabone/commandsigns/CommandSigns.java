@@ -27,7 +27,6 @@ import org.zonedabone.commandsigns.util.SignLoader;
 import org.zonedabone.commandsigns.util.SignText;
 import org.zonedabone.commandsigns.util.Updater;
 
-
 public class CommandSigns extends JavaPlugin {
 
 	// Listeners
@@ -76,21 +75,6 @@ public class CommandSigns extends JavaPlugin {
 		return perm;
 	}
 
-	@Override
-	public void onDisable() {
-		if (updateTask != null)
-			updateTask.cancel();
-		loader.saveFile();
-	}
-
-	@Override
-	public void onEnable() {
-		load();
-		PluginManager pm = getServer().getPluginManager();
-		getCommand("commandsigns").setExecutor(commandExecutor);
-		pm.registerEvents(listener, this);
-	}
-
 	public void load() {
 		config.load();
 		messenger.load();
@@ -105,6 +89,21 @@ public class CommandSigns extends JavaPlugin {
 			startMetrics();
 		else
 			getLogger().info(messenger.parseRaw("metrics.opt_out"));
+	}
+
+	@Override
+	public void onDisable() {
+		if (updateTask != null)
+			updateTask.cancel();
+		loader.saveFile();
+	}
+
+	@Override
+	public void onEnable() {
+		load();
+		PluginManager pm = getServer().getPluginManager();
+		getCommand("commandsigns").setExecutor(commandExecutor);
+		pm.registerEvents(listener, this);
 	}
 
 	public boolean setupEconomy() {

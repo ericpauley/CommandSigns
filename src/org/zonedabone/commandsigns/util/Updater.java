@@ -25,22 +25,6 @@ import com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager;
 
 public class Updater {
 
-	public volatile Version currentVersion, newestVersion;
-
-	public volatile boolean newAvailable = false;
-
-	public volatile boolean awaitingRestart = false;
-
-	private CommandSigns plugin;
-
-	private String downloadLocation = "http://dev.bukkit.org/media/files/";
-
-	private final String version = "https://raw.github.com/zonedabone/CommandSigns/master/VERSION";
-
-	public Updater(CommandSigns plugin) {
-		this.plugin = plugin;
-	}
-
 	private class AllowAllTrustManager extends X509ExtendedTrustManager {
 
 		@Override
@@ -283,5 +267,21 @@ public class Updater {
 			}
 			return versionString;
 		}
+	}
+
+	public volatile Version currentVersion, newestVersion;
+
+	public volatile boolean newAvailable = false;
+
+	public volatile boolean awaitingRestart = false;
+
+	private CommandSigns plugin;
+
+	private String downloadLocation = "http://dev.bukkit.org/media/files/";
+
+	private final String version = "https://raw.github.com/zonedabone/CommandSigns/master/VERSION";
+
+	public Updater(CommandSigns plugin) {
+		this.plugin = plugin;
 	}
 }

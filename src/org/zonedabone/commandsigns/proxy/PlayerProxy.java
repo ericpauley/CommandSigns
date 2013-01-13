@@ -168,6 +168,11 @@ public class PlayerProxy implements Player {
 		return originator.getBedSpawnLocation();
 	}
 
+	@Override
+	public boolean getCanPickupItems() {
+		return originator.getCanPickupItems();
+	}
+
 	public Location getCompassTarget() {
 		return originator.getCompassTarget();
 	}
@@ -186,6 +191,11 @@ public class PlayerProxy implements Player {
 
 	public int getEntityId() {
 		return originator.getEntityId();
+	}
+
+	@Override
+	public EntityEquipment getEquipment() {
+		return originator.getEquipment();
 	}
 
 	public float getExhaustion() {
@@ -289,6 +299,11 @@ public class PlayerProxy implements Player {
 		return originator.getLocation();
 	}
 
+	@Override
+	public Location getLocation(Location arg0) {
+		return originator.getLocation(arg0);
+	}
+
 	public int getMaxFireTicks() {
 		return originator.getMaxFireTicks();
 	}
@@ -349,6 +364,11 @@ public class PlayerProxy implements Player {
 		return originator.getRemainingAir();
 	}
 
+	@Override
+	public boolean getRemoveWhenFarAway() {
+		return originator.getRemoveWhenFarAway();
+	}
+
 	public float getSaturation() {
 		return originator.getSaturation();
 	}
@@ -399,6 +419,11 @@ public class PlayerProxy implements Player {
 
 	public void giveExp(int amount) {
 		originator.giveExp(amount);
+	}
+
+	@Override
+	public void giveExpLevels(int arg0) {
+		originator.giveExpLevels(arg0);
 	}
 
 	public boolean hasLineOfSight(Entity arg0) {
@@ -603,6 +628,11 @@ public class PlayerProxy implements Player {
 		originator.removePotionEffect(type);
 	}
 
+	@Override
+	public void resetMaxHealth() {
+		originator.resetMaxHealth();
+	}
+
 	public void resetPlayerTime() {
 		originator.resetPlayerTime();
 	}
@@ -661,6 +691,16 @@ public class PlayerProxy implements Player {
 
 	public void setBedSpawnLocation(Location location) {
 		originator.setBedSpawnLocation(location);
+	}
+
+	@Override
+	public void setBedSpawnLocation(Location arg0, boolean arg1) {
+		originator.setBedSpawnLocation(arg0, arg1);
+	}
+
+	@Override
+	public void setCanPickupItems(boolean arg0) {
+		originator.setCanPickupItems(arg0);
 	}
 
 	public void setCompassTarget(Location loc) {
@@ -727,6 +767,11 @@ public class PlayerProxy implements Player {
 		originator.setLevel(level);
 	}
 
+	@Override
+	public void setMaxHealth(int arg0) {
+		originator.setMaxHealth(arg0);
+	}
+
 	public void setMaximumAir(int ticks) {
 		originator.setMaximumAir(ticks);
 	}
@@ -763,6 +808,11 @@ public class PlayerProxy implements Player {
 		originator.setRemainingAir(ticks);
 	}
 
+	@Override
+	public void setRemoveWhenFarAway(boolean arg0) {
+		originator.setRemoveWhenFarAway(arg0);
+	}
+
 	public void setSaturation(float value) {
 		originator.setSaturation(value);
 	}
@@ -781,6 +831,11 @@ public class PlayerProxy implements Player {
 
 	public void setSprinting(boolean sprinting) {
 		originator.setSprinting(sprinting);
+	}
+
+	@Override
+	public void setTexturePack(String arg0) {
+		originator.setTexturePack(arg0);
 	}
 
 	public void setTicksLived(int value) {
@@ -845,61 +900,6 @@ public class PlayerProxy implements Player {
 	@SuppressWarnings("deprecation")
 	public void updateInventory() {
 		originator.updateInventory();
-	}
-
-	@Override
-	public void giveExpLevels(int arg0) {
-		originator.giveExpLevels(arg0);
-	}
-
-	@Override
-	public void setBedSpawnLocation(Location arg0, boolean arg1) {
-		originator.setBedSpawnLocation(arg0, arg1);
-	}
-
-	@Override
-	public boolean getCanPickupItems() {
-		return originator.getCanPickupItems();
-	}
-
-	@Override
-	public EntityEquipment getEquipment() {
-		return originator.getEquipment();
-	}
-
-	@Override
-	public boolean getRemoveWhenFarAway() {
-		return originator.getRemoveWhenFarAway();
-	}
-
-	@Override
-	public void setCanPickupItems(boolean arg0) {
-		originator.setCanPickupItems(arg0);
-	}
-
-	@Override
-	public void setRemoveWhenFarAway(boolean arg0) {
-		originator.setRemoveWhenFarAway(arg0);
-	}
-
-	@Override
-	public Location getLocation(Location arg0) {
-		return originator.getLocation(arg0);
-	}
-
-	@Override
-	public void resetMaxHealth() {
-		originator.resetMaxHealth();
-	}
-
-	@Override
-	public void setMaxHealth(int arg0) {
-		originator.setMaxHealth(arg0);
-	}
-
-	@Override
-	public void setTexturePack(String arg0) {
-		originator.setTexturePack(arg0);
 	}
 
 }

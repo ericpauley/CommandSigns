@@ -18,13 +18,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.zonedabone.commandsigns.CommandSigns;
 
 public class SignLoader {
-	
+
 	CommandSigns plugin;
-	
+
 	public SignLoader(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	public void loadFile() {
 		plugin.activeSigns.clear();
 		if (new File(plugin.getDataFolder(), "signs.dat").exists()) {
@@ -166,7 +166,7 @@ public class SignLoader {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public void saveFile() {
 		FileConfiguration config = new YamlConfiguration();
 		ConfigurationSection data = config.createSection("signs");
@@ -192,7 +192,8 @@ public class SignLoader {
 			 */
 			try {
 				config.save(new File(plugin.getDataFolder(), "signs.yml"));
-				plugin.getLogger().info(plugin.activeSigns.size() + " signs saved");
+				plugin.getLogger().info(
+						plugin.activeSigns.size() + " signs saved");
 			} catch (IOException e) {
 				plugin.getLogger().severe("Failed to save CommandSigns");
 				e.printStackTrace();
@@ -217,7 +218,8 @@ public class SignLoader {
 			int signNumber = 0;
 
 			writer.write("");
-			for (Map.Entry<Location, SignText> entry : plugin.activeSigns.entrySet()) {
+			for (Map.Entry<Location, SignText> entry : plugin.activeSigns
+					.entrySet()) {
 				try {
 					signNumber++;
 					entry.getValue().trim();
