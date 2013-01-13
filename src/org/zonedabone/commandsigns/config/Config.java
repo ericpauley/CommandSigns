@@ -1,7 +1,8 @@
-package org.zonedabone.commandsigns.util;
+package org.zonedabone.commandsigns.config;
 
 import org.bukkit.configuration.Configuration;
 import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.util.YamlLoader;
 
 public class Config extends ConfigStore {
 

@@ -12,8 +12,8 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.zonedabone.commandsigns.ClickHandler;
-import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.util.SignText;
 
 public class EventListener implements Listener {

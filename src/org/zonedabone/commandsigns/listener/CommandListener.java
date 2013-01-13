@@ -323,7 +323,7 @@ public class CommandListener implements CommandExecutor {
 	protected boolean save(final CommandSender sender, Player player,
 			String[] args) {
 		if (plugin.hasPermission(sender, "commandsigns.save", false)) {
-			plugin.saveFile();
+			plugin.loader.saveFile();
 			plugin.messenger.sendMessage(sender, "success.saved");
 		}
 		return true;

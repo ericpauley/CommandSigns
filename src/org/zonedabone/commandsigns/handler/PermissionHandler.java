@@ -1,7 +1,7 @@
 package org.zonedabone.commandsigns.handler;
 
-import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.SignExecutor;
 
 public class PermissionHandler extends Handler {
 

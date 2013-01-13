@@ -1,10 +1,10 @@
 package org.zonedabone.commandsigns.handler;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 
-import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.SignExecutor;
 
 public class GroupHandler extends Handler {
 

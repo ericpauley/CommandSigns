@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.util;
+package org.zonedabone.commandsigns.config;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.util.YamlLoader;
 
 public class Messaging extends ConfigStore {
 

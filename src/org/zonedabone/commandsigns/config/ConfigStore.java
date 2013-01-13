@@ -1,4 +1,4 @@
-package org.zonedabone.commandsigns.util;
+package org.zonedabone.commandsigns.config;
 
 import java.util.Collection;
 import java.util.Map;

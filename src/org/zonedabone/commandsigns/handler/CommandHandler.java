@@ -6,8 +6,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.PluginManager;
-import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.CommandSigns;
+import org.zonedabone.commandsigns.SignExecutor;
 import org.zonedabone.commandsigns.proxy.CommandSenderProxy;
 import org.zonedabone.commandsigns.proxy.PlayerProxy;
 
