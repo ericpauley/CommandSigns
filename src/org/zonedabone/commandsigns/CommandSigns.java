@@ -161,7 +161,7 @@ public class CommandSigns extends JavaPlugin {
 			}
 		}
 		getLogger().info(
-				"Successfully loaded " + activeSigns.size() + " signs.");
+				"Successfully loaded " + activeSigns.size() + " signs");
 	}
 
 	public void loadOldFile() {
@@ -281,6 +281,7 @@ public class CommandSigns extends JavaPlugin {
 			 */
 			try {
 				config.save(new File(getDataFolder(), "signs.yml"));
+				getLogger().info(activeSigns.size() + " signs saved");
 			} catch (IOException e) {
 				getLogger().severe("Failed to save CommandSigns");
 				e.printStackTrace();
