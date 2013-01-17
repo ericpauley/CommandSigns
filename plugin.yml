@@ -1,10 +1,11 @@
 name: CommandSigns
 main: org.zonedabone.commandsigns.CommandSigns
 authors: [zonedabone, CJxD, HansAnderson]
-version: 1.8.8.2
+version: 1.9.0
 description: >
              Add commands to signs.
 depend: [Vault]
+softdepend: [Multiverse-Core]
 dev-url: http://dev.bukkit.org/server-mods/command-signs/
 commands:
   commandsigns:
