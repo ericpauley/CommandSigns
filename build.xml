@@ -19,7 +19,7 @@
 		<mkdir dir="${bin}" />
 	</target>
 	<target name="build" depends="init" description="compile the source">
-		<javac srcdir="${src}" destdir="${bin}" debug="on" debuglevel="lines,vars,source" includeantruntime="false" encoding="Cp1252">
+		<javac source="1.6" target="1.6" srcdir="${src}" destdir="${bin}" debug="on" debuglevel="lines,vars,source" includeantruntime="false" encoding="Cp1252">
 			<classpath>
 				<pathelement path="${lib}" />
 				<pathelement location="${lib}/Bukkit.jar" />
@@ -37,5 +37,4 @@
 	<target name="clean" description="clean up">
 		<delete dir="${bin}" />
 	</target>
-
 </project>
