@@ -192,12 +192,12 @@ public class SignLoader {
 			 */
 			try {
 				config.save(new File(plugin.getDataFolder(), "signs.yml"));
-				plugin.getLogger().info(
-						plugin.activeSigns.size() + " signs saved");
 			} catch (IOException e) {
 				plugin.getLogger().severe("Failed to save CommandSigns");
 				e.printStackTrace();
 			}
+			plugin.getLogger().info(plugin.activeSigns.size()
+					+ " signs saved");
 		}
 	}
 
