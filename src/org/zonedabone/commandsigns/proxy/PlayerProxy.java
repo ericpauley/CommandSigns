@@ -19,6 +19,7 @@ import org.bukkit.Note;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.Statistic;
+import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.conversations.Conversation;
@@ -862,7 +863,7 @@ public class PlayerProxy implements Player {
 		return originator.setWindowProperty(prop, value);
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public Arrow shootArrow() {
 		return originator.shootArrow();
 	}
@@ -887,19 +888,60 @@ public class PlayerProxy implements Player {
 		return originator.teleport(location, cause);
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public Egg throwEgg() {
 		return originator.throwEgg();
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public Snowball throwSnowball() {
 		return originator.throwSnowball();
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public void updateInventory() {
 		originator.updateInventory();
 	}
+
+    @Override
+    public String getCustomName() {
+        return originator.getCustomName();
+    }
+
+    @Override
+    public boolean isCustomNameVisible() {
+        return originator.isCustomNameVisible();
+    }
+
+    @Override
+    public void setCustomName(String arg0) {
+        originator.setCustomName(arg0);
+    }
+
+    @Override
+    public void setCustomNameVisible(boolean arg0) {
+        originator.setCustomNameVisible(arg0);
+    }
+
+    @Override
+    public WeatherType getPlayerWeather() {
+        return originator.getPlayerWeather();
+    }
+
+    @Override
+    @Deprecated
+    public boolean isOnGround() {
+        return originator.isOnGround();
+    }
+
+    @Override
+    public void resetPlayerWeather() {
+        originator.resetPlayerWeather();
+    }
+
+    @Override
+    public void setPlayerWeather(WeatherType arg0) {
+        originator.setPlayerWeather(arg0);
+    }
 
 }
