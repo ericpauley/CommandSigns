@@ -34,6 +34,9 @@
 			<zipfileset dir="." includes="LICENSE.txt" />
 		</jar>
 	</target>
+	<target name="test" description="test">
+		<antcall target="build" />
+	</target>
 	<target name="clean" description="clean up">
 		<delete dir="${bin}" />
 	</target>
