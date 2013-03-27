@@ -196,9 +196,9 @@ public class SignLoader {
 				plugin.getLogger().severe("Failed to save CommandSigns");
 				e.printStackTrace();
 			}
-			plugin.getLogger().info(plugin.activeSigns.size()
-					+ " signs saved");
 		}
+		plugin.getLogger().info(plugin.activeSigns.size()
+                + " signs saved");
 	}
 
 	public void saveOldFile() {

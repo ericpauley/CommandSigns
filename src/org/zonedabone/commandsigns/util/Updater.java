@@ -25,6 +25,23 @@ import com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager;
 
 public class Updater {
 
+    public volatile Version currentVersion, newestVersion;
+
+    public volatile boolean newAvailable = false;
+
+    public volatile boolean awaitingRestart = false;
+
+    private CommandSigns plugin;
+
+    private final String downloadLocation = "http://dev.bukkit.org/media/files/";
+    private URL downloadUrl;
+
+    private final String version = "https://raw.github.com/zonedabone/CommandSigns/master/VERSION";
+
+    public Updater(CommandSigns plugin) {
+        this.plugin = plugin;
+    }
+    
 	private class AllowAllTrustManager extends X509ExtendedTrustManager {
 
 		@Override
@@ -106,8 +123,8 @@ public class Updater {
 				BufferedReader in = new BufferedReader(new InputStreamReader(
 						connection.getInputStream()));
 				newestVersion = new Version(in.readLine());
-				downloadLocation = downloadLocation + in.readLine()
-						+ "/CommandSigns.jar";
+				downloadUrl = new URL(downloadLocation + in.readLine()
+						+ "/CommandSigns.jar");
 
 				if (currentVersion.compareTo(newestVersion) < 0) {
 					newAvailable = true;
@@ -137,14 +154,13 @@ public class Updater {
 			if (newAvailable && !awaitingRestart) {
 				try {
 					long startTime = System.currentTimeMillis();
-					URL url = new URL(downloadLocation);
 
 					URLConnection connection;
-					if (url.getProtocol() == "HTTPS") {
+					if (downloadUrl.getProtocol() == "HTTPS") {
 						connection = new AllowAllTrustManager()
-								.getHTTPSConnection(url);
+								.getHTTPSConnection(downloadUrl);
 					} else {
-						connection = url.openConnection();
+						connection = downloadUrl.openConnection();
 					}
 
 					InputStream reader = connection.getInputStream();
@@ -267,21 +283,5 @@ public class Updater {
 			}
 			return versionString;
 		}
-	}
-
-	public volatile Version currentVersion, newestVersion;
-
-	public volatile boolean newAvailable = false;
-
-	public volatile boolean awaitingRestart = false;
-
-	private CommandSigns plugin;
-
-	private String downloadLocation = "http://dev.bukkit.org/media/files/";
-
-	private final String version = "https://raw.github.com/zonedabone/CommandSigns/master/VERSION";
-
-	public Updater(CommandSigns plugin) {
-		this.plugin = plugin;
 	}
 }
