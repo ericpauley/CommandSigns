@@ -22,7 +22,7 @@
 		<javac source="1.6" target="1.6" srcdir="${src}" destdir="${bin}" debug="on" debuglevel="lines,vars,source" includeantruntime="false" encoding="Cp1252">
 			<classpath>
 				<pathelement path="${lib}" />
-				<pathelement location="${lib}/Bukkit.jar" />
+				<pathelement location="${lib}/Tekkit.jar" />
 				<pathelement location="${lib}/Vault.jar" />
 			</classpath>
 		</javac>
