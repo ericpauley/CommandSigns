@@ -604,7 +604,7 @@ public class Metrics {
 
 			// Begin hitting the server with glorious data
 			taskId = plugin.getServer().getScheduler()
-					.runTaskTimerAsynchronously(plugin, new Runnable() {
+					.scheduleAsyncRepeatingTask(plugin, new Runnable() {
 
 						private boolean firstPost = true;
 
@@ -643,7 +643,7 @@ public class Metrics {
 										"[Metrics] {0}", e.getMessage());
 							}
 						}
-					}, 0, PING_INTERVAL * 1200).getTaskId();
+					}, 0, PING_INTERVAL * 1200);
 
 			return true;
 		}

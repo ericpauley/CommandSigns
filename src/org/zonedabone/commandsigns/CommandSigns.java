@@ -14,7 +14,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.zonedabone.commandsigns.config.Config;
 import org.zonedabone.commandsigns.config.Messaging;
 import org.zonedabone.commandsigns.listener.CommandListener;
@@ -50,7 +49,7 @@ public class CommandSigns extends JavaPlugin {
 	public Updater updateHandler = new Updater(this);
 
 	// Class variables
-	private BukkitTask updateTask;
+	private int updateTask;
 
 	public File getUpdateFile() {
 		return new File(getServer().getUpdateFolderFile().getAbsoluteFile(),
@@ -93,8 +92,7 @@ public class CommandSigns extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		if (updateTask != null)
-			updateTask.cancel();
+		getServer().getScheduler().cancelTask(updateTask);
 		loader.saveFile();
 	}
 
@@ -203,7 +201,7 @@ public class CommandSigns extends JavaPlugin {
 
 	public void startUpdateCheck() {
 		Runnable checker = updateHandler.new Checker();
-		updateTask = getServer().getScheduler().runTaskTimer(this, checker, 0,
+		updateTask = getServer().getScheduler().scheduleAsyncRepeatingTask(this, checker, 0,
 				1728000L);
 	}
 }

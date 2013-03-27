@@ -17,9 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.Server;
-import org.bukkit.Sound;
 import org.bukkit.Statistic;
-import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.conversations.Conversation;
@@ -33,7 +31,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.InventoryView.Property;
@@ -169,11 +166,6 @@ public class PlayerProxy implements Player {
 		return originator.getBedSpawnLocation();
 	}
 
-	@Override
-	public boolean getCanPickupItems() {
-		return originator.getCanPickupItems();
-	}
-
 	public Location getCompassTarget() {
 		return originator.getCompassTarget();
 	}
@@ -186,17 +178,8 @@ public class PlayerProxy implements Player {
 		return originator.getEffectivePermissions();
 	}
 
-	public Inventory getEnderChest() {
-		return originator.getEnderChest();
-	}
-
 	public int getEntityId() {
 		return originator.getEntityId();
-	}
-
-	@Override
-	public EntityEquipment getEquipment() {
-		return originator.getEquipment();
 	}
 
 	public float getExhaustion() {
@@ -205,10 +188,6 @@ public class PlayerProxy implements Player {
 
 	public float getExp() {
 		return originator.getExp();
-	}
-
-	public int getExpToLevel() {
-		return originator.getExpToLevel();
 	}
 
 	public double getEyeHeight() {
@@ -233,10 +212,6 @@ public class PlayerProxy implements Player {
 
 	public long getFirstPlayed() {
 		return originator.getFirstPlayed();
-	}
-
-	public float getFlySpeed() {
-		return originator.getFlySpeed();
 	}
 
 	public int getFoodLevel() {
@@ -300,11 +275,6 @@ public class PlayerProxy implements Player {
 		return originator.getLocation();
 	}
 
-	@Override
-	public Location getLocation(Location arg0) {
-		return originator.getLocation(arg0);
-	}
-
 	public int getMaxFireTicks() {
 		return originator.getMaxFireTicks();
 	}
@@ -365,11 +335,6 @@ public class PlayerProxy implements Player {
 		return originator.getRemainingAir();
 	}
 
-	@Override
-	public boolean getRemoveWhenFarAway() {
-		return originator.getRemoveWhenFarAway();
-	}
-
 	public float getSaturation() {
 		return originator.getSaturation();
 	}
@@ -410,21 +375,12 @@ public class PlayerProxy implements Player {
 		return originator.getVelocity();
 	}
 
-	public float getWalkSpeed() {
-		return originator.getWalkSpeed();
-	}
-
 	public World getWorld() {
 		return originator.getWorld();
 	}
 
 	public void giveExp(int amount) {
 		originator.giveExp(amount);
-	}
-
-	@Override
-	public void giveExpLevels(int arg0) {
-		originator.giveExpLevels(arg0);
 	}
 
 	public boolean hasLineOfSight(Entity arg0) {
@@ -540,10 +496,6 @@ public class PlayerProxy implements Player {
 		return originator.isSprinting();
 	}
 
-	public boolean isValid() {
-		return originator.isValid();
-	}
-
 	public boolean isWhitelisted() {
 		return originator.isWhitelisted();
 	}
@@ -605,10 +557,6 @@ public class PlayerProxy implements Player {
 		originator.playNote(loc, instrument, note);
 	}
 
-	public void playSound(Location arg0, Sound arg1, float arg2, float arg3) {
-		originator.playSound(arg0, arg1, arg2, arg3);
-	}
-
 	public void recalculatePermissions() {
 		originator.recalculatePermissions();
 	}
@@ -627,11 +575,6 @@ public class PlayerProxy implements Player {
 
 	public void removePotionEffect(PotionEffectType type) {
 		originator.removePotionEffect(type);
-	}
-
-	@Override
-	public void resetMaxHealth() {
-		originator.resetMaxHealth();
 	}
 
 	public void resetPlayerTime() {
@@ -694,16 +637,6 @@ public class PlayerProxy implements Player {
 		originator.setBedSpawnLocation(location);
 	}
 
-	@Override
-	public void setBedSpawnLocation(Location arg0, boolean arg1) {
-		originator.setBedSpawnLocation(arg0, arg1);
-	}
-
-	@Override
-	public void setCanPickupItems(boolean arg0) {
-		originator.setCanPickupItems(arg0);
-	}
-
 	public void setCompassTarget(Location loc) {
 		originator.setCompassTarget(loc);
 	}
@@ -730,10 +663,6 @@ public class PlayerProxy implements Player {
 
 	public void setFlying(boolean value) {
 		originator.setFlying(value);
-	}
-
-	public void setFlySpeed(float arg0) throws IllegalArgumentException {
-		originator.setFlySpeed(arg0);
 	}
 
 	public void setFoodLevel(int value) {
@@ -766,11 +695,6 @@ public class PlayerProxy implements Player {
 
 	public void setLevel(int level) {
 		originator.setLevel(level);
-	}
-
-	@Override
-	public void setMaxHealth(int arg0) {
-		originator.setMaxHealth(arg0);
 	}
 
 	public void setMaximumAir(int ticks) {
@@ -809,11 +733,6 @@ public class PlayerProxy implements Player {
 		originator.setRemainingAir(ticks);
 	}
 
-	@Override
-	public void setRemoveWhenFarAway(boolean arg0) {
-		originator.setRemoveWhenFarAway(arg0);
-	}
-
 	public void setSaturation(float value) {
 		originator.setSaturation(value);
 	}
@@ -834,11 +753,6 @@ public class PlayerProxy implements Player {
 		originator.setSprinting(sprinting);
 	}
 
-	@Override
-	public void setTexturePack(String arg0) {
-		originator.setTexturePack(arg0);
-	}
-
 	public void setTicksLived(int value) {
 		originator.setTicksLived(value);
 	}
@@ -849,10 +763,6 @@ public class PlayerProxy implements Player {
 
 	public void setVelocity(Vector velocity) {
 		originator.setVelocity(velocity);
-	}
-
-	public void setWalkSpeed(float arg0) throws IllegalArgumentException {
-		originator.setWalkSpeed(arg0);
 	}
 
 	public void setWhitelisted(boolean value) {
@@ -902,46 +812,4 @@ public class PlayerProxy implements Player {
 	public void updateInventory() {
 		originator.updateInventory();
 	}
-
-    @Override
-    public String getCustomName() {
-        return originator.getCustomName();
-    }
-
-    @Override
-    public boolean isCustomNameVisible() {
-        return originator.isCustomNameVisible();
-    }
-
-    @Override
-    public void setCustomName(String arg0) {
-        originator.setCustomName(arg0);
-    }
-
-    @Override
-    public void setCustomNameVisible(boolean arg0) {
-        originator.setCustomNameVisible(arg0);
-    }
-
-    @Override
-    public WeatherType getPlayerWeather() {
-        return originator.getPlayerWeather();
-    }
-
-    @Override
-    @Deprecated
-    public boolean isOnGround() {
-        return originator.isOnGround();
-    }
-
-    @Override
-    public void resetPlayerWeather() {
-        originator.resetPlayerWeather();
-    }
-
-    @Override
-    public void setPlayerWeather(WeatherType arg0) {
-        originator.setPlayerWeather(arg0);
-    }
-
 }
