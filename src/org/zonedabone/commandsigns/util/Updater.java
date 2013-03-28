@@ -36,7 +36,7 @@ public class Updater {
     private final String downloadLocation = "http://dev.bukkit.org/media/files/";
     private URL downloadUrl;
 
-    private final String version = "https://raw.github.com/zonedabone/CommandSigns/master/VERSION";
+    private final String version = "https://raw.github.com/zonedabone/CommandSigns/tekkit/VERSION";
 
     public Updater(CommandSigns plugin) {
         this.plugin = plugin;
