@@ -360,6 +360,26 @@ public class CommandListener implements CommandExecutor {
 				plugin.messenger.sendMessage(sender, "update.check");
 				plugin.updateHandler.new Checker().run();
 
+				// Report newest version
+				if (plugin.updateHandler.newAvailable) {
+                    plugin.messenger
+                            .sendMessage(
+                                    sender,
+                                    "update.notify",
+                                    new String[] { "VERSION" },
+                                    new String[] { plugin.updateHandler.newestVersion
+                                            .toString() });
+
+                } else {
+                    plugin.messenger
+                            .sendMessage(
+                                    sender,
+                                    "update.confirm_up_to_date",
+                                    new String[] { "VERSION" },
+                                    new String[] { plugin.updateHandler.currentVersion
+                                            .toString() });
+                }
+				
 				// If command wasn't 'update check', proceed and install the
 				// update
 				if (!(args.length == 2 && args[1].equalsIgnoreCase("check"))) {
@@ -378,26 +398,6 @@ public class CommandListener implements CommandExecutor {
 							plugin.messenger.sendMessage(sender,
 									"update.already_downloaded");
 						}
-					}
-				} else {
-					// Otherwise, report the newest version
-					if (plugin.updateHandler.newAvailable) {
-						plugin.messenger
-								.sendMessage(
-										sender,
-										"update.notify",
-										new String[] { "VERSION" },
-										new String[] { plugin.updateHandler.newestVersion
-												.toString() });
-
-					} else {
-						plugin.messenger
-								.sendMessage(
-										sender,
-										"update.confirm_up_to_date",
-										new String[] { "VERSION" },
-										new String[] { plugin.updateHandler.currentVersion
-												.toString() });
 					}
 				}
 			}
