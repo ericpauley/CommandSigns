@@ -47,6 +47,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.Vector;
 
 /**
@@ -942,6 +943,16 @@ public class PlayerProxy implements Player {
     @Override
     public void setPlayerWeather(WeatherType arg0) {
         originator.setPlayerWeather(arg0);
+    }
+
+    @Override
+    public Scoreboard getScoreboard() {
+        return originator.getScoreboard();
+    }
+
+    @Override
+    public void setScoreboard(Scoreboard arg0) throws IllegalArgumentException, IllegalStateException {
+        originator.setScoreboard(arg0);
     }
 
 }
