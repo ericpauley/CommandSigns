@@ -18,7 +18,7 @@ public class CommandHandler extends Handler {
 			boolean negate) {
 		if (command.startsWith("/") || command.startsWith("\\")) {
 			boolean op = false;
-			boolean all = false;
+			PermissionAttachment grant = null;
 			Player player = e.getPlayer();
 			plugin = e.getPlugin();
 			if (command.startsWith("/")) {
@@ -36,9 +36,7 @@ public class CommandHandler extends Handler {
 								// temporarily
 								if (!CommandSigns.permission.playerHas(player,
 										"*")) {
-									all = true;
-									CommandSigns.permission.playerAddTransient(
-											player, "*");
+									grant = player.addAttachment(plugin, "*", true);
 								}
 								run(plugin, player, command, silent);
 							} else {
@@ -81,9 +79,8 @@ public class CommandHandler extends Handler {
 							run(plugin, player, command, silent);
 						}
 					} finally {
-						if (all)
-							CommandSigns.permission.playerRemoveTransient(
-									player, "*");
+						if (grant != null)
+							player.removeAttachment(grant);
 						if (op)
 							player.setOp(false);
 					}
