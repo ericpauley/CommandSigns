@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,7 +45,8 @@ public class SignLoader {
 		}
 		String[] locText;
 		World world;
-		int x, y, z, block;
+		int x, y, z;
+        Material block;
 		Location loc;
 		int attempts = 0;
 		for (String key : data.getKeys(false)) {
@@ -61,8 +63,8 @@ public class SignLoader {
 
 				// Throws exception for an invalid location AND if the
 				// location is air
-				block = loc.getBlock().getTypeId();
-				if (block == 0)
+				block = loc.getBlock().getType();
+				if (block == null || block == Material.AIR)
 					throw new IllegalArgumentException("Location not valid: "
 							+ loc.toString() + ".");
 
@@ -121,7 +123,7 @@ public class SignLoader {
 				int x = 0;
 				int y = 0;
 				int z = 0;
-				int block = 0;
+				Material block;
 				int lineNumber = 0;
 
 				while (scanner.hasNextLine()) {
@@ -140,8 +142,8 @@ public class SignLoader {
 
 						// Throws exception for an invalid location AND if the
 						// location is air
-						block = csl.getBlock().getTypeId();
-						if (block == 0)
+						block = csl.getBlock().getType();
+						if (block == null || block == Material.AIR)
 							throw new IllegalArgumentException(
 									"Location not valid.");
 

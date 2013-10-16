@@ -248,7 +248,7 @@ public class PlayerProxy implements Player {
 		return originator.getGameMode();
 	}
 
-	public int getHealth() {
+	public double getHealth() {
 		return originator.getHealth();
 	}
 
@@ -268,7 +268,7 @@ public class PlayerProxy implements Player {
 		return originator.getKiller();
 	}
 
-	public int getLastDamage() {
+	public double getLastDamage() {
 		return originator.getLastDamage();
 	}
 
@@ -280,6 +280,7 @@ public class PlayerProxy implements Player {
 		return originator.getLastPlayed();
 	}
 
+	@Deprecated
 	public List<Block> getLastTwoTargetBlocks(HashSet<Byte> transparent,
 			int maxDistance) {
 		return originator.getLastTwoTargetBlocks(transparent, maxDistance);
@@ -289,6 +290,7 @@ public class PlayerProxy implements Player {
 		return originator.getLevel();
 	}
 
+	@Deprecated
 	public List<Block> getLineOfSight(HashSet<Byte> transparent, int maxDistance) {
 		return originator.getLineOfSight(transparent, maxDistance);
 	}
@@ -310,7 +312,7 @@ public class PlayerProxy implements Player {
 		return originator.getMaxFireTicks();
 	}
 
-	public int getMaxHealth() {
+	public double getMaxHealth() {
 		return originator.getMaxHealth();
 	}
 
@@ -383,6 +385,7 @@ public class PlayerProxy implements Player {
 		return originator.getSleepTicks();
 	}
 
+	@Deprecated
 	public Block getTargetBlock(HashSet<Byte> transparent, int maxDistance) {
 		return originator.getTargetBlock(transparent, maxDistance);
 	}
@@ -590,6 +593,7 @@ public class PlayerProxy implements Player {
 		originator.playEffect(type);
 	}
 
+	@Deprecated
 	public void playEffect(Location loc, Effect effect, int data) {
 		originator.playEffect(loc, effect, data);
 	}
@@ -598,6 +602,7 @@ public class PlayerProxy implements Player {
 		originator.playEffect(loc, effect, data);
 	}
 
+	@Deprecated
 	public void playNote(Location loc, byte instrument, byte note) {
 		originator.playNote(loc, instrument, note);
 	}
@@ -643,14 +648,17 @@ public class PlayerProxy implements Player {
 		originator.saveData();
 	}
 
+	@Deprecated
 	public void sendBlockChange(Location loc, int material, byte data) {
 		originator.sendBlockChange(loc, material, data);
 	}
 
+	@Deprecated
 	public void sendBlockChange(Location loc, Material material, byte data) {
 		originator.sendBlockChange(loc, material, data);
 	}
 
+	@Deprecated
 	public boolean sendChunkChange(Location loc, int sx, int sy, int sz,
 			byte[] data) {
 		return originator.sendChunkChange(loc, sx, sy, sz, data);
@@ -767,11 +775,6 @@ public class PlayerProxy implements Player {
 
 	public void setLevel(int level) {
 		originator.setLevel(level);
-	}
-
-	@Override
-	public void setMaxHealth(int arg0) {
-		originator.setMaxHealth(arg0);
 	}
 
 	public void setMaximumAir(int ticks) {
@@ -953,6 +956,120 @@ public class PlayerProxy implements Player {
     @Override
     public void setScoreboard(Scoreboard arg0) throws IllegalArgumentException, IllegalStateException {
         originator.setScoreboard(arg0);
+    }
+
+    @Override
+    @Deprecated
+    public int _INVALID_getLastDamage() {
+        return originator._INVALID_getLastDamage();
+    }
+
+    @Override
+    @Deprecated
+    public void _INVALID_setLastDamage(int arg0) {
+        originator._INVALID_setLastDamage(arg0);
+    }
+
+    @Override
+    public Entity getLeashHolder() throws IllegalStateException {
+        return originator.getLeashHolder();
+    }
+
+    @Override
+    public boolean isLeashed() {
+        return originator.isLeashed();
+    }
+
+    @Override
+    public void setLastDamage(double arg0) {
+        originator.setLastDamage(arg0);
+    }
+
+    @Override
+    public boolean setLeashHolder(Entity arg0) {
+        return originator.setLeashHolder(arg0);
+    }
+
+    @Override
+    @Deprecated
+    public void _INVALID_damage(int arg0) {
+        originator._INVALID_damage(arg0);
+    }
+
+    @Override
+    @Deprecated
+    public void _INVALID_damage(int arg0, Entity arg1) {
+        originator._INVALID_damage(arg0, arg1);
+    }
+
+    @Override
+    @Deprecated
+    public int _INVALID_getHealth() {
+        return originator._INVALID_getHealth();
+    }
+
+    @Override
+    @Deprecated
+    public int _INVALID_getMaxHealth() {
+        return originator._INVALID_getMaxHealth();
+    }
+
+    @Override
+    @Deprecated
+    public void _INVALID_setHealth(int arg0) {
+        originator._INVALID_setHealth(arg0);
+    }
+
+    @Override
+    @Deprecated
+    public void _INVALID_setMaxHealth(int arg0) {
+        originator._INVALID_setMaxHealth(arg0);
+    }
+
+    @Override
+    public void damage(double arg0) {
+        originator.damage(arg0);
+    }
+
+    @Override
+    public void damage(double arg0, Entity arg1) {
+        originator.damage(arg0, arg1);
+    }
+
+    @Override
+    public void setHealth(double arg0) {
+        originator.setHealth(arg0);
+    }
+
+    @Override
+    public void setMaxHealth(double arg0) {
+        originator.setMaxHealth(arg0);
+    }
+
+    @Override
+    public double getHealthScale() {
+        return originator.getHealthScale();
+    }
+
+    @Override
+    public boolean isHealthScaled() {
+        return originator.isHealthScaled();
+    }
+
+    @Override
+    @Deprecated
+    public void playSound(Location arg0, String arg1, float arg2, float arg3) {
+        originator.playSound(arg0, arg1, arg2, arg3);
+    }
+
+    @Override
+    public void setHealthScale(double arg0) throws IllegalArgumentException {
+        originator.setHealthScale(arg0);
+    }
+
+    @Override
+    public void setHealthScaled(boolean arg0) {
+        originator.setHealthScaled(arg0);
     }
 
 }
