@@ -20,14 +20,15 @@ import org.zonedabone.commandsigns.CommandSigns;
 
 public class SignLoader {
 
-	CommandSigns plugin;
+	private CommandSigns plugin;
 
 	public SignLoader(CommandSigns plugin) {
 		this.plugin = plugin;
 	}
 
-	public void loadFile() {
+	public synchronized void loadFile() {
 		plugin.activeSigns.clear();
+		
 		if (new File(plugin.getDataFolder(), "signs.dat").exists()) {
 			loadOldFile();
 			if (!new File(plugin.getDataFolder(), "signs.dat").exists()) {
@@ -36,19 +37,23 @@ public class SignLoader {
 			new File(plugin.getDataFolder(), "signs.dat").renameTo(new File(
 					plugin.getDataFolder(), "signs.bak"));
 		}
+		
 		FileConfiguration config = YamlConfiguration
 				.loadConfiguration(new File(plugin.getDataFolder(), "signs.yml"));
 		ConfigurationSection data = config.getConfigurationSection("signs");
+		
 		if (data == null) {
 			plugin.getLogger().info("No signs found.");
 			return;
 		}
+		
 		String[] locText;
 		World world;
 		int x, y, z;
         Material block;
 		Location loc;
 		int attempts = 0;
+		
 		for (String key : data.getKeys(false)) {
 			try {
 				attempts++;
@@ -70,12 +75,15 @@ public class SignLoader {
 
 				boolean redstone = data.getBoolean(key + ".redstone", false);
 				String owner = data.getString(key + ".owner", null);
+				
 				SignText cst = new SignText(owner, redstone);
 				for (Object o : data.getList(key + ".text",
 						new ArrayList<String>())) {
 					cst.addLine(o.toString());
 				}
+				
 				cst.setEnabled(data.getBoolean(key + ".active", true));
+				
 				Map<String, Long> timeouts = cst.getTimeouts();
 				ConfigurationSection cooldowns = data
 						.getConfigurationSection(key + ".cooldowns");
@@ -85,17 +93,7 @@ public class SignLoader {
 				for (String subKey : cooldowns.getKeys(false)) {
 					timeouts.put(subKey, cooldowns.getLong(subKey));
 				}
-				/*
-				 * cst.setLastUse(data.getLong(key + ".lastuse", 0));
-				 * cst.setNumUses(data.getLong(key + ".numuses", 0)); for
-				 * (Object useData : data.getList(key + ".usedata", new
-				 * ArrayList<String>())) { String[] sections =
-				 * useData.toString().split(","); OfflinePlayer user =
-				 * Bukkit.getOfflinePlayer(sections[0]); long lastUse =
-				 * Long.parseLong(sections[1]); long numUses =
-				 * Long.parseLong(sections[2]); cst.getTimeouts().put(user,
-				 * lastUse); cst.getUses().put(user, numUses); }
-				 */
+				
 				plugin.activeSigns.put(loc, cst);
 			} catch (Exception ex) {
 				plugin.getLogger().warning(
@@ -108,7 +106,7 @@ public class SignLoader {
 				"Successfully loaded " + plugin.activeSigns.size() + " signs");
 	}
 
-	public void loadOldFile() {
+	public synchronized void loadOldFile() {
 		try {
 			File file = new File(plugin.getDataFolder(), "signs.dat");
 			if (file.exists()) {
@@ -169,29 +167,24 @@ public class SignLoader {
 		}
 	}
 
-	public void saveFile() {
+	public synchronized void saveFile() {
 		FileConfiguration config = new YamlConfiguration();
 		ConfigurationSection data = config.createSection("signs");
+		
 		for (Map.Entry<Location, SignText> sign : plugin.activeSigns.entrySet()) {
 			Location loc = sign.getKey();
 			SignText cst = sign.getValue();
 			cst.trim();
 			String key = loc.getWorld().getName() + "," + loc.getBlockX() + ","
 					+ loc.getBlockY() + "," + loc.getBlockZ();
+			
 			ConfigurationSection signData = data.createSection(key);
 			signData.set("redstone", cst.isRedstone());
 			signData.set("owner", cst.getOwner());
 			signData.set("text", cst.getText());
 			signData.set("active", cst.isEnabled());
 			signData.createSection("cooldowns", cst.getTimeouts());
-			/*
-			 * data.set(key + ".lastuse", cst.getLastUse()); data.set(key +
-			 * ".numuses", cst.getNumUses()); List<String> useData = new
-			 * ArrayList<String>(cst.getUses().size()); for (OfflinePlayer user
-			 * : cst.getTimeouts().keySet()) { useData.add(user.getName() + ","
-			 * + cst.getLastUse(user) + "," + cst.getUses(user)); } data.set(key
-			 * + ".usedata", useData);
-			 */
+			
 			try {
 				config.save(new File(plugin.getDataFolder(), "signs.yml"));
 			} catch (IOException e) {
@@ -203,7 +196,7 @@ public class SignLoader {
                 + " signs saved");
 	}
 
-	public void saveOldFile() {
+	public synchronized void saveOldFile() {
 		try {
 			File file = new File(plugin.getDataFolder(), "signs.dat");
 			if (!file.exists()) {
