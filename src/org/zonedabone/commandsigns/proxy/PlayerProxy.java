@@ -838,6 +838,7 @@ public class PlayerProxy implements Player {
 		originator.setSprinting(sprinting);
 	}
 
+	@Deprecated
 	@Override
 	public void setTexturePack(String arg0) {
 		originator.setTexturePack(arg0);
@@ -1070,6 +1071,11 @@ public class PlayerProxy implements Player {
     @Override
     public void setHealthScaled(boolean arg0) {
         originator.setHealthScaled(arg0);
+    }
+
+    @Override
+    public void setResourcePack(String arg0) {
+        originator.setResourcePack(arg0);
     }
 
 }
