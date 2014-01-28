@@ -1,3 +1,7 @@
+# For automatically updating
+updater:
+  auto-check: true
+
 # For sending anonymous usage data to us for future improvements
 metrics:
   enable: true

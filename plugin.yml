@@ -85,7 +85,7 @@ permissions:
     commandsigns.create.redstone:
         description: Allows you to create redstone-activated signs
         default: false
-    commandisgns.create.op:
+    commandsigns.create.op:
         description: Allows you to create op-level CommandSigns
         default: false
     commandsigns.remove:

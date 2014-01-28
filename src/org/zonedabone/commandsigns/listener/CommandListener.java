@@ -351,16 +351,17 @@ public class CommandListener implements CommandExecutor {
 
 	protected boolean update(final CommandSender sender, Player player, String[] args) {
         if (plugin.hasPermission(sender, "commandit.update")) {
-            if (plugin.updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
+            
+            if (plugin.updater == null || plugin.updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
                 plugin.messenger.sendMessage(player, "update.start");
                 double time = System.currentTimeMillis();
-                Updater.UpdateResult result = new Updater(plugin, plugin.getBukkitId(), plugin.getFile(), Updater.UpdateType.NO_VERSION_CHECK, false).getResult();
-                switch(result) {
+                Updater downloader = new Updater(plugin, plugin.getBukkitId(), plugin.getFile(), Updater.UpdateType.NO_VERSION_CHECK, false);
+                switch(downloader.getResult()) {
                     case SUCCESS:
-                        plugin.messenger.sendMessage(player, "update.finish", new String[] { "VERSION", "TIME" }, new String[] { plugin.updater.getLatestGameVersion(), new Double((System.currentTimeMillis() - time) / 1000).toString() });
+                        plugin.messenger.sendMessage(player, "update.finish", new String[] { "VERSION", "TIME" }, new String[] { downloader.getLatestGameVersion(), new Double((System.currentTimeMillis() - time) / 1000).toString() });
                         break;
                     case NO_UPDATE:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "there was no update found."});
+                        plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { downloader.getLatestGameVersion() });
                         break;
                     case DISABLED:
                         plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "updater is disabled in configuration (plugins/Updater/config.yml)."});
