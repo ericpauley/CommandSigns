@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.gravitydevelopment.updater.Updater;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
@@ -14,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.zonedabone.commandsigns.config.Config;
 import org.zonedabone.commandsigns.config.Messaging;
 import org.zonedabone.commandsigns.listener.CommandListener;
@@ -25,7 +25,6 @@ import org.zonedabone.commandsigns.thirdparty.Metrics.Plotter;
 import org.zonedabone.commandsigns.util.PlayerState;
 import org.zonedabone.commandsigns.util.SignLoader;
 import org.zonedabone.commandsigns.util.SignText;
-import org.zonedabone.commandsigns.util.Updater;
 
 public class CommandSigns extends JavaPlugin {
 
@@ -35,6 +34,7 @@ public class CommandSigns extends JavaPlugin {
 
 	// Third-party
 	private Metrics metrics;
+	private final int bukkitId = 37306;
 
 	public static Economy economy = null;
 	public static Permission permission = null;
@@ -47,10 +47,7 @@ public class CommandSigns extends JavaPlugin {
 	public SignLoader loader = new SignLoader(this);
 	public Config config = new Config(this);
 	public Messaging messenger = new Messaging(this);
-	public Updater updateHandler = new Updater(this);
-
-	// Class variables
-	private BukkitTask updateTask;
+    public Updater updater;
 
 	public File getUpdateFile() {
 		return new File(getServer().getUpdateFolderFile().getAbsoluteFile(),
@@ -81,10 +78,10 @@ public class CommandSigns extends JavaPlugin {
 		loader.loadFile();
 		setupPermissions();
 		setupEconomy();
-
-		if (config.getBoolean("updater.auto-check") == true)
-			startUpdateCheck();
-
+		
+        if (config.getBoolean("updater.auto-check") == true)
+            updater = new Updater(this, getBukkitId(), this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+        
 		if (config.getBoolean("metrics.enable") == true)
 			startMetrics();
 		else
@@ -93,8 +90,6 @@ public class CommandSigns extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		if (updateTask != null)
-			updateTask.cancel();
 		loader.saveFile();
 	}
 
@@ -201,9 +196,12 @@ public class CommandSigns extends JavaPlugin {
 		}
 	}
 
-	public void startUpdateCheck() {
-		Runnable checker = updateHandler.new Checker();
-		updateTask = getServer().getScheduler().runTaskTimer(this, checker, 0,
-				1728000L);
-	}
+    public int getBukkitId() {
+        return bukkitId;
+    }
+    
+    @Override
+    public File getFile() {
+        return super.getFile();
+    }
 }

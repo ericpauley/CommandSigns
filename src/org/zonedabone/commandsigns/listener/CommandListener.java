@@ -3,6 +3,8 @@ package org.zonedabone.commandsigns.listener;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.gravitydevelopment.updater.Updater;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -347,63 +349,47 @@ public class CommandListener implements CommandExecutor {
 		return true;
 	}
 
-	protected boolean update(final CommandSender sender, Player player,
-			String[] args) {
-		if (sender.hasPermission("commandsigns.update")) {
-			if (args.length == 2 && args[1].equalsIgnoreCase("force")) {
-				// Force-only. Does no check.
-				plugin.messenger.sendMessage(sender, "update.force");
-				plugin.updateHandler.newAvailable = true;
-				plugin.updateHandler.new UpdaterThread(sender).start();
-			} else {
-				// Preliminary check
-				plugin.messenger.sendMessage(sender, "update.check");
-				plugin.updateHandler.new Checker().run();
-
-				// Report newest version
-				if (plugin.updateHandler.newAvailable) {
-                    plugin.messenger
-                            .sendMessage(
-                                    sender,
-                                    "update.notify",
-                                    new String[] { "VERSION" },
-                                    new String[] { plugin.updateHandler.newestVersion
-                                            .toString() });
-
-                } else {
-                    plugin.messenger
-                            .sendMessage(
-                                    sender,
-                                    "update.confirm_up_to_date",
-                                    new String[] { "VERSION" },
-                                    new String[] { plugin.updateHandler.currentVersion
-                                            .toString() });
+	protected boolean update(final CommandSender sender, Player player, String[] args) {
+        if (plugin.hasPermission(sender, "commandit.update")) {
+            if (plugin.updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
+                plugin.messenger.sendMessage(player, "update.start");
+                double time = System.currentTimeMillis();
+                Updater.UpdateResult result = new Updater(plugin, plugin.getBukkitId(), plugin.getFile(), Updater.UpdateType.NO_VERSION_CHECK, false).getResult();
+                switch(result) {
+                    case SUCCESS:
+                        plugin.messenger.sendMessage(player, "update.finish", new String[] { "VERSION", "TIME" }, new String[] { plugin.updater.getLatestGameVersion(), new Double((System.currentTimeMillis() - time) / 1000).toString() });
+                        break;
+                    case NO_UPDATE:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "there was no update found."});
+                        break;
+                    case DISABLED:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "updater is disabled in configuration (plugins/Updater/config.yml)."});
+                        break;
+                    case FAIL_DOWNLOAD:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "failed to download."});
+                        break;
+                    case FAIL_DBO:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "unable to contact Bukkit Dev at this time."});
+                        break;
+                    case FAIL_NOVERSION:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "unable to check latest version."});
+                        break;
+                    case FAIL_BADID:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "the plugin was not found on Bukkit Dev!"});
+                        break;
+                    case FAIL_APIKEY:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "the API key provided is invalid (plugins/Updater/config.yml)."});
+                        break;
+                    default:
+                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "I have no idea what just happened."});
+                        break;
                 }
-				
-				// If command wasn't 'update check', proceed and install the
-				// update
-				if (!(args.length == 2 && args[1].equalsIgnoreCase("check"))) {
-					if (plugin.updateHandler.newAvailable) {
-						if (!plugin.updateHandler.awaitingRestart) {
-							plugin.messenger
-									.sendMessage(
-											sender,
-											"update.start",
-											new String[] { "VERSION" },
-											new String[] { plugin.updateHandler.newestVersion
-													.toString() });
-							plugin.updateHandler.new UpdaterThread(sender)
-									.start();
-						} else {
-							plugin.messenger.sendMessage(sender,
-									"update.already_downloaded");
-						}
-					}
-				}
-			}
-		}
-		return true;
-	}
+            } else {
+                plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { plugin.updater.getLatestGameVersion() });
+            }
+        }
+        return true;
+    }
 
 	protected boolean view(final CommandSender sender, Player player,
 			String[] args) {

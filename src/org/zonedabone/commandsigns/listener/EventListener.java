@@ -1,5 +1,7 @@
 package org.zonedabone.commandsigns.listener;
 
+import net.gravitydevelopment.updater.Updater;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -65,18 +67,13 @@ public class EventListener implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		if (plugin.hasPermission(event.getPlayer(), "commandsigns.update",
-				false)) {
-			if (plugin.updateHandler.newAvailable
-					&& !plugin.updateHandler.awaitingRestart) {
-				plugin.messenger.sendMessage(event.getPlayer(),
-						"update.notify", new String[] { "VERSION" },
-						new String[] { plugin.updateHandler.newestVersion
-								.toString() });
-			}
-		}
-	}
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (plugin.hasPermission(event.getPlayer(), "commandit.update", false)) {
+            if (plugin.updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
+                plugin.messenger.sendMessage(event.getPlayer(), "update.notify", new String[] { "VERSION" }, new String[] { plugin.updater.getLatestGameVersion() });
+            }
+        }
+    }
 
 	@EventHandler
 	public void onRedstoneChange(BlockRedstoneEvent event) {
