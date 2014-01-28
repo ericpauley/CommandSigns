@@ -79,8 +79,12 @@ public class CommandSigns extends JavaPlugin {
 		setupPermissions();
 		setupEconomy();
 		
-        if (config.getBoolean("updater.auto-check") == true)
-            updater = new Updater(this, getBukkitId(), this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+		if (config.getBoolean("updater.auto-check") == true) {
+            if (config.getBoolean("updater.auto-install") == true)
+                updater = new Updater(this, getBukkitId(), this.getFile(), Updater.UpdateType.DEFAULT, false);
+            else
+                updater = new Updater(this, getBukkitId(), this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
+        }
         
 		if (config.getBoolean("metrics.enable") == true)
 			startMetrics();

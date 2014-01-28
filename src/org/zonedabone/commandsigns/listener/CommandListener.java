@@ -350,43 +350,55 @@ public class CommandListener implements CommandExecutor {
 	}
 
 	protected boolean update(final CommandSender sender, Player player, String[] args) {
-        if (plugin.hasPermission(sender, "commandit.update")) {
+        if (plugin.hasPermission(sender, "commandsigns.update")) {
+            Updater updater = plugin.updater;
+            if (updater == null) updater = new Updater(plugin, plugin.getBukkitId(), plugin.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
             
-            if (plugin.updater == null || plugin.updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
-                plugin.messenger.sendMessage(player, "update.start");
-                double time = System.currentTimeMillis();
-                Updater downloader = new Updater(plugin, plugin.getBukkitId(), plugin.getFile(), Updater.UpdateType.NO_VERSION_CHECK, false);
-                switch(downloader.getResult()) {
-                    case SUCCESS:
-                        plugin.messenger.sendMessage(player, "update.finish", new String[] { "VERSION", "TIME" }, new String[] { downloader.getLatestGameVersion(), new Double((System.currentTimeMillis() - time) / 1000).toString() });
-                        break;
-                    case NO_UPDATE:
-                        plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { downloader.getLatestGameVersion() });
-                        break;
-                    case DISABLED:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "updater is disabled in configuration (plugins/Updater/config.yml)."});
-                        break;
-                    case FAIL_DOWNLOAD:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "failed to download."});
-                        break;
-                    case FAIL_DBO:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "unable to contact Bukkit Dev at this time."});
-                        break;
-                    case FAIL_NOVERSION:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "unable to check latest version."});
-                        break;
-                    case FAIL_BADID:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "the plugin was not found on Bukkit Dev!"});
-                        break;
-                    case FAIL_APIKEY:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "the API key provided is invalid (plugins/Updater/config.yml)."});
-                        break;
-                    default:
-                        plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "I have no idea what just happened."});
-                        break;
-                }
+            if (updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
+                if (args.length > 0 && args[0].equals("check")) {
+                    
+                    // Check only
+                    plugin.messenger.sendMessage(player, "update.notify", new String[] { "VERSION" }, new String[] { updater.getLatestName() });
+                    
+                } else {
+                    
+                    // Update
+                    plugin.messenger.sendMessage(player, "update.start");
+                    double time = System.currentTimeMillis();
+                    Updater downloader = new Updater(plugin, plugin.getBukkitId(), plugin.getFile(), Updater.UpdateType.NO_VERSION_CHECK, false);
+                    switch(downloader.getResult()) {
+                        case SUCCESS:
+                            plugin.messenger.sendMessage(player, "update.finish", new String[] { "VERSION", "TIME" }, new String[] { downloader.getLatestName(), new Double((System.currentTimeMillis() - time) / 1000).toString() });
+                            break;
+                        case NO_UPDATE:
+                            plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { downloader.getLatestName() });
+                            break;
+                        case DISABLED:
+                            plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "updater is disabled in configuration (plugins/Updater/config.yml)."});
+                            break;
+                        case FAIL_DOWNLOAD:
+                            plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "failed to download."});
+                            break;
+                        case FAIL_DBO:
+                            plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "unable to contact Bukkit Dev at this time."});
+                            break;
+                        case FAIL_NOVERSION:
+                            plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "unable to check latest version."});
+                            break;
+                        case FAIL_BADID:
+                            plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "the plugin was not found on Bukkit Dev!"});
+                            break;
+                        case FAIL_APIKEY:
+                            plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "the API key provided is invalid (plugins/Updater/config.yml)."});
+                            break;
+                        default:
+                            plugin.messenger.sendMessage(player, "update.fetch_error", new String[] { "ERROR" }, new String[] { "I have no idea what just happened."});
+                            break;
+                    }
+                    
+                }  
             } else {
-                plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { plugin.updater.getLatestGameVersion() });
+                plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { updater.getLatestGameVersion() });
             }
         }
         return true;

@@ -50,15 +50,15 @@ restriction:
   use_once: "The sign has already done its business with you. It doesn't want to do anything more."
   inverse_use_once: "The sign wants you to use it before... you can use it? This is confusing. Game over: 0 points."
   
-  
 update:
   prefix: "&e"
-  start: "Updating to &5{VERSION}{PREFIX}..."
+  start: "Updating CommandSigns..."
   finish: "Downloaded &5{VERSION}{PREFIX} in &5{TIME}{PREFIX} seconds. To complete the update, restart/reload your server."
   already_downloaded: "An update to CommandSigns is already waiting to be installed on reload/restart."
+  notify: "A new version is available: &5{VERSION}{PREFIX}. To update, type /commandsigns update."
   up_to_date: "CommandSigns is already up to date. (&5{VERSION}{PREFIX})"
   fetch_error: "Error fetching update - {ERROR}"
-    
+  
 metrics:
   success: "Plugin metrics enabled! Thank you!"
   opt_out: "You opted out of CommandSigns metrics. =("

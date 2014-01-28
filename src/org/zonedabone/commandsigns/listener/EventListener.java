@@ -69,8 +69,8 @@ public class EventListener implements Listener {
 	@EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (plugin.hasPermission(event.getPlayer(), "commandit.update", false)) {
-            if (plugin.updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
-                plugin.messenger.sendMessage(event.getPlayer(), "update.notify", new String[] { "VERSION" }, new String[] { plugin.updater.getLatestGameVersion() });
+            if (plugin.updater != null && plugin.updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE) {
+                plugin.messenger.sendMessage(event.getPlayer(), "update.notify", new String[] { "VERSION" }, new String[] { plugin.updater.getLatestName() });
             }
         }
     }
