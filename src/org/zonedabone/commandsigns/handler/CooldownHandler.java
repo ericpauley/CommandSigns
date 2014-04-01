@@ -47,7 +47,7 @@ public class CooldownHandler extends Handler {
 							plugin.messenger
 									.sendMessage(
 											e.getPlayer(),
-											"restriction.inverse_cooldown",
+											"restriction.cooldown",
 											new String[] { "COOLDOWN" },
 											new String[] { ""
 													+ Math.round((amount
