@@ -1,10 +1,12 @@
 package org.zonedabone.commandsigns;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.Stack;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -142,7 +144,8 @@ public class SignExecutor {
 				}
 			}
 			while (line.toLowerCase().contains("<randomname>")) {
-				Player[] randoms = plugin.getServer().getOnlinePlayers();
+			    // Ouch. Fuck you Bukkit.
+		        Player[] randoms = (Player[]) new ArrayList<Player>(Bukkit.getServer().getOnlinePlayers()).toArray();
 				int rand = (int) Math.round(Math.random()
 						* (randoms.length - 1));
 				line = line.replaceFirst("(?iu)<randomname>",

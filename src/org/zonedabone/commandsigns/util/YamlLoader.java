@@ -22,6 +22,7 @@ public class YamlLoader {
         File f = new File(plugin.getDataFolder(), filename);
         
         // Load the included file
+        @SuppressWarnings("deprecation")
         FileConfiguration internal = YamlConfiguration.loadConfiguration(plugin.getResource(filename));
         
         // Write the included file if an external one doesn't exist

@@ -695,6 +695,7 @@ public class PlayerProxy implements Player {
 		originator.setAllowFlight(flight);
 	}
 
+	@Deprecated
 	public void setBanned(boolean banned) {
 		originator.setBanned(banned);
 	}
@@ -1076,6 +1077,96 @@ public class PlayerProxy implements Player {
     @Override
     public void setResourcePack(String arg0) {
         originator.setResourcePack(arg0);
+    }
+
+    @Override
+    public <T extends Projectile> T launchProjectile(Class<? extends T> arg0, Vector arg1) {
+        return originator.launchProjectile(arg0, arg1);
+    }
+
+    @Override
+    public void decrementStatistic(Statistic arg0) throws IllegalArgumentException {
+        originator.decrementStatistic(arg0);
+    }
+
+    @Override
+    public void decrementStatistic(Statistic arg0, int arg1) throws IllegalArgumentException {
+        originator.decrementStatistic(arg0, arg1);
+    }
+
+    @Override
+    public void decrementStatistic(Statistic arg0, Material arg1) throws IllegalArgumentException {
+        originator.decrementStatistic(arg0, arg1);
+    }
+
+    @Override
+    public void decrementStatistic(Statistic arg0, EntityType arg1) throws IllegalArgumentException {
+        originator.decrementStatistic(arg0, arg1);
+    }
+
+    @Override
+    public void decrementStatistic(Statistic arg0, Material arg1, int arg2) throws IllegalArgumentException {
+        originator.decrementStatistic(arg0, arg1, arg2);
+    }
+
+    @Override
+    public void decrementStatistic(Statistic arg0, EntityType arg1, int arg2) {
+        originator.decrementStatistic(arg0, arg1, arg2);
+    }
+
+    @Override
+    public int getStatistic(Statistic arg0) throws IllegalArgumentException {
+        return originator.getStatistic(arg0);
+    }
+
+    @Override
+    public int getStatistic(Statistic arg0, Material arg1) throws IllegalArgumentException {
+        return originator.getStatistic(arg0, arg1);
+    }
+
+    @Override
+    public int getStatistic(Statistic arg0, EntityType arg1) throws IllegalArgumentException {
+        return originator.getStatistic(arg0, arg1);
+    }
+
+    @Override
+    public boolean hasAchievement(Achievement arg0) {
+        return originator.hasAchievement(arg0);
+    }
+
+    @Override
+    public void incrementStatistic(Statistic arg0, EntityType arg1) throws IllegalArgumentException {
+        originator.incrementStatistic(arg0, arg1);
+    }
+
+    @Override
+    public void incrementStatistic(Statistic arg0, EntityType arg1, int arg2) throws IllegalArgumentException {
+        originator.incrementStatistic(arg0, arg1, arg2);
+    }
+
+    @Override
+    public void removeAchievement(Achievement arg0) {
+        originator.removeAchievement(arg0);
+    }
+
+    @Override
+    public void sendSignChange(Location arg0, String[] arg1) throws IllegalArgumentException {
+        originator.sendSignChange(arg0, arg1);
+    }
+
+    @Override
+    public void setStatistic(Statistic arg0, int arg1) throws IllegalArgumentException {
+        originator.setStatistic(arg0, arg1);
+    }
+
+    @Override
+    public void setStatistic(Statistic arg0, Material arg1, int arg2) throws IllegalArgumentException {
+        originator.setStatistic(arg0, arg1, arg2);
+    }
+
+    @Override
+    public void setStatistic(Statistic arg0, EntityType arg1, int arg2) {
+        originator.setStatistic(arg0, arg1, arg2);
     }
 
 }

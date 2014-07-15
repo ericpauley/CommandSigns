@@ -398,8 +398,10 @@ public class CommandListener implements CommandExecutor {
                     
                 }  
             } else {
-                plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { updater.getLatestGameVersion() });
+                plugin.messenger.sendMessage(player, "update.up_to_date", new String[] { "VERSION" }, new String[] { updater.getLatestName() });
             }
+        } else {
+            plugin.messenger.sendMessage(player, "failure.no_perms");
         }
         return true;
     }
