@@ -15,13 +15,12 @@ This file is part of CommandSigns.
     
 Building CommandSigns
 --------------------------------------
-All libraries required to build CommandSigns are included in the /lib folder. Just
-add them to your build path and you're good to go. Note that for releases be sure
-you don't export the /lib folder into the jar.
+This is a specialized maven release of Commandsigns. To build, simply download 
+the contents of this repository. From there, make sure you have Apache Maven
+Installed. Navigate to the project root, and from command line, run 
+"mvn clean package" without the quotes. The Compiled jar will be located inside
+of your /target directory
 
-Alternatively, you can use the ant build-file, build.xml. While this file is mainly
-for use by the automated build server, running it locally will export CommandSigns.jar
-to the /bin directory.
 Automatic Builds
 ---------------------------------
 Automatic builds can be found at:
