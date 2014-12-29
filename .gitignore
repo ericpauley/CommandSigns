@@ -3,6 +3,6 @@
 /target/
 /lib/
 ./build.xml
-.settings
+/.settings/
 .classpath
 .project
