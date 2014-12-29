@@ -1,0 +1,65 @@
+prefix: "&4[CommandSigns]&f "
+success:
+  cleared: "CommandSign text and status cleared."
+  copied: "Added to CommandSigns clipboard. Click a block to enable."
+  line_print: "{NUMBER} &4: &f{LINE}"
+  saved: "Saved CommandSigns to file."
+  reloaded: "Reload complete."
+  done_editing: "Finished editing sign."
+  enabled: "CommandSign enabled."
+  disabled: "CommandSign disabled."
+  removed: "CommandSign removed."
+  redstone_enabled: "CommandSign is now redstone activated."
+  redstone_disabled: "CommandSign is no longer redstone activated."
+    
+information:
+  text_in_clipboard: "You still have text in your clipboard."
+    
+progress:
+  remove: "Select a CommandSign to remove."
+  copy: "Select a CommandSign to copy."
+  read: "Select a CommandSign to read."
+  redstone: "Select a CommandSign to toggle redstone activation."
+  toggle: "Select a CommandSign to enable or disable it."
+  add: "Ready to add."
+  edit_started: "Started editing CommandSign. Type /commandsigns edit to finish."
+  select_sign: "Select a CommandSign to start editing."
+    
+failure:
+  prefix: "&c"
+  no_perms: "You do not have permission to do this."
+  wrong_syntax: "Wrong CommandSigns command syntax."
+  no_super: "You may not make signs with '/*'."
+  no_op: "You may not make signs with '/^' or '/#'."
+  invalid_line: "Line number invalid!"
+  remove_first: "CommandSign text must be removed first."
+  already_enabled: "CommandSign is already enabled!"
+  not_a_sign: "Selected block is not a CommandSign."
+  cannot_use: "You may not use this type of sign."
+  player_only: "This command can only be run as a player."
+  must_select: "You must select a sign to edit or leave edit mode with /commandsigns clear."
+  no_batch: "The mode you are in doesn't support batch processing."
+  not_in_mode: "You must type a command before toggling batch mode."
+    
+restriction:
+  not_permitted: "This sign isn't allowed to socialise with people like you."
+  bad_random: "You try to hit the sign, but you miss this time. The sign would laugh at you, but it can't laugh. Yet."
+  not_enough_money: "A magical force tries to take money from your pockets, but you don't have {MONEY}. It gives up."
+  cooldown: "The sign is tired! You must wait another {COOLDOWN} seconds before you start abusing it again."
+  inverse_cooldown: "The sign complains that it wasn't ready. Try again within {COOLDOWN} seconds, or it'll fall asleep again."
+  use_once: "The sign has already done its business with you. It doesn't want to do anything more."
+  inverse_use_once: "The sign wants you to use it before... you can use it? This is confusing. Game over: 0 points."
+  
+update:
+  prefix: "&e"
+  start: "Updating CommandSigns..."
+  finish: "Downloaded &5{VERSION}{PREFIX} in &5{TIME}{PREFIX} seconds. To complete the update, restart/reload your server."
+  already_downloaded: "An update to CommandSigns is already waiting to be installed on reload/restart."
+  notify: "A new version is available: &5{VERSION}{PREFIX}. To update, type /commandsigns update."
+  up_to_date: "CommandSigns is already up to date. (&5{VERSION}{PREFIX})"
+  fetch_error: "Error fetching update - {ERROR}"
+  
+metrics:
+  success: "Plugin metrics enabled! Thank you!"
+  opt_out: "You opted out of CommandSigns metrics. =("
+  failure: "Could not initialize metrics."

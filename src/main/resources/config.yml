@@ -1,0 +1,8 @@
+# For automatically updating
+updater:
+  auto-check: true
+  auto-install: false
+
+# For sending anonymous usage data to us for future improvements
+metrics:
+  enable: true
