@@ -18,8 +18,8 @@
    </build>
    <repositories>
       <repository>
-         <id>bukkit-releases-repo</id>
-         <url>http://repo.bukkit.org/content/groups/public/</url>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
       </repository>
       <repository>
          <id>vault-repo</id>
@@ -30,10 +30,10 @@
          <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.8-SNAPSHOT</version>
-            <systemPath>${project.basedir}/lib/Bukkit.jar</systemPath>
-            <scope>system</scope>
-         </dependency>
+            <version>1.8-R0.1-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
          <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>Vault</artifactId>
