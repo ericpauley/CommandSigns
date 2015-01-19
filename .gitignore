@@ -1,2 +1,8 @@
 # Build Folders
-bin
+/bin/
+/target/
+/lib/
+./build.xml
+/.settings/
+.classpath
+.project
