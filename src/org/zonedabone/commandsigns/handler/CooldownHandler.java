@@ -55,9 +55,9 @@ public class CooldownHandler extends Handler {
 															.currentTimeMillis()) / 1000 + 1) });
 					}
 					if (negate) {
-						lastUse.put(e.getPlayer().getName(),
-								System.currentTimeMillis());
-						latest = lastUse.get(e.getPlayer());
+					    long time = System.currentTimeMillis();
+                        lastUse.put(e.getPlayer().getName(), time);
+                        latest = time;
 					}
 				}
 			} else {
@@ -79,9 +79,9 @@ public class CooldownHandler extends Handler {
 									"restriction.use_once");
 					}
 					if (negate) {
-						lastUse.put(e.getPlayer().getName(),
-								System.currentTimeMillis());
-						latest = lastUse.get(e.getPlayer());
+					    long time = System.currentTimeMillis();
+						lastUse.put(e.getPlayer().getName(), time);
+						latest = time;
 					}
 				}
 			}
