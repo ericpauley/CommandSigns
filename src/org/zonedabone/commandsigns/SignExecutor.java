@@ -1,8 +1,12 @@
 package org.zonedabone.commandsigns;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
@@ -121,7 +125,7 @@ public class SignExecutor {
 		return wait;
 	}
 
-	private LinkedList<String> parseCommandSign(Player player, Location loc) {
+    private LinkedList<String> parseCommandSign(Player player, Location loc) {
 		LinkedList<String> commandList = new LinkedList<String>();
 		SignText commandSign = plugin.activeSigns.get(location);
 		for (String line : commandSign) {
@@ -144,12 +148,11 @@ public class SignExecutor {
 				}
 			}
 			while (line.toLowerCase().contains("<randomname>")) {
-			    // Ouch. Fuck you Bukkit.
-		        Player[] randoms = (Player[]) new ArrayList<Player>(Bukkit.getServer().getOnlinePlayers()).toArray();
+		        List<Player> randoms = new ArrayList<Player>(Bukkit.getServer().getOnlinePlayers());
 				int rand = (int) Math.round(Math.random()
-						* (randoms.length - 1));
+						* (randoms.size() - 1));
 				line = line.replaceFirst("(?iu)<randomname>",
-						randoms[rand].getName());
+						randoms.get(rand).getName());
 			}
 			if (player != null) {
 				line = line.replaceAll("(?iu)<x>", ""

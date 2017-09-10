@@ -5,7 +5,7 @@ import org.zonedabone.commandsigns.SignExecutor;
 
 public class MoneyHandler extends Handler {
 
-	@Override
+    @Override
 	public void handle(SignExecutor e, String command, boolean silent,
 			boolean negate) {
 		plugin = e.getPlugin();
