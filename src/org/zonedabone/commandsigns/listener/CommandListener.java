@@ -126,7 +126,14 @@ public class CommandListener implements CommandExecutor {
 				text = new SignText(player.getName(), false);
 				plugin.playerText.put(player, text);
 			}
-			String line = StringUtils.join(args, " ", textStart, args.length);
+			StringBuilder lineSB = new StringBuilder();
+			for (int i = textStart; i < args.length; i++) {
+			    lineSB.append(args[i]);
+			    if (i != args.length - 1) {
+			        lineSB.append(' ');
+			    }
+			}
+			String line = lineSB.toString();
 			if (line.startsWith("/*")
 					&& !plugin.hasPermission(player,
 							"commandsigns.create.super", false)) {
