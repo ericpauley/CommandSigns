@@ -1,2 +1,4 @@
 # Build Folders
-bin
+bin/
+.metadata/
+RemoteSystemsTempFiles/
